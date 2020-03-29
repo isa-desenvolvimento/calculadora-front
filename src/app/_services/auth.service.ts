@@ -4,19 +4,20 @@ import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http
 import { Observable, throwError } from 'rxjs';
 import { retry, catchError } from 'rxjs/operators';
 import { LoginResponse } from '../_models/user';
+import { environment } from '../../environments/environment';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class AuthService {
 
-	// API de autenticação
-	API_PATH = 'https://localhost:5001/v1/account/login';
+	// API de autenticação parametrizada
+	API_PATH: string = environment.API_PATH;
 
 	constructor(
 		private router: Router,
 		private http: HttpClient
-		) { }
+	) { }
 
 	HTTP_HEADER = {
 		headers: new HttpHeaders({
@@ -34,10 +35,10 @@ export class AuthService {
 	// Login e token
 	login(data): Observable<LoginResponse> {
 		return this.http
-		.post<LoginResponse>(this.API_PATH, data, this.HTTP_HEADER)
-		.pipe(
-			retry(2),
-			catchError(this.handleError)
+			.post<LoginResponse>(`${this.API_PATH}/login`, data, this.HTTP_HEADER)
+			.pipe(
+				retry(2),
+				catchError(this.handleError)
 			);
 	}
 
@@ -66,10 +67,10 @@ export class AuthService {
 	// Recupera dados de API para o Dashboard
 	getData(data): Observable<LoginResponse> {
 		return this.http
-		.post<LoginResponse>(this.API_PATH, data, this.HTTP_HEADER)
-		.pipe(
-			retry(2),
-			catchError(this.handleError)
+			.post<LoginResponse>(`${this.API_PATH}/login`, data, this.HTTP_HEADER)
+			.pipe(
+				retry(2),
+				catchError(this.handleError)
 			);
 	}
 

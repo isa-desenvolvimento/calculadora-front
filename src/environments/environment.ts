@@ -3,7 +3,9 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: true,
+  API_PATH: "https://heroku-api-calculadora.herokuapp.com/v1"
+  // API_PATH: "https://localhost:5001/v1"
 };
 
 /*
