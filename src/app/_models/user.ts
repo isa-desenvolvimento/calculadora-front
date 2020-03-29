@@ -1,7 +1,15 @@
+export interface User {
+    id: number;
+    email: string;
+    username: string;
+    password: string;
+    role: string;
+}
+
 export interface LoginResponse {
-    name: string;
+    user: User;
+    token: string;
     data: any;
-    access_token: string;
     message: string;
     status: string;
 }

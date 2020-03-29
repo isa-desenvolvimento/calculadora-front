@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../_services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
 	selector: 'app-login',
@@ -12,17 +13,19 @@ export class LoginComponent implements OnInit {
 	errorMessage: String = '';
 
 	constructor(
-		private authService: AuthService
-		) {}
+		private authService: AuthService,
+		private router: Router
+	) { }
 
 	ngOnInit() {
-		this.authService.logout();
+		this.authService.isLoggedIn() && this.router.navigate(['/dashboard']);
 	}
 
 	login() {
 		this.model.action = 'login';
 		this.authService.login(this.model).subscribe(response => {
-			if (response.status === 'success') {
+			debugger
+			if (!!response.token) {
 				this.authService.setUser(response);
 			}
 		}, error => {

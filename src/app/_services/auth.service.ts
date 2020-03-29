@@ -11,7 +11,7 @@ import { LoginResponse } from '../_models/user';
 export class AuthService {
 
 	// API de autenticação
-	API_PATH = 'https://auth-api';
+	API_PATH = 'https://localhost:5001/v1/account/login';
 
 	constructor(
 		private router: Router,
@@ -43,8 +43,9 @@ export class AuthService {
 
 	// Salva usuário no localStorage
 	setUser(response: LoginResponse) {
-		localStorage.setItem('name', response.name);
-		localStorage.setItem('access_token', response.access_token);
+		debugger
+		localStorage.setItem('email', response.user.email);
+		localStorage.setItem('token', response.token);
 		this.router.navigate(['/dashboard']);
 	}
 
@@ -53,7 +54,7 @@ export class AuthService {
 		Trocar por verificação de login configurado no backend
 	*/
 	isLoggedIn() {
-		return localStorage.getItem('access_token') != null;
+		return !!localStorage.getItem('token');
 	}
 
 	// Remove usuário do localStorage
