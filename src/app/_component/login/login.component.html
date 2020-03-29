@@ -1,0 +1,22 @@
+<div class="container" style="display: flex;justify-content: center;align-items: center;height: 100vh;">
+	<div class="card" style="width: 50%;">
+		<div class="card-body">
+			<div class="card-text">
+				<div *ngIf="errorMessage" class="alert alert-danger" role="alert">
+				  	{{errorMessage}}
+				</div>
+				<form (ngSubmit)="login()" #form="ngForm">
+					<div class="form-group">
+						<label for="email" style="display: block;">E-mail</label>
+						<input type="email" class="form-control" id="email" name="email" placeholder="exemplo@exemplo.com" [(ngModel)]="model.email" required />
+					</div>
+					<div class="form-group">
+						<label for="password" style="display: block;">Password</label>
+						<input type="password" class="form-control" id="password" name="password" placeholder="Password" [(ngModel)]="model.password" required />
+					</div>
+					<button type="submit" class="btn btn-primary" [disabled]="!form.valid">Submit</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
