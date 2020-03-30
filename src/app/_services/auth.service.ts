@@ -44,10 +44,9 @@ export class AuthService {
 
 	// Salva usuário no localStorage
 	setUser(response: LoginResponse) {
-		debugger
 		localStorage.setItem('username', response.user.username);
 		localStorage.setItem('token', response.token);
-		this.router.navigate(['/dashboard']);
+		this.router.navigate(['/admin']);
 	}
 
 	/* Checa login 
@@ -60,6 +59,7 @@ export class AuthService {
 
 	// Remove usuário do localStorage
 	logout() {
+		debugger
 		localStorage.clear();
 		this.router.navigate(['/login']);
 	}

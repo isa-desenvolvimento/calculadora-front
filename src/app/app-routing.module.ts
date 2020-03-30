@@ -4,6 +4,8 @@ import { AuthGuard } from './_guards/auth.guard';
 import { DashboardComponent } from './_component/dashboard/dashboard.component';
 import { LoginComponent } from './_component/login/login.component';
 import { AdminLayoutComponent } from './_component/layouts/admin-layout/admin-layout.component';
+import { UserComponent } from './_component/pages/user/user.component';
+import { ChequeEmpresarialComponent } from './_component/pages/cheque-empresarial/cheque-empresarial.component';
 
 const routes: Routes = [
 	{
@@ -17,8 +19,12 @@ const routes: Routes = [
 		component: AdminLayoutComponent,
 		children: [
 			{
-				path: 'admin',
-				loadChildren: './_component/layouts/admin-layout/admin-layout.module#AdminLayoutModule'
+				path: 'user',
+				component: UserComponent
+			},
+			{
+				path: 'cheque-empresarial',
+				component: ChequeEmpresarialComponent
 			}
 		]
 	},

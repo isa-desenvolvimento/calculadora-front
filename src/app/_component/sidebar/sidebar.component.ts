@@ -9,8 +9,8 @@ export interface RouteInfo {
 }
 
 export const ROUTES: RouteInfo[] = [
-    { path: '/cheque-empresarial',     title: 'Cheque Empresarial',         icon:'nc-bank',       class: '' },
-    { path: '/user',          title: 'Usuário',      icon:'nc-single-02',  class: '' }
+    { path: '/admin/cheque-empresarial',     title: 'Cheque Empresarial',         icon:'nc-bank',       class: '' },
+    { path: '/admin/user',          title: 'Usuário',      icon:'nc-single-02',  class: '' }
 ];
 
 @Component({
@@ -20,6 +20,7 @@ export const ROUTES: RouteInfo[] = [
 })
 
 export class SidebarComponent implements OnInit {
+    public username: string = localStorage.getItem('username');
     public menuItems: any[];
     ngOnInit() {
         this.menuItems = ROUTES.filter(menuItem => menuItem);
