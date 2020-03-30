@@ -1,9 +1,9 @@
-# FROM node:lts-alpine as build
-# WORKDIR /app
-# COPY package*.json ./
-# RUN npm install
-# COPY . .
-# RUN npm run build-prod
+FROM node:lts-alpine as build
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build-prod
 
 FROM nginx:1.17.6
 
@@ -12,9 +12,10 @@ RUN apt-get update && \
 
 COPY nginx/nginx.conf /etc/nginx/nginx.conf
 COPY nginx/default.conf /etc/nginx/conf.d/default.conf
-COPY index.html /usr/share/nginx/html
 
 WORKDIR /app
+
+COPY --from=build /app/dist/auth-dashboard /usr/share/nginx/html
 
 ## add permissions
 RUN chown -R nginx:nginx /app && chmod -R 755 /app && \
