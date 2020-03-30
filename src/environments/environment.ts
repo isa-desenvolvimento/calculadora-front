@@ -4,8 +4,8 @@
 
 export const environment = {
   production: true,
-  // API_PATH: "https://heroku-api-calculadora.herokuapp.com/v1"
-  API_PATH: "https://localhost:5001/v1"
+   API_PATH: "https://heroku-api-calculadora.herokuapp.com/v1"
+  //API_PATH: "https://localhost:5001/v1"
 };
 
 /*
