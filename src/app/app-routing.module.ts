@@ -23,6 +23,17 @@ const routes: Routes = [
 		]
 	},
 	{
+		path: 'admin',
+		canActivate: [AuthGuard],
+		component: AdminLayoutComponent,
+		children: [
+			{
+				path: 'admin',
+				loadChildren: './_component/layouts/admin-layout/admin-layout.module#AdminLayoutModule'
+			}
+		]
+	},
+	{
 		path: 'login',
 		component: LoginComponent,
 	},
