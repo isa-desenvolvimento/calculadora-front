@@ -1,18 +1,18 @@
-FROM node:lts-alpine as build
-WORKDIR /app
-COPY package*.json ./
-RUN npm install
-COPY . .
-RUN npm run build-prod
+# FROM node:lts-alpine as build
+# WORKDIR /app
+# COPY package*.json ./
+# RUN npm install
+# COPY . .
+# RUN npm run build-prod
 
 FROM nginx:1.17.6
 
 RUN apt-get update && \
     apt-get install -y --no-install-recommends python3 gunicorn
 
-COPY nginx.conf /etc/nginx/nginx.conf
-COPY default.conf /etc/nginx/conf.d/default.conf
-COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx/nginx.conf /etc/nginx/nginx.conf
+COPY nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY index.html /usr/share/nginx/html
 
 WORKDIR /app
 
