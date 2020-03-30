@@ -8,18 +8,27 @@ import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './_component/login/login.component';
 import { DashboardComponent } from './_component/dashboard/dashboard.component';
 
+import { AdminLayoutComponent } from './_component/layouts/admin-layout/admin-layout.component';
+
+import { SidebarModule } from './_component/sidebar/sidebar.module';
+import { NavbarModule} from './_component/navbar/navbar.module';
+import { ToastrModule } from "ngx-toastr";
 
 @NgModule({
   declarations: [
     AppComponent,
     LoginComponent,
-    DashboardComponent
+    DashboardComponent,
+    AdminLayoutComponent
   ],
   imports: [
     BrowserModule,
     AppRoutingModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    SidebarModule,
+    NavbarModule,
+    ToastrModule.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]
