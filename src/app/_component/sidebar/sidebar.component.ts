@@ -20,6 +20,7 @@ export const ROUTES: RouteInfo[] = [
 })
 
 export class SidebarComponent implements OnInit {
+    public username: string = localStorage.getItem('username');
     public menuItems: any[];
     ngOnInit() {
         this.menuItems = ROUTES.filter(menuItem => menuItem);
