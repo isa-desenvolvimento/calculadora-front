@@ -3,12 +3,12 @@ import Chart from 'chart.js';
 
 
 @Component({
-    selector: 'dashboard-cmp',
+    selector: 'cheque-empresarial-cmp',
     moduleId: module.id,
-    templateUrl: 'dashboard.component.html'
+    templateUrl: 'cheque-empresarial.component.html'
 })
 
-export class DashboardComponent implements OnInit{
+export class ChequeEmpresarialComponent implements OnInit{
 
   public canvas : any;
   public ctx;
