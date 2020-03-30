@@ -45,7 +45,7 @@ export class AuthService {
 	// Salva usuário no localStorage
 	setUser(response: LoginResponse) {
 		debugger
-		localStorage.setItem('email', response.user.email);
+		localStorage.setItem('username', response.user.username);
 		localStorage.setItem('token', response.token);
 		this.router.navigate(['/dashboard']);
 	}

@@ -7,8 +7,8 @@
 				</div>
 				<form (ngSubmit)="login()" #form="ngForm">
 					<div class="form-group">
-						<label for="email" style="display: block;">E-mail</label>
-						<input type="email" class="form-control" id="email" name="email" placeholder="exemplo@exemplo.com" [(ngModel)]="model.email" required />
+						<label for="username" style="display: block;">Username</label>
+						<input class="form-control" id="username" name="username" placeholder="username" [(ngModel)]="model.username" required />
 					</div>
 					<div class="form-group">
 						<label for="password" style="display: block;">Password</label>
