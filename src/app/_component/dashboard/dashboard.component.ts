@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
 	getSomePrivateStuff() {
 		this.model.action = 'stuff';
 		this.authService.getData(this.model).subscribe(response => {
-			if (response.status === 'success') {
+			if (!!response.token) {
 				console.log(response.data)
 			}
 		}, error => {

@@ -1,9 +1,9 @@
 export interface User {
     id: number;
-    email: string;
     username: string;
     password: string;
-    role: string;
+    profile: string;
+    status: string;
 }
 
 export interface LoginResponse {
@@ -11,5 +11,4 @@ export interface LoginResponse {
     token: string;
     data: any;
     message: string;
-    status: string;
 }
