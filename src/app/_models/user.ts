@@ -3,7 +3,7 @@ export interface User {
     username: string;
     password?: string;
     profile: string;
-    status: string;
+    status: any;
     createdDate?: Date;
 }
 

@@ -13,7 +13,10 @@
               </th>
             </thead>
             <tbody>
-              <tr *ngFor="let row of tableData.dataRows">
+              <tr *ngFor="let row of tableData.dataRows" contenteditable (blur)="onBlurMethod($event)">
+                <td hidden>
+                  {{row.id}}
+                </td>
                 <td>
                   {{row.createdDate}}
                 </td>
