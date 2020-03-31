@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { UserService } from '../../../_services/user.service';
 
 declare interface TableData {
     headerRow: string[];
-    dataRows: string[][];
+    dataRows: Object[];
 }
 
 @Component({
@@ -11,18 +12,28 @@ declare interface TableData {
     templateUrl: 'table.component.html'
 })
 
-export class TableComponent implements OnInit{
-    public tableData1: TableData;
-    ngOnInit(){
-        this.tableData1 = {
-            headerRow: [ 'Data', 'Nome', 'Perfil', 'Status'],
-            dataRows: [
-                ['12/11/2019', 'Dakota Rice', 'Consulta', 'Ativo'],
-                ['12/11/2019', 'Minerva Hooper', 'Consulta', 'Ativo'],
-                ['12/11/2019', 'Sage Rodriguez', 'Consulta', 'Ativo'],
-                ['12/11/2019', 'Doris Greene', 'Consulta', 'Ativo'],
-                ['12/11/2019', 'Mason Porter', 'Consulta', 'Ativo']
-            ]
-        };
+export class TableComponent implements OnInit {
+
+    constructor(
+        private userService: UserService,
+    ) {
+    }
+
+    public tableData: TableData;
+    public errorMessage: TableData;
+
+    ngOnInit() {
+        this.buildDataTable();
+    }
+
+    buildDataTable() {
+        this.userService.getAll().subscribe(userList => {
+            this.tableData = {
+                headerRow: ['Data de criação', 'Nome', 'Perfil', 'Status'],
+                dataRows: userList,
+            };
+        }, err => {
+            this.errorMessage = err.error.message;
+        });
     }
 }

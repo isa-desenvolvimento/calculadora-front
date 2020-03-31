@@ -51,7 +51,9 @@ export class UserComponent implements OnInit {
         this.userService.addUser(this.payload)
             .subscribe(
                 data => {
-                    debugger
+                    // TODO: Plmdds
+                    location.reload();
+                    this.resetFields();
                 },
                 err => {
                     this.errorMessage = err.error.title;
