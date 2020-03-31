@@ -7,6 +7,7 @@ import { AdminLayoutRoutes } from './admin-layout.routing';
 
 import { ChequeEmpresarialComponent }       from '../../pages/cheque-empresarial/cheque-empresarial.component';
 import { UserComponent }            from '../../pages/user/user.component';
+import { TableComponent } from '../../pages/components/table/table.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -19,7 +20,8 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   ],
   declarations: [
     ChequeEmpresarialComponent,
-    UserComponent
+    UserComponent,
+    TableComponent
   ]
 })
 
