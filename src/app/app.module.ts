@@ -7,6 +7,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { HttpClientModule } from '@angular/common/http';
 import { LoginComponent } from './_component/login/login.component';
+import { UserComponent } from './_component/pages/user/user.component';
+import { TableComponent } from './_component/pages/table/table.component';
 import { DashboardComponent } from './_component/dashboard/dashboard.component';
 
 import { AdminLayoutComponent } from './_component/layouts/admin-layout/admin-layout.component';
@@ -19,6 +21,8 @@ import { ToastrModule } from "ngx-toastr";
   declarations: [
     AppComponent,
     LoginComponent,
+    UserComponent,
+    TableComponent,
     DashboardComponent,
     AdminLayoutComponent
   ],

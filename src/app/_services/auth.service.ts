@@ -12,7 +12,7 @@ import { environment } from '../../environments/environment';
 export class AuthService {
 
 	// API de autenticação parametrizada
-	API_PATH: string = environment.API_PATH;
+	AUTH_PATH: string = environment.AUTH_PATH;
 
 	constructor(
 		private router: Router,
@@ -35,7 +35,7 @@ export class AuthService {
 	// Login e token
 	login(data): Observable<LoginResponse> {
 		return this.http
-			.post<LoginResponse>(`${this.API_PATH}/login`, data, this.HTTP_HEADER)
+			.post<LoginResponse>(`${this.AUTH_PATH}/login`, data, this.HTTP_HEADER)
 			.pipe(
 				retry(2),
 				catchError(this.handleError)
@@ -67,7 +67,7 @@ export class AuthService {
 	// Recupera dados de API para o Dashboard
 	getData(data): Observable<LoginResponse> {
 		return this.http
-			.post<LoginResponse>(`${this.API_PATH}/login`, data, this.HTTP_HEADER)
+			.post<LoginResponse>(`${this.AUTH_PATH}/login`, data, this.HTTP_HEADER)
 			.pipe(
 				retry(2),
 				catchError(this.handleError)

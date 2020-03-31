@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  API_PATH: "https://heroku-api-calculadora.herokuapp.com/v1"
+  AUTH_PATH: "https://heroku-api-calculadora.herokuapp.com/auth",
+  API_PATH: "https://heroku-api-calculadora.herokuapp.com/api"
 };

@@ -5,7 +5,7 @@
         <h5 class="card-title">Usuário</h5>
       </div>
       <div class="card-body">
-        <form (ngSubmit)="cadastroUsuario()" [formGroup]="userForm">
+        <form [formGroup]="userForm">
           <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
 				  	{{errorMessage}}
 			  	</div>
@@ -57,13 +57,13 @@
                       </legend>
                       <div class="col-sm-7  ml-2">
                         <div class="form-check">
-                          <input class="form-check-input" type="radio" name="status"  formControlName="status" id="status1" value="ativo" checked>
+                          <input class="form-check-input" type="radio" name="status"  formControlName="status" id="status1" [value]="true" checked>
                           <label class="form-check-label" for="status1">
                             Ativo
                           </label>
                         </div>
                         <div class="form-check ">
-                          <input class="form-check-input" type="radio" name="status"  formControlName="status" id="status2" value="inativo">
+                          <input class="form-check-input" type="radio" name="status"  formControlName="status" id="status2" [value]="false">
                           <label class="form-check-label" for="status2">
                             Inativo
                           </label>
@@ -75,10 +75,10 @@
               </div>
               <div class="row">
                 <div class="update ml-auto mr-md-3">
-                  <button type="submit" class="btn btn-info btn-round " [disabled]="!userForm.valid">Salvar</button>
+                  <button type="button" class="btn btn-info btn-round" (click)="addUser()" [disabled]="!userForm.valid">Salvar</button>
                 </div>
                 <div class="update mr-3">
-                  <button type="reset" class="btn btn-info btn-round">Cancelar</button>
+                  <button type="button" (click)="resetFields()" class="btn btn-info btn-round">Cancelar</button>
                 </div>
               </div>
             </div>
