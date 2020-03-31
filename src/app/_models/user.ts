@@ -4,6 +4,7 @@ export interface User {
     password?: string;
     profile: string;
     status: string;
+    createdDate?: Date;
 }
 
 export interface LoginResponse {

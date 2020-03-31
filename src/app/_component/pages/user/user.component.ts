@@ -46,6 +46,7 @@ export class UserComponent implements OnInit {
             username: this.f.username.value,
             status: this.f.status.value,
             profile: this.f.profile.value,
+            createdDate: new Date()
         };
 
         this.userService.addUser(this.payload)
