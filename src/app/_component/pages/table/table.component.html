@@ -18,7 +18,7 @@
                   {{row.id}}
                 </td>
                 <td width="100" disabled>
-                  {{row.createdDate}}
+                  {{formatDate(row.createdDate)}}
                 </td>
                 <td contenteditable="true" class="single-line" (keydown.enter)="updateName($event, row)"
                   (blur)="updateName($event, row)">
@@ -38,7 +38,8 @@
                   </select>
                 </td>
                 <td width="50">
-                  <button (click)="deleteUser(row)" type="submit" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
+                  <button (click)="deleteUser(row)" type="submit" class="btn btn-danger btn-sm"><i
+                      class="fa fa-trash"></i></button>
                 </td>
               </tr>
             </tbody>

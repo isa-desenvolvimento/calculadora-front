@@ -39,6 +39,16 @@ export class TableComponent implements OnInit {
         });
     }
 
+    formatDate(createdDate: Date) {
+        let timestamp = Date.parse(createdDate.toString());
+        let date = new Date(timestamp).toJSON();
+        let formatedDate = date.slice(0, 10).split("-").reverse().join("/")
+            .concat(' ')
+            .concat(date.slice(11, 16));
+
+        return formatedDate;
+    }
+
     updateUser(payload: User) {
         this.userService.updateUser(payload)
             .subscribe(
