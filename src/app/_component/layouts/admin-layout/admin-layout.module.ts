@@ -5,9 +5,9 @@ import { FormsModule } from '@angular/forms';
 
 import { AdminLayoutRoutes } from './admin-layout.routing';
 
-import { ChequeEmpresarialComponent }       from '../../pages/cheque-empresarial/cheque-empresarial.component';
-import { UserComponent }            from '../../pages/user/user.component';
-import { TableComponent } from '../../pages/components/table/table.component';
+import { ChequeEmpresarialComponent } from '../../pages/cheque-empresarial/cheque-empresarial.component';
+import { UserComponent } from '../../pages/user/user.component';
+import { TableComponent } from '../../pages/table/table.component';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
@@ -25,4 +25,4 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
   ]
 })
 
-export class AdminLayoutModule {}
+export class AdminLayoutModule { }

@@ -4,8 +4,8 @@
       <div class="card-header">
         <h4 class="card-title">Lista de Usuários</h4>
       </div>
-      <div class="card-body">
-        <div class="table">
+      <div class="card-body" style="height: calc(100vh - 215px);overflow: scroll;">
+        <div class="table table-striped table-hover">
           <table class="table" *ngIf="tableData && tableData.headerRow && tableData.dataRows">
             <thead class="text-primary">
               <th *ngFor="let header of tableData.headerRow">
@@ -13,21 +13,32 @@
               </th>
             </thead>
             <tbody>
-              <tr *ngFor="let row of tableData.dataRows" contenteditable (blur)="onBlurMethod($event)">
+              <tr *ngFor="let row of tableData.dataRows">
                 <td hidden>
                   {{row.id}}
                 </td>
-                <td>
+                <td width="100" disabled>
                   {{row.createdDate}}
                 </td>
-                <td>
+                <td contenteditable="true" class="single-line" (keydown.enter)="updateName($event, row)"
+                  (blur)="updateName($event, row)">
                   {{row.username}}
                 </td>
-                <td>
-                  {{row.profile}}
+                <td width="100">
+                  <select class="custom-select mr-sm-2" (change)="updateSelect($event, row,  'profile', 'value')">
+                    <option [selected]="row.profile === 'consult'" value="consult">Consulta</option>
+                    <option [selected]="row.profile === 'editor'" value="editor">Edição</option>
+                    <option [selected]="row.profile === 'admin'" value="admin">Administrador</option>
+                  </select>
                 </td>
-                <td>
-                  {{row.status ? "Ativo" : "Inativo"}}
+                <td width="100">
+                  <select class="custom-select mr-sm-2" (change)="updateSelect($event, row, 'status', 'value')">
+                    <option [selected]="row.status" value="true">Ativo</option>
+                    <option [selected]="!row.status" value="false">Inativo</option>
+                  </select>
+                </td>
+                <td width="50">
+                  <button (click)="deleteUser(row)" type="submit" class="btn btn-danger btn-sm"><i class="fa fa-trash"></i></button>
                 </td>
               </tr>
             </tbody>

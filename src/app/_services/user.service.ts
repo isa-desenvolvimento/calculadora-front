@@ -21,10 +21,7 @@ export class UserService {
   }
 
   updateUser(payload: User) {
-    let localPayload = { ...payload };
-    localPayload.status = payload.status === 'Ative' ? true : false
-    delete localPayload.id;
-    return this.http.put(`${environment.API_PATH}/users/${payload.id.toString().trim()}`, localPayload);
+    return this.http.put(`${environment.API_PATH}/users/${payload.id}`, payload);
   }
 
   removeUser(id: number) {

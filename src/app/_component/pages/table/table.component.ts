@@ -23,7 +23,6 @@ export class TableComponent implements OnInit {
     public myModel: any;
     public tableData: TableData;
     public errorMessage: string;
-    payload: User;
 
     ngOnInit() {
         this.buildDataTable();
@@ -32,28 +31,18 @@ export class TableComponent implements OnInit {
     buildDataTable() {
         this.userService.getAll().subscribe(userList => {
             this.tableData = {
-                headerRow: ['Data de criação', 'Nome', 'Perfil', 'Status'],
-                dataRows: userList,
+                headerRow: ['Data de criação', 'Nome', 'Perfil', 'Status', ''],
+                dataRows: userList.reverse(),
             };
         }, err => {
             this.errorMessage = err.error.message;
         });
     }
 
-    onBlurMethod(e) {
-        const rows = e.target.textContent;
-
-        this.payload = {
-            id: rows.split('  ')[0],
-            createdDate: rows.split('  ')[1],
-            username: rows.split('  ')[2],
-            profile: rows.split('  ')[3],
-            status: rows.split('  ')[4]
-        };
-
-        this.userService.updateUser(this.payload)
+    updateUser(payload: User) {
+        this.userService.updateUser(payload)
             .subscribe(
-                data => {
+                () => {
                     // TODO: Plmdds
                     location.reload();
                 },
@@ -61,6 +50,34 @@ export class TableComponent implements OnInit {
                     this.errorMessage = err.error.title;
                     // this.loading = false;
                 });
+    }
 
+    updateName(event: any, payload: User) {
+        const localUsername = event.target.innerText;
+
+        // Verify changes
+        if (payload.username === localUsername) return false;
+
+        let localPayload = { ...payload };
+        localPayload.username = localUsername;
+
+        this.updateUser(localPayload);
+    }
+
+    updateSelect(event: any, payload: User, attr: string, ref: string) {
+        let localPayload = { ...payload };
+        localPayload[attr] = event.target[ref];
+        localPayload.status = (localPayload.status === 'true');
+
+        this.updateUser(localPayload);
+    }
+
+    deleteUser(payload: User) {
+        this.userService.removeUser(payload.id).subscribe(() => {
+            // TODO: Plmdds
+            location.reload();
+        }, err => {
+            this.errorMessage = err.error.message;
+        });
     }
 }
