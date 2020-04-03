@@ -2,7 +2,7 @@
   <div class="col-md-4">
     <div class="card card-user">
       <div class="card-header">
-        <h5 class="card-title">Ciriar usuário</h5>
+        <h5 class="card-title">Criar usuário</h5>
       </div>
       <div class="card-body">
         <form [formGroup]="userForm">
@@ -14,14 +14,14 @@
               <div class="row">
                 <div class="col-sm-12 pt-0">
                   <div class="form-group row">
-                    <label for="nome" class="col-sm-2 col-form-label">Nome</label>
+                    <label for="nome" class="ml-3 col-form-label">Nome</label>
                     <div class="col-sm-10">
-                      <input type="text" class="form-control" name="username" formControlName="username"
-                        id="user-username" required>
+                      <input type="text" class="form-control" name="user_name" formControlName="user_name"
+                        id="user_name" required>
                     </div>
                   </div>
                 </div>
-                <div class="col-6  pt-0 ">
+                <div class="col-6  pt-0 col-auto">
                   <fieldset class="form-group ml-sm-5">
                     <div class="form-group row">
                       <legend class="col-form-label col-sm-5 pt-0">
@@ -53,7 +53,7 @@
                     </div>
                   </fieldset>
                 </div>
-                <div class="col-6 pt-0 ">
+                <div class="col-6 pt-0 col-auto">
                   <fieldset class="form-group">
                     <div class="form-group row">
                       <legend class="col-form-label col-sm-5 pt-0">
@@ -79,12 +79,12 @@
                   </fieldset>
                 </div>
               </div>
-              <div class="row">
-                <div class="update ml-auto mr-md-3">
+              <div class="row card-footer">
+                <div class="update ml-auto mr-1">
                   <button type="button" class="btn btn-info btn-round" (click)="addUser()"
                     [disabled]="!userForm.valid">Adicionar</button>
                 </div>
-                <div class="update mr-3">
+                <div class="update">
                   <button type="button" (click)="resetFields()" class="btn btn-info btn-round">Limpar</button>
                 </div>
               </div>
@@ -94,7 +94,7 @@
       </div>
     </div>
   </div>
-  <div class="col-sm-8 pt-0">
-    <table-cmp title="Lista de Usuários"></table-cmp>
+  <div class="col-md-8 col-sm-12 pt-0">
+    <table-cmp ></table-cmp>
   </div>
 </div>

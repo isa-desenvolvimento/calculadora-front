@@ -1,171 +1,130 @@
-<div class="row">
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="nc-icon nc-globe text-warning"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Capacity</p>
-              <p class="card-title">150GB
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <i class="fa fa-refresh"></i> Update Now
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="nc-icon nc-money-coins text-success"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Revenue</p>
-              <p class="card-title">$ 1,345
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <i class="fa fa-calendar-o"></i> Last day
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="nc-icon nc-vector text-danger"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Errors</p>
-              <p class="card-title">23
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <i class="fa fa-clock-o"></i> In the last hour
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-lg-3 col-md-6 col-sm-6">
-    <div class="card card-stats">
-      <div class="card-body ">
-        <div class="row">
-          <div class="col-5 col-md-4">
-            <div class="icon-big text-center icon-warning">
-              <i class="nc-icon nc-favourite-28 text-primary"></i>
-            </div>
-          </div>
-          <div class="col-7 col-md-8">
-            <div class="numbers">
-              <p class="card-category">Followers</p>
-              <p class="card-title">+45K
-                <p>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <i class="fa fa-refresh"></i> Update now
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row">
+<div class="row ">
   <div class="col-md-12">
-    <div class="card ">
-      <div class="card-header ">
-        <h5 class="card-title">Users Behavior</h5>
-        <p class="card-category">24 Hours performance</p>
+      <div class="card ">
+          <div class="card-header ">
+              <!-- <h5 class="card-title">Cheque Empresarial</h5> -->
+          </div>
+          <div class="card-body ">
+              <div class="row">
+                  <div class="col-md-3">
+                      <form class="row">
+                          <div class="col-sm-12">
+                              <label for="nome" class="col-form-label">Pasta</label>
+                              <input type="text" class="form-control col-md-12 col-sm-12" name="ce_pasta" formControlName="ce_pasta" id="ce_pasta" required>
+                          </div>
+                          <div class="col-sm-12">
+                              <label for="nome" class="col-form-label">Contrato</label>
+                              <input type="text" class="form-control col-md-12 col-sm-12" name="ce_contrato" formControlName="ce_contrato" id="ce_contrato" required>
+                          </div>
+                          <div class="col-sm-12">
+                              <label for="nome" class="col-form-label">Tipo de Contrato</label>
+                              <input type="text" class="form-control col-md-12 col-sm-12" name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                          <div class="col-sm-12">
+                              <br />
+                              <div class="stats">
+                                  <button type="button" (click)="resetFields()" class="btn btn-info btn-round">Pesquisar</button>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+                  <div class="col-md-7 col-sm-12">
+                      <form class="row">
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Data do Cálculo</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_pasta" formControlName="ce_pasta" id="ce_pasta" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Última Atualização</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_contrato" formControlName="ce_contrato" id="ce_contrato" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Índice</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Encargos Contratuais</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12 " name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Taxa Contrato %</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Multa</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Juros Mora</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Honorários %</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                          <div class="col-md-4 col-sm-12">
+                              <label for="nome" class="col-form-label">Multa sob contrato</label>
+                              <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato" formControlName="ce_tipo_contrato" id="ce_tipo_contrato" required>
+                          </div>
+                      </form>
+                  </div>
+                  <div class="col-md-2 col-sm-12">
+                      <br />
+                      <div class="stats">
+                          <button type="button" (click)="resetFields()" class="btn btn-info btn-round">Atualizar Risco</button>
+                      </div>
+                      <div class="stats">
+                          <button type="button" (click)="resetFields()" class="btn btn-info btn-round">Simular Cálculo</button>
+                      </div>
+                  </div>
+                  <div class="col-md-4 col-sm-12">
+                      <form class="row">
+                          <div class="col-sm-12">
+                              <h5 class="card-title">Amortização</h5>
+                          </div>
+                          <div class="col-sm-12">
+                              <label for="nome" class="col-form-label">Data</label>
+                              <input type="text" class="form-control col-md-6 col-sm-12" name="ce_pasta" formControlName="ce_pasta" id="ce_pasta" required>
+                          </div>
+                          <div class="col-sm-12">
+                              <label for="nome" class="col-form-label">Valor</label>
+                              <input type="text" class="form-control col-md-6 col-sm-12" name="ce_contrato" formControlName="ce_contrato" id="ce_contrato" required>
+                          </div>
+                          <div class="col-sm-12">
+                              <br />
+                              <div class="stats">
+                                  <button type="button" (click)="resetFields()" class="col-md-4 col-sm-4 btn btn-info btn-round">Adicionar</button>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+                  <div class="col-md-8 col-sm-12">
+                      <form class="row ">
+                          <div class="col-sm-12">
+                              <br />
+                              <div class="stats float-right mr-md-3">
+                                  <button type="button" (click)="resetFields()" class="btn btn-info btn-round">Incluir Lançamentos</button>
+                              </div>
+                          </div>
+                          <div class="col-sm-12">
+                              <div class="float-right">
+                                  <label for="nome" class="col-form-label">Data Vencimento</label>
+                                  <input type="text" class="form-control col-md-12 col-sm-12" name="ce_pasta" formControlName="ce_pasta" id="ce_pasta" required>
+                              </div>
+                          </div>
+                          <div class="col-sm-12">
+                              <div class="float-right">
+                                  <label for="nome" class="col-form-label">Saldo Devedor Vencimento</label>
+                                  <input type="text" class="form-control col-md-12 col-sm-12" name="ce_contrato" formControlName="ce_contrato" id="ce_contrato" required>
+                              </div>
+                          </div>
+                      </form>
+                  </div>
+              </div>
+          </div>
       </div>
-      <div class="card-body ">
-        <canvas id=chartHours width="400" height="100"></canvas>
-      </div>
-      <div class="card-footer ">
-        <hr>
-        <div class="stats">
-          <i class="fa fa-history"></i> Updated 3 minutes ago
-        </div>
-      </div>
-    </div>
   </div>
-</div>
-<div class="row">
-  <div class="col-md-4">
-    <div class="card ">
-      <div class="card-header ">
-        <h5 class="card-title">Email Statistics</h5>
-        <p class="card-category">Last Campaign Performance</p>
-      </div>
-      <div class="card-body ">
-        <canvas id="chartEmail"></canvas>
-      </div>
-      <div class="card-footer ">
-        <div class="legend">
-          <i class="fa fa-circle text-primary"></i> Opened
-          <i class="fa fa-circle text-warning"></i> Read
-          <i class="fa fa-circle text-danger"></i> Deleted
-          <i class="fa fa-circle text-gray"></i> Unopened
-        </div>
-        <hr>
-        <div class="stats">
-          <i class="fa fa-calendar"></i> Number of emails sent
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="col-md-8">
-    <div class="card card-chart">
-      <div class="card-header">
-        <h5 class="card-title">NASDAQ: AAPL</h5>
-        <p class="card-category">Line Chart with Points</p>
-      </div>
-      <div class="card-body">
-        <canvas id="speedChart" width="400" height="100"></canvas>
-      </div>
-      <div class="card-footer">
-        <div class="chart-legend">
-          <i class="fa fa-circle text-info"></i> Tesla Model S
-          <i class="fa fa-circle text-warning"></i> BMW 5 Series
-        </div>
-        <hr/>
-        <div class="card-stats">
-          <i class="fa fa-check"></i> Data information certified
-        </div>
-      </div>
-    </div>
+  <div class="col-md-12 col-sm-12 pt-0">
+    <table-cmp ></table-cmp>
   </div>
 </div>

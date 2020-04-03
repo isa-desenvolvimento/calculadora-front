@@ -20,7 +20,7 @@ export class UserComponent implements OnInit {
 
     ngOnInit() {
         this.userForm = this.formBuilder.group({
-            username: ['', Validators.required],
+            user_name: ['', Validators.required],
             status: ['', Validators.required],
             profile: ['', Validators.required]
         });
@@ -43,7 +43,7 @@ export class UserComponent implements OnInit {
         this.loading = true;
 
         this.payload = {
-            username: this.f.username.value,
+            username: this.f.user_name.value,
             status: this.f.status.value,
             profile: this.f.profile.value,
             createdDate: new Date()
