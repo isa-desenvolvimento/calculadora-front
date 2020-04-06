@@ -7,27 +7,36 @@
             <div class="card-body ">
                 <div class="row">
                     <div class="col-md-3">
-                        <form class="row">
+                        <form class="row" [formGroup]="ceForm">
                             <div class="col-sm-12">
-                                <label for="nome" class="col-form-label">Pasta</label>
-                                <input type="text" class="form-control col-md-12 col-sm-12" name="ce_pasta"
-                                    id="ce_pasta" required>
+                                <label for="ce_pasta" class="col-form-label">Pasta</label>
+                                <select class="form-control custom-select col-md-12 col-sm-12" name="ce_pasta"
+                                    id="ce_pasta" formControlName="ce_pasta" required>
+                                    <option *ngFor="let folder of folderData_field" [value]="folder">
+                                        {{folder}}</option>
+                                </select>
                             </div>
                             <div class="col-sm-12">
-                                <label for="nome" class="col-form-label">Contrato</label>
-                                <input type="text" class="form-control col-md-12 col-sm-12" name="ce_contrato"
-                                    id="ce_contrato" required>
+                                <label for="ce_contrato" class="col-form-label">Contrato</label>
+                                <select class="form-control custom-select col-md-12 col-sm-12" name="ce_contrato"
+                                    id="ce_contrato" formControlName="ce_contrato" required>
+                                    <option *ngFor="let contract of contractList_field" [value]="contract.id">
+                                        {{contract.title}}</option>
+                                </select>
                             </div>
                             <div class="col-sm-12">
                                 <label for="nome" class="col-form-label">Tipo de Contrato</label>
-                                <input type="text" class="form-control col-md-12 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <select class="form-control custom-select col-md-12 col-sm-12" name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato" formControlName="ce_tipo_contrato">
+                                    <option *ngFor="let typeContract of typeContractList_field" [value]="typeContract">
+                                        {{typeContract}}</option>
+                                </select>
                             </div>
                             <div class="col-sm-12">
                                 <br />
                                 <div class="stats">
-                                    <button type="button" (click)="resetFields()"
-                                        class="btn btn-info btn-round">Pesquisar</button>
+                                    <button type="button" (click)="filterContracts()" class="btn btn-info btn-round"
+                                        [disabled]="!ceForm.valid">Pesquisar</button>
                                 </div>
                             </div>
                         </form>
@@ -36,48 +45,48 @@
                         <form class="row">
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Data do Cálculo</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_pasta"
-                                    id="ce_pasta" required>
+                                <input type="date" class="form-control col-md-11 col-sm-12" name="dateCalc"
+                                    max="3000-12-31" min="1000-01-01">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_contrato"
-                                    id="ce_contrato" required>
+                                <input type="date" class="form-control col-md-11 col-sm-12" name="ce_contrato"
+                                    id="ce_contrato" max="3000-12-31" min="1000-01-01">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Índice</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Encargos Contratuais</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12 " name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <input type="number" class="form-control col-md-11 col-sm-12 " name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Taxa Contrato %</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Multa</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Juros Mora</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Honorários %</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Multa sob contrato</label>
-                                <input type="text" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" required>
+                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_tipo_contrato"
+                                    id="ce_tipo_contrato">
                             </div>
                         </form>
                     </div>
@@ -99,13 +108,13 @@
                             </div>
                             <div class="col-sm-12">
                                 <label for="nome" class="col-form-label">Data</label>
-                                <input type="text" class="form-control col-md-6 col-sm-12" name="ce_pasta" id="ce_pasta"
-                                    required>
+                                <input type="date" class="form-control col-md-6 col-sm-12" name="ce_pasta" id="ce_pasta"
+                                    max="3000-12-31" min="1000-01-01">
                             </div>
                             <div class="col-sm-12">
                                 <label for="nome" class="col-form-label">Valor</label>
-                                <input type="text" class="form-control col-md-6 col-sm-12" name="ce_contrato"
-                                    id="ce_contrato" required>
+                                <input type="number" class="form-control col-md-6 col-sm-12" name="ce_contrato"
+                                    id="ce_contrato">
                             </div>
                             <div class="col-sm-12">
                                 <br />
@@ -128,14 +137,14 @@
                             <div class="col-sm-12">
                                 <div class="float-right">
                                     <label for="nome" class="col-form-label">Data Vencimento</label>
-                                    <input type="text" class="form-control col-md-12 col-sm-12" name="ce_pasta"
-                                        id="ce_pasta" required>
+                                    <input type="date" class="form-control col-md-12 col-sm-12" name="ce_pasta"
+                                        id="ce_pasta" max="3000-12-31" min="1000-01-01">
                                 </div>
                             </div>
                             <div class="col-sm-12">
                                 <div class="float-right">
                                     <label for="nome" class="col-form-label">Saldo Devedor Vencimento</label>
-                                    <input type="text" class="form-control col-md-12 col-sm-12" name="ce_contrato"
+                                    <input type="number" class="form-control col-md-12 col-sm-12" name="ce_contrato"
                                         id="ce_contrato" required>
                                 </div>
                             </div>
@@ -152,7 +161,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Lista de Usuários</h4>
+                        <h4 class="card-title">Lista de Propostas</h4>
                     </div>
                     <div class="card-body" style="height: calc(100vh - 215px);overflow: scroll;">
                         <div class="table table-striped table-hover">

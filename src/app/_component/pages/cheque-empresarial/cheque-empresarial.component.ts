@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ChequeEmpresarial } from '../../../_models/ChequeEmpresarial';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 declare interface TableData {
   headerRow: Array<Object>;
@@ -23,13 +24,64 @@ export class ChequeEmpresarialComponent implements OnInit {
   tableData: TableData;
   teste = 123
 
-
   constructor(
+    private formBuilder: FormBuilder,
   ) { }
 
   ngOnInit() {
+    this.ceForm = this.formBuilder.group({
+      ce_pasta: ['', Validators.required],
+      ce_contrato: ['', Validators.required],
+      ce_tipo_contrato: []
+    });
     this.buildDataTable();
+    console.log(this.tableData);
   }
+
+  // convenience getter for easy access to form fields
+  get f() { return this.ceForm.controls; }
+
+  resetFields() {
+    this.ceForm.reset()
+  }
+
+  filterContracts() {
+    this.tableData.dataRows = this.tableData.dataRows.filter((row) => row["contractRef"] === parseInt(this.f.ce_contrato.value));
+  }
+
+
+  // Mock formulário de riscos
+  // Consulta 
+
+  folderData_field = [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25];
+
+  contractList_field = [{
+    title: "AA",
+    id: "0",
+    fodlerRef: "1",
+  }, {
+    title: "BB",
+    id: "1",
+    fodlerRef: "1",
+  }, {
+    title: "CC",
+    id: "2",
+    fodlerRef: "2",
+  },
+  {
+    title: "DD",
+    id: "3",
+    fodlerRef: "3",
+  },
+  {
+    title: "EE",
+    id: "4",
+    fodlerRef: "1",
+  }];
+
+  typeContractList_field = ["Cheque empresarial", "Parcelado", "Pós"];
+
+  indice_field = ["INPC", "CDI", "IGPM"];
 
   // TODO: Componentizar tabela e passar valores por @input e tratar eventos
   buildDataTable() {
