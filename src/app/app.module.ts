@@ -17,6 +17,9 @@ import { SidebarModule } from './_component/sidebar/sidebar.module';
 import { NavbarModule} from './_component/navbar/navbar.module';
 import { ToastrModule } from "ngx-toastr";
 
+import { DataTablesModule } from 'angular-datatables';
+
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -35,7 +38,8 @@ import { ToastrModule } from "ngx-toastr";
     ReactiveFormsModule,
     SidebarModule,
     NavbarModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    DataTablesModule
   ],
   providers: [],
   bootstrap: [AppComponent]

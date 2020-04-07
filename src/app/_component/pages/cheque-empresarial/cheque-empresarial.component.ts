@@ -24,6 +24,8 @@ export class ChequeEmpresarialComponent implements OnInit {
   tableData: TableData;
   teste = 123
 
+  dtOptions: DataTables.Settings = {};
+
   constructor(
     private formBuilder: FormBuilder,
   ) { }
@@ -35,7 +37,10 @@ export class ChequeEmpresarialComponent implements OnInit {
       ce_tipo_contrato: []
     });
     this.buildDataTable();
-    console.log(this.tableData);
+
+    this.dtOptions = {
+      pagingType: 'full_numbers',
+    };
   }
 
   // convenience getter for easy access to form fields
