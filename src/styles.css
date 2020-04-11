@@ -19,3 +19,28 @@ td:focus {
     display:inline;
     white-space:nowrap;
 }
+
+
+/* override table controls */
+.dataTables_wrapper .dataTables_filter input {
+    background-color: #FFFFFF;
+    border: 1px solid #DDDDDD;
+    border-radius: 4px;
+    padding: 5px;
+    color: #66615b;
+    line-height: normal;
+    font-size: 14px;
+    transition: color 0.3s ease-in-out, border-color 0.3s ease-in-out, background-color 0.3s ease-in-out;
+    box-shadow: none;
+}
+
+table.dataTable thead .sorting,
+table.dataTable thead .sorting_desc {
+    background-image: none;
+    font-weight: normal !important;
+}
+
+table.dataTable thead .sorting_asc {
+    background-image: none;
+    font-weight: bold;
+}
