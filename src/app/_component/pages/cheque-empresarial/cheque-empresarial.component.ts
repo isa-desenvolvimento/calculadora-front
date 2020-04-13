@@ -182,39 +182,39 @@ export class ChequeEmpresarialComponent implements OnInit {
   buildHeaderTable() {
     this.tableData.headerRow = [{
       dataBase: {
-        title: "data Base",
+        title: "Data Base",
         nested: false
       },
       indiceDataBase: {
-        title: "indice Data Base",
+        title: "Indíce Data Base",
         nested: false
       },
       dataBaseAtual: {
-        title: "data Base Atual",
+        title: "Data Base Atual",
         nested: false
       },
       indiceDataAtual: {
-        title: "indice Data Atual",
+        title: "Indíce Data Atual",
         nested: false
       },
       valorDevedor: {
-        title: "valor Devedor",
+        title: "Valor Devedor",
         nested: false
       },
       encargosMonetarios: {
-        title: "encargos Monetarios",
+        title: "Encargos Monetarios",
         nested: false
       },
       correcaoPeloIndice: {
-        title: "correcao Pelo Indice",
+        title: "Correção Pelo Indíce",
         nested: false
       },
       jurosAm: {
-        title: "juros Ao mês",
+        title: "Juros Ao mês",
         nested: false
       },
       dias: {
-        title: "dias",
+        title: "Dias",
         nested: false
       },
       percents: {
@@ -226,15 +226,15 @@ export class ChequeEmpresarialComponent implements OnInit {
         nested: false
       },
       multa: {
-        title: "multa",
+        title: "Multa",
         nested: false
       },
       lancamentos: {
-        title: "lançamentos",
+        title: "Lançamentos",
         nested: false
       },
       valorDevedorAtualizado: {
-        title: "valor Devedor Atualizado",
+        title: "Valor Devedor Atualizado",
         nested: false
       }
     }];

@@ -46,10 +46,10 @@
     }
 
    > thead > tr > th{
-       font-size: 14px;
-       font-weight: $font-weight-bold;
+       font-size: 12px;
+       font-weight: $font-weight-bold !important;
        padding-bottom: 0;
-       text-transform: uppercase;
+       //text-transform: uppercase;
        border: 0;
    }
 
