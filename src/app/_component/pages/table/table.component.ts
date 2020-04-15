@@ -23,17 +23,20 @@ export class TableComponent implements OnInit {
     public myModel: any;
     public tableData: TableData;
     public errorMessage: string;
+    public tableLoading = false;
 
     ngOnInit() {
         this.buildDataTable();
     }
 
     buildDataTable() {
+        this.tableLoading = true;
         this.userService.getAll().subscribe(userList => {
             this.tableData = {
                 headerRow: ['Data de criação', 'Nome', 'Perfil', 'Status', ''],
                 dataRows: userList.reverse(),
             };
+            this.tableLoading = false;
         }, err => {
             this.errorMessage = err.error.message;
         });
