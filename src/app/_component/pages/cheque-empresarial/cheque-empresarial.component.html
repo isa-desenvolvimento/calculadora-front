@@ -75,9 +75,9 @@
                             </div>
                             <div class="col-md-3 col-sm-12" [hidden]="!ce_form_riscos.ce_indice.value">
                                 <label for="nome" class="col-form-label"> Encargos Contratuais %</label>
-                                <input  type="number"
-                                    class="form-control col-md-11 col-sm-12 " name="ce_encargos_contratuais"
-                                    id="ce_encargos_contratuais" formControlName="ce_encargos_contratuais">
+                                <input type="number" class="form-control col-md-11 col-sm-12 "
+                                    name="ce_encargos_contratuais" id="ce_encargos_contratuais"
+                                    formControlName="ce_encargos_contratuais">
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Multa</label>
@@ -116,11 +116,11 @@
                             <hr>
                         </div>
                     </div>
-                    
+
                     <div class="col-lg-12 col-sm-12">
                         <form class="row" [formGroup]="ceFormAmortizacao">
                             <div class="col-lg-3 col-sm-3">
-                                <div  style="padding: 0 12px 0 12px">
+                                <div style="padding: 0 12px 0 12px">
                                     <label for="nome" class="col-form-label">Data Vencimento</label>
                                     <input type="date" class="form-control col-md-12 col-sm-12"
                                         name="ce_data_vencimento" id="ce_data_vencimento"
@@ -128,7 +128,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-3 col-sm-3">
-                                <div  style="padding: 0 12px 5px 12px">
+                                <div style="padding: 0 12px 5px 12px">
                                     <label for="nome" class="col-form-label">Saldo Devedor</label>
                                     <input type="number" class="form-control col-md-12 col-sm-12"
                                         name="ce_saldo_devedor" id="ce_saldo_devedor" formControlName="ce_saldo_devedor"
@@ -137,11 +137,19 @@
                             </div>
                             <div class="col-lg-4 mt-4">
                                 <div class="stats">
-                                    <button type="button" (click)="resetFields()" class="btn btn-info btn-round">Incluir
+                                    <button type="button" (click)="resetFields()" class="btn btn-info btn-round"
+                                        disabled>Incluir
                                         Lançamentos</button>
                                 </div>
                             </div>
                         </form>
+                    </div>
+
+                </div>
+                <br>
+                <div class="d-flex justify-content-center" *ngIf="tableLoading && (tableData.dataRows.length === 0)">
+                    <div class="spinner-grow text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
                     </div>
                 </div>
             </div>
@@ -159,31 +167,20 @@
                             *ngIf="tableData && tableData.headerRow && tableData.dataRows && !tableLoading">
                             <thead class="text-primary">
                                 <tr *ngFor="let header of tableData.headerRow">
-                                    <th>
-                                        {{header.dataBase.title}}
-                                    <th>
-                                        {{header.indiceDataBase.title}}
-                                    <th>
-                                        {{header.dataBaseAtual.title}}
-                                    <th>
-                                        {{header.indiceDataAtual.title}}
-                                    <th>
-                                        {{header.valorDevedor.title}}
-                                    <th>
-                                        {{header.correcaoPeloIndice.title}}
-                                    <th>
-                                        {{header.dias.title}}
-                                    <th>
-                                        {{header.percents.title}}
-                                    <th>
-                                        {{header.moneyValue.title}}
-                                    <th>
-                                        {{header.multa.title}}
-                                    <th>
-                                        {{header.lancamentos.title}}
-                                    <th>
-                                        {{header.valorDevedorAtualizado.title}}
-                                    </th>
+                                    <th>{{header.dataBase.title}}</th>
+                                    <th>{{header.indiceDB.title}}</th>
+                                    <th>{{header.indiceDataBase.title}}</th>
+                                    <th>{{header.dataBaseAtual.title}}</th>
+                                    <th>{{header.indiceBA.title}}</th>
+                                    <th>{{header.indiceDataBaseAtual.title}}</th>
+                                    <th>{{header.valorDevedor.title}}</th>
+                                    <th>{{header.correcaoPeloIndice.title}}</th>
+                                    <th>{{header.dias.title}}</th>
+                                    <th>{{header.percents.title}}</th>
+                                    <th>{{header.moneyValue.title}}</th>
+                                    <th>{{header.multa.title}}</th>
+                                    <th>{{header.lancamentos.title}}</th>
+                                    <th>{{header.valorDevedorAtualizado.title}}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -192,13 +189,31 @@
                                         {{row.dataBase}}
                                     </td>
                                     <td>
-                                        {{row.indiceDataBase}}
+                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice">
+                                            <option *ngFor="let indice of indice_field" [value]="indice"
+                                                [selected]="indice === row.indiceDB">
+                                                {{indice}}</option>
+                                        </select>
+                                    </td>
+                                    <td width="180">
+                                        <input type="number" class="form-control" name="ce_indiceDataBase"
+                                            id="ce_indiceDataBase" [placeholder]="row.indiceDataBase">
                                     </td>
                                     <td>
-                                        {{row.dataBaseAtual}}
+                                        <input type="date" class="form-control col-md-11 col-sm-12"
+                                            name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
+                                            min="1000-01-01" [value]="row.dataBaseAtual">
                                     </td>
                                     <td>
-                                        {{row.indiceDataAtual}}
+                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice">
+                                            <option *ngFor="let indice of indice_field" [value]="indice"
+                                                [selected]="indice === row.indiceBA">
+                                                {{indice}}</option>
+                                        </select>
+                                    </td>
+                                    <td width="180">
+                                        <input type="number" class="form-control" name="ce_indiceDataBase"
+                                            id="ce_indiceDataBase" [placeholder]="row.indiceDataBaseAtual">
                                     </td>
                                     <td>
                                         {{row.valorDevedor}}

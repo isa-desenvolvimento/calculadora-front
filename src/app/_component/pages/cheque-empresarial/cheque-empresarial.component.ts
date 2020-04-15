@@ -107,42 +107,55 @@ export class ChequeEmpresarialComponent implements OnInit {
   filterContracts() {
     this.tableLoading = true;
     setTimeout(() => {
-      this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value));
+      this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 500);
+    }, 1500);
   }
 
   simularCalc() {
-    let teste = this.tableData.dataRows.map(row => {
-      //   dataBaseAtual: "02/12/2010",
-      //     indiceDataAtual: "100",
-      //       valorDevedor: "233300",
-      //         encargosMonetarios: {
-      //   correcaoPeloIndice: "1222",
-      //     jurosAm: {
-      //     dias: "10",
-      //       percents: "2",
-      //         moneyValue: "1000000",
-      //   },
-      //   multa: "30000",
-      // },
-      // lancamentos: "131231",
+    this.tableLoading = true;
+    setTimeout(() => {
+      this.tableData.dataRows.map(row => {
+        //   dataBaseAtual: "02/12/2010",
+        //     indiceDataAtual: "100",
+        //       valorDevedor: "233300",
+        //         encargosMonetarios: {
+        //   correcaoPeloIndice: "1222",
+        //     jurosAm: {
+        //     dias: "10",
+        //       percents: "2",
+        //         moneyValue: "1000000",
+        //   },
+        //   multa: "30000",
+        // },
+        // lancamentos: "131231",
 
-      // this.ce_form.ce_encargos_monietarios && (row['wayner'] = this.ce_form_riscos.ce_encargos_monietarios.value);
-      // this.ce_form_riscos.ce_ultima_atualizacao && (row['wayner'] = this.ce_form_riscos.ce_ultima_atualizacao.value);
-      // this.ce_form_riscos.ce_juros_mora && (row['wayner'] = this.ce_form_riscos.ce_juros_mora.value);
+        // this.ce_form.ce_encargos_monietarios && (row['wayner'] = this.ce_form_riscos.ce_encargos_monietarios.value);
+        // this.ce_form_riscos.ce_ultima_atualizacao && (row['wayner'] = this.ce_form_riscos.ce_ultima_atualizacao.value);
+        // this.ce_form_riscos.ce_juros_mora && (row['wayner'] = this.ce_form_riscos.ce_juros_mora.value);
 
-      this.ce_form_riscos.ce_data_calculo && (this.total_date_now = new Date(Date.now()).toJSON());
-      this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = this.ce_form_riscos.ce_data_calculo.value);
-      this.ce_form_riscos.ce_honorarios && (this.total_honorarios = this.ce_form_riscos.ce_honorarios.value);
-      this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = this.ce_form_riscos.ce_multa_sobre_constrato.value);
+        // Forms
+        this.ce_form_riscos.ce_data_calculo && (this.total_date_now = new Date(Date.now()).toJSON());
+        this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = this.ce_form_riscos.ce_data_calculo.value);
+        this.ce_form_riscos.ce_honorarios && (this.total_honorarios = this.ce_form_riscos.ce_honorarios.value);
+        this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = this.ce_form_riscos.ce_multa_sobre_constrato.value);
 
-      this.ce_form_riscos.ce_indice && (row['indiceDataBase'] = this.ce_form_riscos.ce_indice.value);
-      this.ce_form_riscos.ce_encargos_contratuais && (row['indiceEncargosContratuais'] = this.ce_form_riscos.ce_encargos_contratuais.value);
-      this.ce_form_riscos.ce_saldo_devedor && (row['valorDevedorAtualizado'] = this.ce_form_riscos.ce_saldo_devedor.value)
-      this.ce_form_riscos.ce_data_vencimento && (row['dataBase'] = this.ce_form_riscos.ce_data_vencimento.value);
-      row['encargosMonetarios'].multa = this.ce_form_riscos['ce_multa'].value;
-    });
+
+        // Table Values
+
+        // Indices
+        this.ce_form_riscos.ce_indice && (row['indiceDB'] = this.ce_form_riscos.ce_indice.value);
+        this.ce_form_riscos.ce_indice && (row['indiceBA'] = this.ce_form_riscos.ce_indice.value);
+
+        this.ce_form_riscos.ce_encargos_contratuais && (row['indiceEncargosContratuais'] = this.ce_form_riscos.ce_encargos_contratuais.value);
+        this.ce_form_riscos.ce_saldo_devedor && (row['valorDevedorAtualizado'] = this.ce_form_riscos.ce_saldo_devedor.value)
+        this.ce_form_riscos.ce_data_vencimento && (row['dataBase'] = this.ce_form_riscos.ce_data_vencimento.value);
+        row['encargosMonetarios'].multa = this.ce_form_riscos['ce_multa'].value;
+
+        this.tableLoading = false;
+      });
+    }, 2000);
+
   }
 
 
@@ -185,16 +198,24 @@ export class ChequeEmpresarialComponent implements OnInit {
         title: "Data Base",
         nested: false
       },
-      indiceDataBase: {
-        title: "Indíce Data Base",
-        nested: false
-      },
       dataBaseAtual: {
         title: "Data Base Atual",
         nested: false
       },
-      indiceDataAtual: {
-        title: "Indíce Data Atual",
+      indiceDB: {
+        title: "Indíce",
+        nested: false
+      },
+      indiceDataBase: {
+        title: "Indíce Data Base",
+        nested: false
+      },
+      indiceBA: {
+        title: "Indíce",
+        nested: false
+      },
+      indiceDataBaseAtual: {
+        title: "Indíce Data Base Atual",
         nested: false
       },
       valorDevedor: {
@@ -243,10 +264,13 @@ export class ChequeEmpresarialComponent implements OnInit {
   get Carga() {
     return [{
       dataBase: "02/01/1997",
+      indiceDB: "CDI",
+      indiceDataBase: "67,30",
+      indiceBA: "IGPM",
+      indiceDataBaseAtual: "33,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1222",
@@ -262,10 +286,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "IGPM",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "11,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -281,10 +308,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "37,30",
+      indiceBA: "CDI",
+      indiceDataBaseAtual: "18,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -300,10 +330,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "13,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "98,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -319,10 +352,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "12,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "22,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -338,10 +374,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "11,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "10,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -357,10 +396,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -376,10 +418,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -395,10 +440,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -414,10 +462,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -433,10 +484,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -452,10 +506,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -471,10 +528,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -490,10 +550,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -509,10 +572,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -528,10 +594,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -547,10 +616,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -566,10 +638,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -585,10 +660,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       contractRef: 0
     }, {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -605,10 +683,13 @@ export class ChequeEmpresarialComponent implements OnInit {
     },
     {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -625,10 +706,13 @@ export class ChequeEmpresarialComponent implements OnInit {
     },
     {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -645,10 +729,13 @@ export class ChequeEmpresarialComponent implements OnInit {
     },
     {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -665,10 +752,13 @@ export class ChequeEmpresarialComponent implements OnInit {
     },
     {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
@@ -685,10 +775,13 @@ export class ChequeEmpresarialComponent implements OnInit {
     },
     {
       dataBase: "02/01/1997",
+      indiceDB: "INPC",
+      indiceDataBase: "67,30",
+      indiceBA: "INPC",
+      indiceDataBaseAtual: "38,29",
       indiceEncargosContratuais: 1,
-      indiceDataBase: "INPC",
       dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "100",
+      indiceDataAtual: "10067,30",
       valorDevedor: "233300",
       encargosMonetarios: {
         correcaoPeloIndice: "1233",
