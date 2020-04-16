@@ -166,7 +166,7 @@
                         <table [dtOptions]="dtOptions" datatable class="table table-hover"
                             *ngIf="tableData && tableData.headerRow && tableData.dataRows && !tableLoading">
                             <thead class="text-primary">
-                                <tr *ngFor="let header of tableData.headerRow">
+                                <tr *ngFor="let header of tableData.headerRow" align="center">
                                     <th>{{header.dataBase.title}}</th>
                                     <th>{{header.indiceDB.title}}</th>
                                     <th>{{header.indiceDataBase.title}}</th>
@@ -184,8 +184,8 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of tableData.dataRows" style="font-size: 12px;">
-                                    <td>
+                                <tr *ngFor="let row of tableData.dataRows" style="font-size: 12px;" align="center">
+                                    <td width="100">
                                         {{row.dataBase}}
                                     </td>
                                     <td>
@@ -195,9 +195,8 @@
                                                 {{indice}}</option>
                                         </select>
                                     </td>
-                                    <td width="180">
-                                        <input type="number" class="form-control" name="ce_indiceDataBase"
-                                            id="ce_indiceDataBase" [placeholder]="row.indiceDataBase">
+                                    <td>
+                                        {{row.indiceDataBase}}
                                     </td>
                                     <td>
                                         <input type="date" class="form-control col-md-11 col-sm-12"
@@ -211,9 +210,8 @@
                                                 {{indice}}</option>
                                         </select>
                                     </td>
-                                    <td width="180">
-                                        <input type="number" class="form-control" name="ce_indiceDataBase"
-                                            id="ce_indiceDataBase" [placeholder]="row.indiceDataBaseAtual">
+                                    <td>
+                                        {{row.indiceDataBaseAtual}}
                                     </td>
                                     <td>
                                         {{row.valorDevedor}}
@@ -221,16 +219,16 @@
                                     <td>
                                         {{row.encargosMonetarios.correcaoPeloIndice}}
                                     </td>
-                                    <td>
+                                    <td width="50">
                                         {{row.encargosMonetarios.jurosAm.dias}}
                                     </td>
-                                    <td>
+                                    <td width="50">
                                         {{row.encargosMonetarios.jurosAm.percents}}
                                     </td>
-                                    <td>
+                                    <td width="30">
                                         {{row.encargosMonetarios.jurosAm.moneyValue}}
                                     </td>
-                                    <td>
+                                    <td width="60">
                                         {{row.encargosMonetarios.multa}}
                                     </td>
                                     <td>
