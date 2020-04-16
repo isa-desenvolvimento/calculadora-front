@@ -39,7 +39,6 @@ export class ChequeEmpresarialComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.filterContracts();
     this.ceForm = this.formBuilder.group({
       ce_pasta: [],
       ce_contrato: ['', Validators.required],
@@ -110,7 +109,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 0);
+    }, 2000);
   }
 
   simularCalc() {
@@ -157,7 +156,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         this.tableLoading = false;
       });
-    }, 0);
+    }, 3000);
 
   }
 
