@@ -51,8 +51,8 @@
                                 <label for="ce_indice" class="col-form-label">Indice</label>
                                 <select class="form-control custom-select col-md-12 col-sm-12" name="ce_indice"
                                     id="ce_indice" formControlName="ce_indice">
-                                    <option *ngFor="let indice of indice_field" [value]="indice">
-                                        {{indice}}</option>
+                                    <option *ngFor="let indice of indice_field" [value]="indice.type">
+                                        {{indice.type}}</option>
                                 </select>
                             </div>
                             <div class="col-md-3 col-sm-12">
@@ -189,25 +189,27 @@
                                         {{row.dataBase}}
                                     </td>
                                     <td>
-                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice">
-                                            <option *ngFor="let indice of indice_field" [value]="indice"
-                                                [selected]="indice === row.indiceDB">
-                                                {{indice}}</option>
+                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice"
+                                            (change)="updateInlineIndice($event, row, 'indiceDataBase')">
+                                            <option *ngFor="let indice of indice_field" [value]="indice.type"
+                                                [selected]="indice.type === row.indiceDB">
+                                                {{indice.type}}</option>
                                         </select>
                                     </td>
                                     <td>
                                         {{row.indiceDataBase}}
                                     </td>
-                                    <td>
+                                    <td width="110">
                                         <input type="date" class="form-control col-md-11 col-sm-12"
                                             name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
                                             min="1000-01-01" [value]="row.dataBaseAtual">
                                     </td>
                                     <td>
-                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice">
-                                            <option *ngFor="let indice of indice_field" [value]="indice"
-                                                [selected]="indice === row.indiceBA">
-                                                {{indice}}</option>
+                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice"
+                                            (change)="updateInlineIndice($event, row, 'indiceDataBaseAtual')">
+                                            <option *ngFor="let indice of indice_field" [value]="indice.type"
+                                                [selected]="indice.type === row.indiceBA">
+                                                {{indice.type}}</option>
                                         </select>
                                     </td>
                                     <td>

@@ -147,6 +147,8 @@ export class ChequeEmpresarialComponent implements OnInit {
         // Indices
         this.ce_form_riscos.ce_indice && (row['indiceDB'] = this.ce_form_riscos.ce_indice.value);
         this.ce_form_riscos.ce_indice && (row['indiceBA'] = this.ce_form_riscos.ce_indice.value);
+        this.ce_form_riscos.ce_indice && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
+        this.ce_form_riscos.ce_indice && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
 
         this.ce_form_riscos.ce_encargos_contratuais && (row['indiceEncargosContratuais'] = this.ce_form_riscos.ce_encargos_contratuais.value);
         this.ce_form_riscos.ce_saldo_devedor && (row['valorDevedorAtualizado'] = this.ce_form_riscos.ce_saldo_devedor.value)
@@ -159,6 +161,13 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   }
 
+  getIndiceDataBase(indice) {
+    return this.indice_field.filter(ind => ind.type === indice).map(ind => ind.value)
+  }
+
+  updateInlineIndice(e, row, indiceToChangeInline) {
+    row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value);
+  }
 
   // Mock formulário de riscos
   // Consulta 
@@ -191,7 +200,19 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   typeContractList_field = ["Cheque empresarial", "Parcelado", "Pós"];
 
-  indice_field = ["INPC", "CDI", "IGPM"];
+  indice_field = [{
+    type: "INPC",
+    value: "60,872914"
+  },
+  {
+    type: "CDI",
+    value: "71,712333"
+  },
+  {
+    type: "IGPM",
+    value: "1,24"
+  }
+  ];
 
   buildHeaderTable() {
     this.tableData.headerRow = [{
