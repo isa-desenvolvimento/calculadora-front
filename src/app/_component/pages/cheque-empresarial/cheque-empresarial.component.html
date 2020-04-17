@@ -117,32 +117,81 @@
                         </div>
                     </div>
 
-                    <div class="col-lg-12 col-sm-12">
+                    <div class="col-lg-8 col-sm-12">
                         <form class="row" [formGroup]="ceFormAmortizacao">
-                            <div class="col-lg-3 col-sm-3">
-                                <div style="padding: 0 12px 0 12px">
-                                    <label for="nome" class="col-form-label">Data Vencimento</label>
-                                    <input type="date" class="form-control col-md-12 col-sm-12"
-                                        name="ce_data_vencimento" id="ce_data_vencimento"
-                                        formControlName="ce_data_vencimento" max="3000-12-31" min="1000-01-01">
-                                </div>
+                            <div class="col-md-4 col-sm-12">
+                                <label for="nome" class="col-form-label">Data Vencimento</label>
+                                <input *ngIf="(tableData.dataRows.length === 0)" type="date"
+                                    class="form-control col-md-12 col-sm-12" name="ceFA_data_vencimento"
+                                    id="ceFA_data_vencimento" formControlName="ceFA_data_vencimento" max="3000-12-31"
+                                    min="1000-01-01">
+                                <p *ngIf="!(tableData.dataRows.length === 0)">
+                                    {{tableData.dataRows[0]["dataBase"]}}
+                                </p>
                             </div>
-                            <div class="col-lg-3 col-sm-3">
-                                <div style="padding: 0 12px 5px 12px">
-                                    <label for="nome" class="col-form-label">Saldo Devedor</label>
-                                    <input type="number" class="form-control col-md-12 col-sm-12"
-                                        name="ce_saldo_devedor" id="ce_saldo_devedor" formControlName="ce_saldo_devedor"
-                                        required>
-                                </div>
+                            <div class="col-md-4 col-sm-12">
+                                <label for="nome" class="col-form-label">Saldo Devedor</label>
+                                <input *ngIf="(tableData.dataRows.length === 0)" type="number"
+                                    class="form-control col-md-12 col-sm-12" name="ceFa_saldo_devedor"
+                                    style="height: 35px" id="ceFa_saldo_devedor" formControlName="ceFa_saldo_devedor">
+                                <p *ngIf="!(tableData.dataRows.length === 0)">
+                                    R$ {{tableData.dataRows[0]["valorDevedor"]}}
+                                </p>
                             </div>
-                            <div class="col-lg-4 mt-4">
-                                <div class="stats">
-                                    <button type="button" (click)="resetFields()" class="btn btn-info btn-round"
-                                        disabled>Incluir
-                                        Lançamentos</button>
-                                </div>
+                            <div class="col-md-4 col-sm-12">
+                                <label for="nome" class="col-form-label">Data Base Atual</label>
+                                <input type="date" class="form-control col-md-12 col-sm-12" name="ceFA_data_base_atual"
+                                    id="ceFA_data_base_atual" formControlName="ceFA_data_base_atual" max="3000-12-31"
+                                    min="1000-01-01">
+                            </div>
+                            <div class="col-md-3 col-sm-12">
+                                <label for="nome" class="col-form-label">Valor Lançamento</label>
+                                <input type="number" class="form-control col-md-12 col-sm-12"
+                                    name="ceFA_valor_lancamento" style="height: 35px" id="ceFA_valor_lancamento"
+                                    formControlName="ceFA_valor_lancamento">
+                            </div>
+                            <div class="col-md-3 col-sm-12">
+                                <label for="nome" class="col-form-label">Tipo de lançamento</label>
+                                <select class="form-control custom-select" name="ceFA_tipo_lancamento"
+                                    id="ceFA_tipo_lancamento" formControlName="ceFA_tipo_lancamento">
+                                    <option selected>Crédito</option>
+                                    <option>Débito</option>
+                                </select>
+                            </div>
+                            <div class="col-md-3 col-sm-12" style="padding: 8px 0 0 10px">
+                                <fieldset class="form-group ml-sm-3">
+                                    <div class="form-group row">
+                                        <legend class="col-form-label col-sm-5 pt-0">
+                                            <label class="form-check-label" for="profile2">Amortização</label>
+                                        </legend>
+                                        <div class="col-sm-7 ml-4 ml-sm-2">
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" id="profile1"
+                                                    value="inicio" checked>
+                                                <label class="form-check-label" for="profile1">
+                                                    Ínicio
+                                                </label>
+                                            </div>
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" value="fim">
+                                                <label class="form-check-label" for="profile2">
+                                                    Fim
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </fieldset>
                             </div>
                         </form>
+                    </div>
+                    <div class="col-lg-4 mt-4">
+                        <div class="col-lg-12 mt-12">
+                            <div class="stats">
+                                <button type="button" (click)="incluirLancamentos()" class="btn btn-info btn-round"
+                                    [disabled]="!ceFormAmortizacao.valid">Incluir
+                                    Lançamentos</button>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
@@ -160,7 +209,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Lista de Propostas</h4>
+                        <h4 class="card-title">Lista de Lançamentos</h4>
                     </div>
                     <div class="card-body" style="max-height: calc(100vh - 400px);overflow: scroll;">
                         <table [dtOptions]="dtOptions" datatable class="table table-hover"

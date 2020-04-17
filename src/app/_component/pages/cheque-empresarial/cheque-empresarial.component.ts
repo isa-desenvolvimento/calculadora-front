@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ChequeEmpresarial } from '../../../_models/ChequeEmpresarial';
+import { Lancamento } from '../../../_models/ChequeEmpresarial';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 declare interface TableData {
@@ -22,7 +22,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   submitted = false;
   returnUrl: string;
   errorMessage = '';
-  payload: ChequeEmpresarial;
+  payloadLancamento: Lancamento;
   tableData: TableData;
   tableLoading = false;
 
@@ -55,14 +55,17 @@ export class ChequeEmpresarialComponent implements OnInit {
       ce_honorarios: [],
       ce_multa_sobre_constrato: []
     });
-    this.ceFormAmortizacao = this.formBuilder.group({
-      ce_data_vencimento: [],
-      ce_saldo_devedor: []
-    });
     this.tableData = {
       headerRow: [],
       dataRows: []
     }
+    this.ceFormAmortizacao = this.formBuilder.group({
+      ceFA_data_vencimento: [],
+      ceFa_saldo_devedor: [],
+      ceFA_data_base_atual: ['', Validators.required],
+      ceFA_valor_lancamento: ['', Validators.required],
+      ceFA_tipo_lancamento: ['', Validators.required]
+    });
     this.buildHeaderTable();
 
     this.dtOptions = {
@@ -104,12 +107,50 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ceForm.reset()
   }
 
+  incluirLancamentos() {
+    this.tableLoading = true;
+
+    let localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[0]["dataBase"];
+    let localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[0]["valorDevedorAtualizado"];
+
+    console.log(localDataBase);
+    setTimeout(() => {
+      this.payloadLancamento = ({
+        dataBase: localDataBase,
+        indiceDB: null,
+        indiceDataBase: null,
+        indiceBA: null,
+        indiceDataBaseAtual: null,
+        indiceEncargosContratuais: null,
+        dataBaseAtual: this.ce_form_amortizacao.ceFA_data_base_atual.value,
+        indiceDataAtual: null,
+        valorDevedor: localValorDevedor,
+        encargosMonetarios: {
+          correcaoPeloIndice: null,
+          jurosAm: {
+            dias: null,
+            percents: null,
+            moneyValue: null,
+          },
+          multa: null,
+        },
+        lancamentos: this.ce_form_amortizacao.ceFA_valor_lancamento.value,
+        tipoLancamento: this.ce_form_amortizacao.ceFA_tipo_lancamento.value,
+        valorDevedorAtualizado: null,
+        contractRef: null
+      });
+      this.tableData.dataRows.push(this.payloadLancamento);
+      this.tableLoading = false;
+    }, 0);
+
+  }
+
   filterContracts() {
     this.tableLoading = true;
     setTimeout(() => {
       this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 2000);
+    }, 0);
   }
 
   simularCalc() {
@@ -149,14 +190,16 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.ce_form_riscos.ce_indice && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
         this.ce_form_riscos.ce_indice && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
 
+        // Amortizacao
+        // this.ce_form_amortizacao.ceFA_saldo_devedor && (row['valorDevedorAtualizado'] = this.ce_form_amortizacao.ceFA_saldo_devedor.value)
+        // this.ce_form_amortizacao.ceFA_data_vencimento && (row['dataBase'] = this.ce_form_riscos.ceFA_data_vencimento.value);
+
         this.ce_form_riscos.ce_encargos_contratuais && (row['indiceEncargosContratuais'] = this.ce_form_riscos.ce_encargos_contratuais.value);
-        this.ce_form_riscos.ce_saldo_devedor && (row['valorDevedorAtualizado'] = this.ce_form_riscos.ce_saldo_devedor.value)
-        this.ce_form_riscos.ce_data_vencimento && (row['dataBase'] = this.ce_form_riscos.ce_data_vencimento.value);
         row['encargosMonetarios'].multa = this.ce_form_riscos['ce_multa'].value;
 
         this.tableLoading = false;
       });
-    }, 3000);
+    }, 0);
 
   }
 
@@ -200,6 +243,9 @@ export class ChequeEmpresarialComponent implements OnInit {
   typeContractList_field = ["Cheque empresarial", "Parcelado", "Pós"];
 
   indice_field = [{
+    type: "---",
+    value: "0"
+  }, {
     type: "INPC",
     value: "60,872914"
   },
