@@ -48,7 +48,6 @@ export class ChequeEmpresarialComponent implements OnInit {
       ce_indice: [],
       ce_encargos_monietarios: [],
       ce_data_calculo: [],
-      ce_ultima_atualizacao: [],
       ce_encargos_contratuais: [],
       ce_multa: [],
       ce_juros_mora: [],
@@ -64,7 +63,8 @@ export class ChequeEmpresarialComponent implements OnInit {
       ceFa_saldo_devedor: [],
       ceFA_data_base_atual: ['', Validators.required],
       ceFA_valor_lancamento: ['', Validators.required],
-      ceFA_tipo_lancamento: ['', Validators.required]
+      ceFA_tipo_lancamento: ['', Validators.required],
+      ceFA_tipo_amortizacao: []
     });
     this.buildHeaderTable();
 
@@ -139,7 +139,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         valorDevedorAtualizado: null,
         contractRef: null
       });
-      this.tableData.dataRows.push(this.payloadLancamento);
+      this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
     }, 0);
 
@@ -207,7 +207,8 @@ export class ChequeEmpresarialComponent implements OnInit {
     return this.indice_field.filter(ind => ind.type === indice).map(ind => ind.value)
   }
 
-  updateInlineIndice(e, row, indiceToChangeInline) {
+  updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
+    row[innerIndice] = e.target.value;
     row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value);
   }
 
