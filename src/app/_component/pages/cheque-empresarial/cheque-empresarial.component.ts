@@ -114,8 +114,12 @@ export class ChequeEmpresarialComponent implements OnInit {
   incluirLancamentos() {
     this.tableLoading = true;
     const lastLine = this.tableData.dataRows.length === 0 ? this.tableData.dataRows.length : this.tableData.dataRows.length - 1;
-    let localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[lastLine]["dataBaseAtual"];
-    let localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[0]["valorDevedorAtualizado"];
+    const localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[lastLine]["dataBaseAtual"];
+    const localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[0]["valorDevedorAtualizado"];
+
+    const localLancamentos = this.ce_form_amortizacao.ceFA_valor_lancamento.value;
+    const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
+    const localDataBaseAtual = this.ce_form_amortizacao.ceFA_data_base_atual.value;
 
     setTimeout(() => {
       this.payloadLancamento = ({
@@ -125,7 +129,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         indiceBA: null,
         indiceDataBaseAtual: null,
         indiceEncargosContratuais: null,
-        dataBaseAtual: this.ce_form_amortizacao.ceFA_data_base_atual.value,
+        dataBaseAtual: localDataBaseAtual,
         indiceDataAtual: null,
         valorDevedor: localValorDevedor,
         encargosMonetarios: {
@@ -137,8 +141,8 @@ export class ChequeEmpresarialComponent implements OnInit {
           },
           multa: null,
         },
-        lancamentos: this.ce_form_amortizacao.ceFA_valor_lancamento.value,
-        tipoLancamento: this.ce_form_amortizacao.ceFA_tipo_lancamento.value,
+        lancamentos: localLancamentos,
+        tipoLancamento: localTipoLancamento,
         valorDevedorAtualizado: null,
         contractRef: null
       });
@@ -146,6 +150,18 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableLoading = false;
     }, 0);
 
+  }
+
+  testeCalculo(qtdDias = 10) {
+    const localEncargos_contratuais = this.ce_form_riscos.ce_encargos_contratuais.value;
+    const localMulta = this.ce_form_riscos.ce_multa.value;
+    const localJuros_mora = this.ce_form_riscos.ce_juros_mora.value;
+    const localHonorarios = this.ce_form_riscos.ce_honorarios.value;
+
+    console.log(localEncargos_contratuais,
+      localMulta,
+      localJuros_mora,
+      localHonorarios);
   }
 
   filterContracts() {
@@ -201,9 +217,10 @@ export class ChequeEmpresarialComponent implements OnInit {
         row['encargosMonetarios'].multa = this.ce_form_riscos['ce_multa'].value;
 
         this.tableLoading = false;
+
       });
     }, 1000);
-
+    this.testeCalculo();
   }
 
   getIndiceDataBase(indice) {

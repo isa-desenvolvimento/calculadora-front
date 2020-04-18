@@ -68,19 +68,20 @@
                                         {{indice.type}}</option>
                                 </select>
                             </div>
-                            <div class="col-md-3 col-sm-12" [hidden]="ce_form_riscos.ce_indice.value !== 'Encargos Contratuais %'">
-                                <label for="nome" class="col-form-label"> Encargos Contratuais %</label>
+                            <div class="col-md-3 col-sm-12"
+                                [hidden]="ce_form_riscos.ce_indice.value !== 'Encargos Contratuais %'">
+                                <label for="nome" class="col-form-label">Encargos Contratuais %</label>
                                 <input type="number" class="form-control col-md-11 col-sm-12 "
                                     name="ce_encargos_contratuais" id="ce_encargos_contratuais"
                                     formControlName="ce_encargos_contratuais">
                             </div>
                             <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Multa</label>
+                                <label for="nome" class="col-form-label">Multa %</label>
                                 <input type="number" class="form-control col-md-11 col-sm-12" name="ce_multa"
                                     id="ce_multa" formControlName="ce_multa" value>
                             </div>
                             <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Juros Mora</label>
+                                <label for="nome" class="col-form-label">Juros Mora %</label>
                                 <input type="number" class="form-control col-md-11 col-sm-12" name="ce_juros_mora"
                                     id="ce_juros_mora" formControlName="ce_juros_mora">
                             </div>
