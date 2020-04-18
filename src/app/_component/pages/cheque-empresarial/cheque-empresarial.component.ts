@@ -117,7 +117,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     let localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[lastLine]["dataBaseAtual"];
     let localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[0]["valorDevedorAtualizado"];
 
-    console.log(localDataBase);
     setTimeout(() => {
       this.payloadLancamento = ({
         dataBase: localDataBase,
@@ -154,7 +153,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 0);
+    }, 1000);
   }
 
   simularCalc() {
@@ -203,7 +202,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         this.tableLoading = false;
       });
-    }, 0);
+    }, 1000);
 
   }
 
