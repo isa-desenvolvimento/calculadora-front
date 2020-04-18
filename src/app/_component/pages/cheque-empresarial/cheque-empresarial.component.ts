@@ -25,6 +25,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   payloadLancamento: Lancamento;
   tableData: TableData;
   tableLoading = false;
+  today: string;
 
   // total
   total_date_now: any;
@@ -36,9 +37,12 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-  ) { }
+  ) {
+  }
 
   ngOnInit() {
+    this.today = new Date().toISOString().substring(0, 10);
+
     this.ceForm = this.formBuilder.group({
       ce_pasta: [],
       ce_contrato: ['', Validators.required],
@@ -109,8 +113,8 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   incluirLancamentos() {
     this.tableLoading = true;
-
-    let localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[0]["dataBase"];
+    const lastLine = this.tableData.dataRows.length === 0 ? this.tableData.dataRows.length : this.tableData.dataRows.length - 1;
+    let localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[lastLine]["dataBaseAtual"];
     let localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[0]["valorDevedorAtualizado"];
 
     console.log(localDataBase);
@@ -257,6 +261,10 @@ export class ChequeEmpresarialComponent implements OnInit {
   {
     type: "IGPM",
     value: "1,24"
+  },
+  {
+    type: "Encargos Contratuais %",
+    value: "0"
   }
   ];
 
