@@ -157,7 +157,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         contractRef: null
       });
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
-      console.log(this.payloadLancamento);
       this.tableLoading = false;
     }, 0);
     this.simularCalc(true);
@@ -196,7 +195,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.tableLoading = true;
     setTimeout(() => {
       let teste = this.tableData.dataRows.map(row => {
-        debugger
 
         const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
