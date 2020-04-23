@@ -54,7 +54,8 @@
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Data do Cálculo</label>
-                                <input type="text" [value]="today" class="form-control col-md-11 col-sm-12" readonly>
+                                <input type="text" [value]="getCurrentDate('DD/MM/YYYY')"
+                                    class="form-control col-md-11 col-sm-12" readonly>
                             </div>
                             <div class="col-md-3 col-sm-12">
                             </div>
@@ -71,30 +72,33 @@
                             <div class="col-md-3 col-sm-12"
                                 [hidden]="ce_form_riscos.ce_indice.value !== 'Encargos Contratuais %'">
                                 <label for="nome" class="col-form-label">Encargos Contratuais %</label>
-                                <input type="number" class="form-control col-md-11 col-sm-12 "
-                                    name="ce_encargos_contratuais" id="ce_encargos_contratuais"
-                                    formControlName="ce_encargos_contratuais">
+                                <input type="number" (change)="verifyNumber($event)" min="0"
+                                    class="form-control col-md-11 col-sm-12 " name="ce_encargos_contratuais"
+                                    id="ce_encargos_contratuais" formControlName="ce_encargos_contratuais">
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Multa %</label>
-                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_multa"
-                                    id="ce_multa" formControlName="ce_multa" value>
+                                <input type="number" (change)="verifyNumber($event)" min="0"
+                                    class="form-control col-md-11 col-sm-12" name="ce_multa" id="ce_multa"
+                                    formControlName="ce_multa" value>
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Juros Mora %</label>
-                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_juros_mora"
-                                    id="ce_juros_mora" formControlName="ce_juros_mora">
+                                <input type="number" (change)="verifyNumber($event)" min="0"
+                                    class="form-control col-md-11 col-sm-12" name="ce_juros_mora" id="ce_juros_mora"
+                                    formControlName="ce_juros_mora">
                             </div>
                             <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Honorários %</label>
-                                <input type="number" class="form-control col-md-11 col-sm-12" name="ce_honorarios"
-                                    id="ce_honorarios" formControlName="ce_honorarios">
+                                <label for="nome" class="col-form-label">Honorários</label>
+                                <input type="number" (change)="verifyNumber($event)" min="0"
+                                    class="form-control col-md-11 col-sm-12" name="ce_honorarios" id="ce_honorarios"
+                                    formControlName="ce_honorarios">
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Multa sob contrato</label>
-                                <input type="number" class="form-control col-md-11 col-sm-12"
-                                    name="ce_multa_sobre_constrato" id="ce_multa_sobre_constrato"
-                                    formControlName="ce_multa_sobre_constrato">
+                                <input type="number" (change)="verifyNumber($event)" min="0"
+                                    class="form-control col-md-11 col-sm-12" name="ce_multa_sobre_constrato"
+                                    id="ce_multa_sobre_constrato" formControlName="ce_multa_sobre_constrato">
                             </div>
                         </form>
                     </div>
@@ -129,8 +133,9 @@
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Saldo Devedor</label>
                                 <input *ngIf="(tableData.dataRows.length === 0)" type="number"
-                                    class="form-control col-md-12 col-sm-12" name="ceFa_saldo_devedor"
-                                    style="height: 35px" id="ceFa_saldo_devedor" formControlName="ceFa_saldo_devedor">
+                                    (change)="verifyNumber($event)" min="0" class="form-control col-md-12 col-sm-12"
+                                    name="ceFa_saldo_devedor" style="height: 35px" id="ceFa_saldo_devedor"
+                                    formControlName="ceFa_saldo_devedor">
                                 <p *ngIf="!(tableData.dataRows.length === 0)">
                                     R$ {{tableData.dataRows[0]["valorDevedor"]}}
                                 </p>
@@ -140,13 +145,13 @@
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Data Base Atual</label>
                                 <input type="date" class="form-control col-md-12 col-sm-12" name="ceFA_data_base_atual"
-                                    id="ceFA_data_base_atual" formControlName="ceFA_data_base_atual" max="3000-12-31"
-                                    min="1000-01-01">
+                                    id="ceFA_data_base_atual" formControlName="ceFA_data_base_atual">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Valor Lançamento</label>
-                                <input type="number" class="form-control col-md-12 col-sm-12"
-                                    name="ceFA_valor_lancamento" style="height: 35px" id="ceFA_valor_lancamento"
+                                <input type="number" (change)="verifyNumber($event)" min="0"
+                                    class="form-control col-md-12 col-sm-12" name="ceFA_valor_lancamento"
+                                    style="height: 35px" id="ceFA_valor_lancamento"
                                     formControlName="ceFA_valor_lancamento">
                             </div>
                             <div class="col-md-2 col-sm-12">
@@ -158,14 +163,16 @@
                                         <div class="col-sm-7 ml-2">
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio" name="ceFA_tipo_lancamento"
-                                                    formControlName="ceFA_tipo_lancamento" id="status1" [value]="true">
+                                                    formControlName="ceFA_tipo_lancamento" id="status1"
+                                                    [value]="'credit'">
                                                 <label class="form-check-label" for="status1" style="margin: -30px">
                                                     Crédito
                                                 </label>
                                             </div>
                                             <div class="form-check ">
                                                 <input class="form-check-input" type="radio" name="ceFA_tipo_lancamento"
-                                                    formControlName="ceFA_tipo_lancamento" id="status2" [value]="false">
+                                                    formControlName="ceFA_tipo_lancamento" id="status2"
+                                                    [value]="'debit'">
                                                 <label class="form-check-label" for="status2" style="margin: -30px">
                                                     Débito
                                                 </label>
@@ -184,7 +191,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio"
                                                     name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status3" [value]="true">
+                                                    id="status3" [value]="true" disabled>
                                                 <label class="form-check-label" for="status3" style="margin: -30px">
                                                     Ínicio
                                                 </label>
@@ -192,7 +199,7 @@
                                             <div class="form-check ">
                                                 <input class="form-check-input" type="radio"
                                                     name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status4" [value]="false">
+                                                    id="status4" [value]="false" disabled>
                                                 <label class="form-check-label" for="status4" style="margin: -30px">
                                                     Fim
                                                 </label>
@@ -244,8 +251,8 @@
                                     <th>{{header.valorDevedor.title}}</th>
                                     <th>{{header.correcaoPeloIndice.title}}</th>
                                     <th>{{header.dias.title}}</th>
-                                    <th>{{header.percents.title}}</th>
-                                    <th>{{header.moneyValue.title}}</th>
+                                    <th>{{header.percentsJuros.title}}</th>
+                                    <!-- <th>{{header.moneyValue.title}}</th> -->
                                     <th>{{header.multa.title}}</th>
                                     <th>{{header.lancamentos.title}}</th>
                                     <th>{{header.valorDevedorAtualizado.title}}</th>
@@ -253,8 +260,8 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" style="font-size: 12px;" align="center">
-                                    <td width="100">
-                                        {{row.dataBase}}
+                                    <td>
+                                        {{formatDate(row)}}
                                     </td>
                                     <td>
                                         <select class="form-control custom-select" name="ce_indice" id="ce_indice"
@@ -267,10 +274,11 @@
                                     <td>
                                         {{row.indiceDataBase}}
                                     </td>
-                                    <td width="110">
+                                    <td>
                                         <input type="date" class="form-control col-md-11 col-sm-12"
                                             name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
-                                            min="1000-01-01" [value]="row.dataBaseAtual">
+                                            min="1000-01-01" [value]="row.dataBaseAtual"
+                                            (change)="changeDate($event, row)">
                                     </td>
                                     <td>
                                         <select class="form-control custom-select" name="ce_indice" id="ce_indice"
@@ -284,28 +292,28 @@
                                         {{row.indiceDataBaseAtual}}
                                     </td>
                                     <td>
-                                        {{row.valorDevedor}}
+                                        {{formatCurrency(row.valorDevedor)}}
                                     </td>
                                     <td>
-                                        {{row.encargosMonetarios.correcaoPeloIndice}}
+                                        {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}}
                                     </td>
-                                    <td width="50">
+                                    <td>
                                         {{row.encargosMonetarios.jurosAm.dias}}
                                     </td>
-                                    <td width="50">
-                                        {{row.encargosMonetarios.jurosAm.percents}}
+                                    <td>
+                                        {{formatCurrency(row.encargosMonetarios.jurosAm.percentsJuros)}}
                                     </td>
-                                    <td width="30">
+                                    <!-- <td width="30">
                                         {{row.encargosMonetarios.jurosAm.moneyValue}}
-                                    </td>
-                                    <td width="60">
-                                        {{row.encargosMonetarios.multa}}
+                                    </td> -->
+                                    <td>
+                                        {{formatCurrency(row.encargosMonetarios.multa)}}
                                     </td>
                                     <td>
-                                        {{row.lancamentos}}
+                                        {{row.tipoLancamento  === 'debit' ? formatCurrency(row.lancamentos * (-1)) : formatCurrency(row.lancamentos)}}
                                     </td>
                                     <td>
-                                        {{row.valorDevedorAtualizado}}
+                                        {{formatCurrency(row.valorDevedorAtualizado)}}
                                     </td>
                                 </tr>
                             </tbody>
@@ -319,16 +327,16 @@
                     <div class="card-footer" *ngIf="tableData.dataRows.length > 0 && !tableLoading">
                         <div class="row">
                             <div class="col-md-10">
-                                <p>Subtotal apurado em {{total_date_now}}</p>
+                                <p>Subtotal apurado em {{total_date_now || getCurrentDate()}}</p>
                                 <p>Honorários</p>
                                 <p>Multa Sob Contrato</p>
                                 <p>TOTAL APURADO EM {{total_data_calculo}}</p>
                             </div>
                             <div class="col-md-2">
-                                <p>R$ - 10.000.000.000,00</p>
-                                <p>R$ - {{total_honorarios}}</p>
-                                <p>R$ - {{total_multa_sob_contrato}}</p>
-                                <p>R$ - 10.000.000.000,00</p>
+                                <p>{{formatCurrency(1000)}}</p>
+                                <p>{{formatCurrency(total_honorarios)}}</p>
+                                <p>{{formatCurrency(total_multa_sob_contrato)}}</p>
+                                <p>{{formatCurrency(1000)}}</p>
                             </div>
                         </div>
 
