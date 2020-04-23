@@ -30,8 +30,10 @@ export class ChequeEmpresarialComponent implements OnInit {
   // total
   total_date_now: any;
   total_data_calculo: any;
-  total_honorarios: any;
-  total_multa_sob_contrato: any;
+  total_honorarios = 0;
+  total_multa_sob_contrato = 0;
+  total_subtotal = 0;
+  total_grandtotal = 0;
 
   dtOptions: DataTables.Settings = {};
 
@@ -155,9 +157,10 @@ export class ChequeEmpresarialComponent implements OnInit {
         contractRef: null
       });
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
+      console.log(this.payloadLancamento);
       this.tableLoading = false;
     }, 0);
-
+    this.simularCalc(true);
   }
 
   filterContracts() {
@@ -165,7 +168,8 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 4);
+    }, 1000);
+    this.simularCalc(true);
   }
 
   getCurrentDate(format = "DD/MM/YYYY hh:mm") {
@@ -180,27 +184,31 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   changeDate(e, row) {
     row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
+
+    this.simularCalc(true);
   }
 
   formatDate(row) {
     return moment(row['dataBase']).format("DD-MM-YYYY");
   }
 
-  simularCalc() {
+  simularCalc(isInlineChange = false) {
     this.tableLoading = true;
     setTimeout(() => {
-      this.tableData.dataRows.map(row => {
+      let teste = this.tableData.dataRows.map(row => {
         debugger
 
         const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
 
         // - Indices
-        this.ce_form_riscos.ce_indice && (row['indiceDB'] = this.ce_form_riscos.ce_indice.value);
-        this.ce_form_riscos.ce_indice && (row['indiceBA'] = this.ce_form_riscos.ce_indice.value);
+        if (!isInlineChange) {
+          this.ce_form_riscos.ce_indice && (row['indiceDB'] = this.ce_form_riscos.ce_indice.value);
+          this.ce_form_riscos.ce_indice && (row['indiceBA'] = this.ce_form_riscos.ce_indice.value);
 
-        this.ce_form_riscos.ce_indice && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
-        this.ce_form_riscos.ce_indice && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
+          this.ce_form_riscos.ce_indice && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
+          this.ce_form_riscos.ce_indice && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
+        }
 
         // Table Values
 
@@ -216,7 +224,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         // -- ???
         // row['encargosMonetarios']['jurosAm']['moneyValue'] = 99999999999;
         row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
-        
+
         // Amortizacao
         // this.ce_form_amortizacao.ceFA_saldo_devedor && (row['valorDevedorAtualizado'] = this.ce_form_amortizacao.ceFA_saldo_devedor.value)
         // this.ce_form_amortizacao.ceFA_data_vencimento && (row['dataBase'] = this.ce_form_riscos.ceFA_data_vencimento.value);
@@ -229,10 +237,16 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.ce_form_riscos.ce_honorarios && (this.total_honorarios = this.ce_form_riscos.ce_honorarios.value);
         this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = this.ce_form_riscos.ce_multa_sobre_constrato.value);
 
-        this.tableLoading = false;
+        // this.total_subtotal = 1000;
+        // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
+        this.tableLoading = false;
+        return parseFloat(row['valorDevedorAtualizado']);
       });
-    }, 4);
+      this.total_grandtotal = teste.reduce(function (acumulador, valorAtual) {
+        return acumulador + valorAtual;
+      }) + this.total_multa_sob_contrato + this.total_honorarios;
+    }, 1000);
   }
 
   getIndiceDataBase(indice) {
@@ -242,6 +256,8 @@ export class ChequeEmpresarialComponent implements OnInit {
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
     row[innerIndice] = e.target.value;
     row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value);
+
+    this.simularCalc(true);
   }
 
   // Mock formulário de riscos
@@ -366,563 +382,53 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   get Carga() {
-    return [{
-      dataBase: "02/01/1997",
-      indiceDB: "CDI",
-      indiceDataBase: "67,30",
-      indiceBA: "IGPM",
-      indiceDataBaseAtual: "33.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1222",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
+    return [
+      {
+        dataBase: "2020-04-23",
+        indiceDB: null,
+        indiceDataBase: null,
+        indiceBA: null,
+        indiceDataBaseAtual: null,
+        indiceEncargosContratuais: null,
+        dataBaseAtual: "2020-04-25",
+        indiceDataAtual: null,
+        valorDevedor: 100000,
+        encargosMonetarios: {
+          correcaoPeloIndice: "0.00",
+          jurosAm: {
+            dias: 2,
+            percentsJuros: "66.67"
+          },
+          multa: "0.00"
         },
-        multa: "30000",
+        lancamentos: 1000,
+        tipoLancamento: "debit",
+        valorDevedorAtualizado: "101066.67",
+        contractRef: 0
       },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "IGPM",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "11.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
+      {
+        dataBase: "2020-04-25",
+        indiceDB: null,
+        indiceDataBase: null,
+        indiceBA: null,
+        indiceDataBaseAtual: null,
+        indiceEncargosContratuais: null,
+        dataBaseAtual: "2020-04-28",
+        indiceDataAtual: null,
+        valorDevedor: 100000,
+        encargosMonetarios: {
+          correcaoPeloIndice: "0.00",
+          jurosAm: {
+            dias: 2,
+            percentsJuros: "66.67"
+          },
+          multa: "0.00"
         },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "37,30",
-      indiceBA: "CDI",
-      indiceDataBaseAtual: "18.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "13,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "98.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "12,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "22.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "11,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "10.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    }, {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    },
-    {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 3
-    },
-    {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 1
-    },
-    {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 1
-    },
-    {
-      dataBase: "02/01/1997",
-      indiceDB: "INPC",
-      indiceDataBase: "67,30",
-      indiceBA: "INPC",
-      indiceDataBaseAtual: "38.29",
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/12/2010",
-      indiceDataAtual: "10067,30",
-      valorDevedor: "233300",
-      encargosMonetarios: {
-        correcaoPeloIndice: "1233",
-        jurosAm: {
-          dias: "10",
-          percentsJuros: "2",
-          // moneyValue: "1000000",
-        },
-        multa: "30000",
-      },
-      lancamentos: "131231",
-      tipoLancamento: "debit",
-      valorDevedorAtualizado: "0",
-      contractRef: 1
-    },
-    {
-      dataBase: "08/04/2020",
-      indiceDB: "INPC",
-      indiceDataBase: null,
-      indiceBA: "INPC",
-      indiceDataBaseAtual: null,
-      indiceEncargosContratuais: 1,
-      dataBaseAtual: "02/05/2020",
-      indiceDataAtual: null,
-      valorDevedor: "100000",
-      encargosMonetarios: {
-        correcaoPeloIndice: null,
-        jurosAm: {
-          dias: null,
-          percentsJuros: null,
-          moneyValue: null,
-        },
-        multa: null,
-      },
-      lancamentos: "1000",
-      valorDevedorAtualizado: null,
-      contractRef: 0
-    }];
+        lancamentos: 1000,
+        tipoLancamento: "debit",
+        valorDevedorAtualizado: "101066.67",
+        contractRef: 0
+      }];
   }
 
 }

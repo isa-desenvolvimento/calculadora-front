@@ -191,7 +191,7 @@
                                             <div class="form-check">
                                                 <input class="form-check-input" type="radio"
                                                     name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status3" [value]="true" disabled>
+                                                    id="status3" [value]="true">
                                                 <label class="form-check-label" for="status3" style="margin: -30px">
                                                     Ínicio
                                                 </label>
@@ -199,7 +199,7 @@
                                             <div class="form-check ">
                                                 <input class="form-check-input" type="radio"
                                                     name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status4" [value]="false" disabled>
+                                                    id="status4" [value]="false">
                                                 <label class="form-check-label" for="status4" style="margin: -30px">
                                                     Fim
                                                 </label>
@@ -333,10 +333,10 @@
                                 <p>TOTAL APURADO EM {{total_data_calculo}}</p>
                             </div>
                             <div class="col-md-2">
-                                <p>{{formatCurrency(1000)}}</p>
-                                <p>{{formatCurrency(total_honorarios)}}</p>
-                                <p>{{formatCurrency(total_multa_sob_contrato)}}</p>
-                                <p>{{formatCurrency(1000)}}</p>
+                                <p>{{formatCurrency(total_subtotal || 0)}}</p>
+                                <p>{{formatCurrency(total_honorarios || 0)}}</p>
+                                <p>{{formatCurrency(total_multa_sob_contrato || 0)}}</p>
+                                <p>{{formatCurrency(total_grandtotal || 0)}}</p>
                             </div>
                         </div>
 
