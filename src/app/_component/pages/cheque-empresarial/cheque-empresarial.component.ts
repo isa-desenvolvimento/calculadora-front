@@ -109,8 +109,8 @@ export class ChequeEmpresarialComponent implements OnInit {
   get ce_form_riscos() { return this.ceFormRiscos.controls; }
   get ce_form_amortizacao() { return this.ceFormAmortizacao.controls; }
 
-  resetFields() {
-    this.ceForm.reset()
+  resetFields(form) {
+    this[form].reset()
   }
 
   formatCurrency(value) {
@@ -127,6 +127,9 @@ export class ChequeEmpresarialComponent implements OnInit {
     const localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[lastLine]["dataBaseAtual"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[lastLine]["valorDevedorAtualizado"];
 
+    const localTypeIndice = this.ce_form_riscos.ce_indice.value;
+    const localTypeValue = this.getIndiceDataBase(localTypeIndice);
+
     const localLancamentos = this.ce_form_amortizacao.ceFA_valor_lancamento.value;
     const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
     const localDataBaseAtual = this.ce_form_amortizacao.ceFA_data_base_atual.value;
@@ -134,10 +137,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.payloadLancamento = ({
         dataBase: localDataBase,
-        indiceDB: null,
-        indiceDataBase: null,
-        indiceBA: null,
-        indiceDataBaseAtual: null,
+        indiceDB: localTypeIndice,
+        indiceDataBase: localTypeValue,
+        indiceBA: localTypeIndice,
+        indiceDataBaseAtual: localTypeValue,
         indiceEncargosContratuais: null,
         dataBaseAtual: localDataBaseAtual,
         indiceDataAtual: null,
@@ -159,6 +162,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
     }, 0);
+    this.resetFields('ceFormAmortizacao');
     this.simularCalc(true);
   }
 
@@ -244,7 +248,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.total_grandtotal = teste.reduce(function (acumulador, valorAtual) {
         return acumulador + valorAtual;
       }) + this.total_multa_sob_contrato + this.total_honorarios;
-    }, 1000);
+    }, 4);
   }
 
   getIndiceDataBase(indice) {
