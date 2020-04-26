@@ -53,7 +53,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ceFormRiscos = this.formBuilder.group({
       ce_indice: [],
       ce_encargos_monietarios: [],
-      ce_data_calculo: [],
+      ce_data_calculo: this.getCurrentDate('YYYY-MM-DD'),
       ce_encargos_contratuais: [],
       ce_multa: [],
       ce_juros_mora: [],
@@ -132,6 +132,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     const localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[this.getLastLine()]["valorDevedorAtualizado"];
 
     this.total_date_now = moment(localDataBase).format("DD-MM-YYYY");
+    this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD-MM-YYYY") || this.getCurrentDate();
 
     const localTypeIndice = this.ce_form_riscos.ce_indice.value;
     const localTypeValue = this.getIndiceDataBase(localTypeIndice);
@@ -240,7 +241,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         // this.ce_form_riscos.ce_encargos_contratuais && (row['indiceEncargosContratuais'] = this.ce_form_riscos.ce_encargos_contratuais.value);
 
         // Forms Total
-        this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = this.getCurrentDate());
+        this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = this.ce_form_riscos.ce_data_calculo.value);
         this.ce_form_riscos.ce_honorarios && (this.total_honorarios = this.ce_form_riscos.ce_honorarios.value);
         this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = this.ce_form_riscos.ce_multa_sobre_constrato.value);
 
