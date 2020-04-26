@@ -280,12 +280,12 @@
                                         <select class="form-control custom-select" name="ce_indice" id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="indice.type === row.indiceDB">
+                                                [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceDB">
                                                 {{indice.type}}</option>
                                         </select>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBase}}
+                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value)}}
                                     </td>
                                     <td width="120">
                                         <input type="date" class="form-control col-md-11 col-sm-12"
@@ -297,12 +297,12 @@
                                         <select class="form-control custom-select" name="ce_indice" id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="indice.type === row.indiceBA">
+                                                [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceBA">
                                                 {{indice.type}}</option>
                                         </select>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBaseAtual}}
+                                        {{row.indiceDataBaseAtual || getIndiceDataBase(ce_form_riscos.ce_indice.value)}}
                                     </td>
                                     <td>
                                         {{formatCurrency(row.valorDevedor)}}
@@ -311,7 +311,7 @@
                                         {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}}
                                     </td>
                                     <td>
-                                        {{row.encargosMonetarios.jurosAm.dias}}
+                                        {{row.encargosMonetarios.jurosAm.dias || 0}}
                                     </td>
                                     <td>
                                         {{formatCurrency(row.encargosMonetarios.jurosAm.percentsJuros)}}
@@ -340,13 +340,14 @@
                     <div class="card-footer" *ngIf="tableData.dataRows.length > 0 && !tableLoading">
                         <div class="row">
                             <div class="col-md-10">
-                                <p>Subtotal apurado em {{total_date_now || getCurrentDate()}}</p>
+                                <p>Subtotal apurado em</p>
                                 <p>Honorários</p>
                                 <p>Multa Sob Contrato</p>
                                 <p>TOTAL APURADO EM {{total_data_calculo}}</p>
                             </div>
                             <div class="col-md-2">
-                                <p>{{formatCurrency(total_subtotal || 0)}}</p>
+                                <!-- <p>{{formatCurrency(total_subtotal)}}</p> -->
+                                <p>{{total_date_now}}</p>
                                 <p>{{formatCurrency(total_honorarios || 0)}}</p>
                                 <p>{{formatCurrency(total_multa_sob_contrato || 0)}}</p>
                                 <p>{{formatCurrency(total_grandtotal || 0)}}</p>
