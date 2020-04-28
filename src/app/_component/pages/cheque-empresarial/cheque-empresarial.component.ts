@@ -42,7 +42,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.filterContracts();
+    // this.filterContracts();
 
     this.ceForm = this.formBuilder.group({
       ce_pasta: [],
@@ -165,7 +165,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       });
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
-    }, 4);
+    }, 0);
     this.resetFields('ceFormAmortizacao');
     this.simularCalc(true);
   }
@@ -175,7 +175,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 4);
+    }, 2000);
     this.simularCalc(true);
   }
 
@@ -202,7 +202,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   simularCalc(isInlineChange = false) {
     this.tableLoading = true;
     setTimeout(() => {
-      let teste = this.tableData.dataRows.map(row => {
+      let tableDataUpdated = this.tableData.dataRows.map(row => {
 
         const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
@@ -248,10 +248,12 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.tableLoading = false;
         return parseFloat(row['valorDevedorAtualizado']);
       });
-      this.total_grandtotal = teste.reduce(function (acumulador, valorAtual) {
+      this.total_grandtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
         return acumulador + valorAtual;
       }) + this.total_multa_sob_contrato + this.total_honorarios;
-    }, 4);
+
+      console.log("tableDataUpdated", tableDataUpdated);
+    }, 0);
   }
 
   getIndiceDataBase(indice) {

@@ -22,11 +22,14 @@ td:focus {
 table, th, td {
     border: 1px solid #dee2e6 !important;
 }
-table.dataTable {
-    border-collapse: collapse !important;
+.align-title-top {
+    vertical-align:top
 }
 
 /* override table controls */
+table.dataTable {
+    border-collapse: collapse !important;
+}
 .dataTables_wrapper .dataTables_filter input {
     background-color: #FFFFFF;
     border: 1px solid #DDDDDD;
