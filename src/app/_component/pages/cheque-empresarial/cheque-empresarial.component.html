@@ -238,7 +238,7 @@
                     <div class="card-header">
                         <h4 class="card-title">Lista de Lançamentos</h4>
                     </div>
-                    <div class="card-body" style="height: 100vh;overflow: scroll;">
+                    <div class="card-body" style="max-height: 100vh;overflow: scroll;">
                         <table [dtOptions]="dtOptions" datatable class="table table-hover"
                             *ngIf="tableData && tableData.headerRow && tableData.dataRows && !tableLoading">
                             <thead class="text-primary">
