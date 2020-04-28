@@ -240,35 +240,38 @@
                     </div>
                     <div class="card-body" style="max-height: 100vh;overflow: scroll;">
                         <table [dtOptions]="dtOptions" datatable class="table table-hover"
-                            *ngIf="tableData && tableData.headerRow && tableData.dataRows && !tableLoading">
-                            <thead class="text-primary">
-                                <tr *ngFor="let header of tableData.headerRow" align="center">
-                                    <th>{{header.dataBase.title}}</th>
-                                    <th>{{header.indiceDB.title}}
-                                        <br>
-                                        <span style="color: #159fa2">{{ce_form_riscos.ce_indice.value}}</span>
+                            *ngIf="tableData && tableData.dataRows && !tableLoading">
+                            <thead>
+                                <tr align="center">
+                                    <th colspan="3"></th>
+                                    <th style="border-left: none !important" colspan="4"></th>
+                                    <th width="400" colspan="4">Encargos Monetarios</th>
+                                    <th style="border-right: 1px solid #dee2e6 !important" colspan="2">
                                     </th>
-                                    <th>{{header.indiceDataBase.title}}</th>
-                                    <th>{{header.dataBaseAtual.title}}</th>
-                                    <th>{{header.indiceBA.title}}
-                                        <br>
-                                        <span style="color: #159fa2">{{ce_form_riscos.ce_indice.value}}</span>
-                                    </th>
-                                    <th>{{header.indiceDataBaseAtual.title}}</th>
-                                    <th>{{header.valorDevedor.title}}</th>
-                                    <th>{{header.correcaoPeloIndice.title}}</th>
-                                    <th>{{header.dias.title}}</th>
-                                    <th>{{header.percentsJuros.title}}
-                                        <br>
-                                        <span style="color: #159fa2">{{ce_form_riscos.ce_juros_mora.value}} %</span>
-                                    </th>
-                                    <!-- <th>{{header.moneyValue.title}}</th> -->
-                                    <th>{{header.multa.title}}
-                                        <br>
-                                        <span style="color: #159fa2">{{ce_form_riscos.ce_multa.value}} %</span>
-                                    </th>
-                                    <th>{{header.lancamentos.title}}</th>
-                                    <th>{{header.valorDevedorAtualizado.title}}</th>
+                                </tr>
+                                <tr align="center">
+                                    <th style="vertical-align:top;" rowspan="2">Data Base</th>
+                                    <th style="vertical-align:top;" rowspan="2">Indice</th>
+                                    <th style="vertical-align:top;" rowspan="2">Indice Data Base</th>
+                                    <th style="vertical-align:top;" rowspan="2">Data Base Atual</th>
+                                    <th style="vertical-align:top;" rowspan="2">Indice</th>
+                                    <th style="vertical-align:top;" rowspan="2">Indice Data Base Atual</th>
+                                    <th style="vertical-align:top;" rowspan="2">Valor devedor</th>
+
+                                    <th width="100" rowspan="2">Correcao pelo indice</th>
+
+                                    <th colspan="2">Juros a.m.</th>
+
+                                    <th width="100" rowspan="2">Multa</th>
+
+                                    <th style="vertical-align:top;" rowspan="2">Lançamentos</th>
+                                    <th style="vertical-align:top; border-right: 1px solid #dee2e6 !important"
+                                        rowspan="2">Valor devedor atualizado</th>
+                                </tr>
+                                <tr align="center">
+                                    <th>Dias</th>
+                                    <th>Juros %</th>
+                                    <!-- <th>R$</th> -->
                                 </tr>
                             </thead>
                             <tbody>

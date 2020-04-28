@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
 
 declare interface TableData {
-  headerRow: Array<Object>;
   dataRows: Array<Object>;
 }
 
@@ -43,7 +42,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.filterContracts();
+    this.filterContracts();
 
     this.ceForm = this.formBuilder.group({
       ce_pasta: [],
@@ -61,7 +60,6 @@ export class ChequeEmpresarialComponent implements OnInit {
       ce_multa_sobre_constrato: []
     });
     this.tableData = {
-      headerRow: [],
       dataRows: []
     }
     this.ceFormAmortizacao = this.formBuilder.group({
@@ -72,7 +70,6 @@ export class ChequeEmpresarialComponent implements OnInit {
       ceFA_tipo_lancamento: ['', Validators.required],
       ceFA_tipo_amortizacao: []
     });
-    this.buildHeaderTable();
 
     this.dtOptions = {
       paging: false,
@@ -168,7 +165,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       });
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
-    }, 1000);
+    }, 4);
     this.resetFields('ceFormAmortizacao');
     this.simularCalc(true);
   }
@@ -178,7 +175,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 1000);
+    }, 4);
     this.simularCalc(true);
   }
 
@@ -319,75 +316,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     value: "1"
   }
   ];
-
-  buildHeaderTable() {
-    this.tableData.headerRow = [{
-      dataBase: {
-        title: "Data Base",
-        nested: false
-      },
-      dataBaseAtual: {
-        title: "Data Base Atual",
-        nested: false
-      },
-      indiceDB: {
-        title: "Indíce",
-        nested: false
-      },
-      indiceDataBase: {
-        title: "Indíce Data Base",
-        nested: false
-      },
-      indiceBA: {
-        title: "Indíce",
-        nested: false
-      },
-      indiceDataBaseAtual: {
-        title: "Indíce Data Base Atual",
-        nested: false
-      },
-      valorDevedor: {
-        title: "Valor Devedor",
-        nested: false
-      },
-      encargosMonetarios: {
-        title: "Encargos Monetarios",
-        nested: false
-      },
-      correcaoPeloIndice: {
-        title: "Correção Pelo Indíce",
-        nested: false
-      },
-      // jurosAm: {
-      //   title: "Juros Ao mês",
-      //   nested: false
-      // },
-      dias: {
-        title: "Qtd Dias",
-        nested: false
-      },
-      percentsJuros: {
-        title: "Juros",
-        nested: false
-      },
-      // moneyValue: {
-      //   title: "R$",
-      //   nested: false
-      // },
-      multa: {
-        title: "Multa",
-        nested: false
-      },
-      lancamentos: {
-        title: "Lançamentos",
-        nested: false
-      },
-      valorDevedorAtualizado: {
-        title: "Valor Devedor Atualizado",
-        nested: false
-      }
-    }];
-  }
 
   get Carga() {
     return [

@@ -19,7 +19,12 @@ td:focus {
     display:inline;
     white-space:nowrap;
 }
-
+table, th, td {
+    border: 1px solid #dee2e6 !important;
+}
+table.dataTable {
+    border-collapse: collapse !important;
+}
 
 /* override table controls */
 .dataTables_wrapper .dataTables_filter input {
