@@ -127,7 +127,7 @@
                                     id="ceFA_data_vencimento" formControlName="ceFA_data_vencimento" max="3000-12-31"
                                     min="1000-01-01">
                                 <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    {{tableData.dataRows[0]["dataBase"]}}
+                                    {{formatDate(tableData.dataRows[0])}}
                                 </p>
                             </div>
                             <div class="col-md-4 col-sm-12">
@@ -238,7 +238,7 @@
                     <div class="card-header">
                         <h4 class="card-title">Lista de Lançamentos</h4>
                     </div>
-                    <div class="card-body" style="max-height: calc(100vh - 400px);overflow: scroll;">
+                    <div class="card-body" style="height: 100vh;overflow: scroll;">
                         <table [dtOptions]="dtOptions" datatable class="table table-hover"
                             *ngIf="tableData && tableData.headerRow && tableData.dataRows && !tableLoading">
                             <thead class="text-primary">
@@ -341,13 +341,13 @@
                         <div class="row">
                             <div class="col-md-10">
                                 <p>Subtotal apurado em</p>
-                                <p>Honorários</p>
-                                <p>Multa Sob Contrato</p>
-                                <p>TOTAL APURADO EM {{total_data_calculo}}</p>
+                                <p>Honorários {{ce_form_riscos.ce_honorarios.value || 0}}%</p>
+                                <p>Multa Sob Contrato {{ce_form_riscos.ce_multa.value || 0}}%</p>
+                                <p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
                             </div>
                             <div class="col-md-2">
                                 <!-- <p>{{formatCurrency(total_subtotal)}}</p> -->
-                                <p>{{total_date_now}}</p>
+                                <p>{{total_date_now || "---------"}}</p>
                                 <p>{{formatCurrency(total_honorarios || 0)}}</p>
                                 <p>{{formatCurrency(total_multa_sob_contrato || 0)}}</p>
                                 <p>{{formatCurrency(total_grandtotal || 0)}}</p>
