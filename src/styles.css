@@ -1,5 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
-
+.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+    background-color: #e3e3e347 !important;
+}
 
 td:focus {
     outline: none;

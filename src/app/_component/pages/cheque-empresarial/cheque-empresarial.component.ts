@@ -52,7 +52,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ceFormRiscos = this.formBuilder.group({
       ce_indice: [],
       ce_encargos_monietarios: [],
-      ce_data_calculo: this.getCurrentDate('YYYY-MM-DD'),
+      ce_data_calculo: this.getCurrentDate('YYYY/MM/DD'),
       ce_encargos_contratuais: [],
       ce_multa: [],
       ce_juros_mora: [],
@@ -128,8 +128,8 @@ export class ChequeEmpresarialComponent implements OnInit {
     const localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[this.getLastLine()]["dataBaseAtual"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[this.getLastLine()]["valorDevedorAtualizado"];
 
-    this.total_date_now = moment(localDataBase).format("DD-MM-YYYY");
-    this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD-MM-YYYY") || this.getCurrentDate();
+    this.total_date_now = moment(localDataBase).format("DD/MM/YYYY");
+    this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate();
 
     const localTypeIndice = this.ce_form_riscos.ce_indice.value;
     const localTypeValue = this.getIndiceDataBase(localTypeIndice);
@@ -154,7 +154,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           jurosAm: {
             dias: null,
             percentsJuros: null,
-            // moneyValue: null,
+            moneyValue: null,
           },
           multa: null,
         },
@@ -175,7 +175,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
       this.tableLoading = false;
-    }, 2000);
+    }, 4);
     this.simularCalc(true);
   }
 
@@ -196,7 +196,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   formatDate(row) {
-    return moment(row['dataBase']).format("DD-MM-YYYY");
+    return moment(row['dataBase']).format("DD/MM/YYYY");
   }
 
   simularCalc(isInlineChange = false) {
@@ -221,14 +221,16 @@ export class ChequeEmpresarialComponent implements OnInit {
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
         row['encargosMonetarios']['correcaoPeloIndice'] = ((valorDevedor * row['indiceDataBaseAtual'] / 30) * qtdDias).toFixed(2);
+
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
         // -- juros 
-        row['encargosMonetarios']['jurosAm']['percentsJuros'] = ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias / 100) * (this.ce_form_riscos.ce_juros_mora.value || 1)).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['percentsJuros'] = ((this.ce_form_riscos.ce_juros_mora.value / 30) * qtdDias).toFixed(2);
+        // -- moneyValue
+        row['encargosMonetarios']['jurosAm']['moneyValue'] = ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias / 100) * (this.ce_form_riscos.ce_juros_mora.value || 0)).toFixed(2);
+
         // -- multa 
         row['encargosMonetarios']['multa'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros'])) * (this.ce_form_riscos.ce_multa.value / 100)).toFixed(2);
-        // -- ???
-        // row['encargosMonetarios']['jurosAm']['moneyValue'] = 99999999999;
         row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
 
         // Amortizacao
@@ -238,8 +240,8 @@ export class ChequeEmpresarialComponent implements OnInit {
         // this.ce_form_riscos.ce_encargos_contratuais && (row['indiceEncargosContratuais'] = this.ce_form_riscos.ce_encargos_contratuais.value);
 
         // Forms Total
-        this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = this.ce_form_riscos.ce_data_calculo.value);
-        this.ce_form_riscos.ce_honorarios && (this.total_honorarios = this.ce_form_riscos.ce_honorarios.value);
+        this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
+        this.ce_form_riscos.ce_honorarios && (this.total_honorarios = (row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100));
         this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = this.ce_form_riscos.ce_multa_sobre_constrato.value);
 
         // this.total_subtotal = 1000;

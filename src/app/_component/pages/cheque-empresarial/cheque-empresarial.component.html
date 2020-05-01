@@ -89,7 +89,7 @@
                                     formControlName="ce_juros_mora">
                             </div>
                             <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Honorários</label>
+                                <label for="nome" class="col-form-label">Honorários %</label>
                                 <input type="number" (change)="verifyNumber($event)" min="0"
                                     class="form-control col-md-11 col-sm-12" name="ce_honorarios" id="ce_honorarios"
                                     formControlName="ce_honorarios">
@@ -245,39 +245,48 @@
                                 <tr align="center">
                                     <th colspan="3"></th>
                                     <th colspan="4"></th>
-                                    <th width="400" colspan="4">Encargos Monetários</th>
-                                    <th colspan="2">
+                                    <th width="400" colspan="4">Encargos Moratórios</th>
+                                    <th colspan="3">
                                     </th>
                                 </tr>
                                 <tr align="center">
                                     <th class="align-title-top" rowspan="2">Data Base</th>
-                                    <th class="align-title-top" rowspan="2">Indíce</th>
+                                    <th class="align-title-top" rowspan="2">Indíce
+                                        <b>{{ce_form_riscos.ce_indice.value}}</b>
+                                    </th>
                                     <th class="align-title-top" rowspan="2">Indíce Data Base</th>
                                     <th class="align-title-top" rowspan="2">Data Base Atual</th>
-                                    <th class="align-title-top" rowspan="2">Indíce</th>
+                                    <th class="align-title-top" rowspan="2">Indíce
+                                        <b>{{ce_form_riscos.ce_indice.value}}</b>
+                                    </th>
                                     <th class="align-title-top" rowspan="2">Indíce Data Base Atual</th>
                                     <th class="align-title-top" rowspan="2">Valor devedor</th>
 
-                                    <th width="100" rowspan="2">Correção pelo indíce</th>
+                                    <th width="100" rowspan="2">Correção pelo Índice</th>
 
-                                    <th colspan="2">Juros a.m.</th>
+                                    <th colspan="3">Juros a.m.</th>
 
-                                    <th width="100" rowspan="2">Multa</th>
+                                    <th width="100" rowspan="2">Multa
+                                        <b>{{( ce_form_riscos.ce_multa.value || 0 ) + "%"}}</b>
+                                    </th>
 
                                     <th class="align-title-top" rowspan="2">Lançamentos</th>
-                                    <th class="align-title-top"
-                                        rowspan="2">Valor devedor atualizado</th>
+                                    <th class="align-title-top" rowspan="2">Valor devedor atualizado</th>
                                 </tr>
                                 <tr align="center">
                                     <th>Dias</th>
-                                    <th>Juros %</th>
-                                    <!-- <th>R$</th> -->
+                                    <th>Juros
+                                        <b>{{( ce_form_riscos.ce_juros_mora.value || 0 ) + "%"}}</b>
+                                    </th>
+                                    <th>R$</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" style="font-size: 12px;" align="center">
                                     <td>
-                                        {{formatDate(row)}}
+                                        <input type="date" class="form-control col-md-11 col-sm-12"
+                                            name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
+                                            min="1000-01-01" [value]="row.dataBase" disabled>
                                     </td>
                                     <td width="100">
                                         <select class="form-control custom-select" name="ce_indice" id="ce_indice"
@@ -317,11 +326,11 @@
                                         {{row.encargosMonetarios.jurosAm.dias || 0}}
                                     </td>
                                     <td>
-                                        {{formatCurrency(row.encargosMonetarios.jurosAm.percentsJuros)}}
+                                        {{row.encargosMonetarios.jurosAm.percentsJuros}}
                                     </td>
-                                    <!-- <td width="30">
-                                        {{row.encargosMonetarios.jurosAm.moneyValue}}
-                                    </td> -->
+                                    <td>
+                                        {{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}}
+                                    </td>
                                     <td>
                                         {{formatCurrency(row.encargosMonetarios.multa)}}
                                     </td>
@@ -345,7 +354,7 @@
                             <div class="col-md-10">
                                 <p>Subtotal apurado em</p>
                                 <p>Honorários {{ce_form_riscos.ce_honorarios.value || 0}}%</p>
-                                <p>Multa Sob Contrato {{ce_form_riscos.ce_multa.value || 0}}%</p>
+                                <p>Multa Sob Contrato</p>
                                 <p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
                             </div>
                             <div class="col-md-2">

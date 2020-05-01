@@ -25,5 +25,5 @@ export interface EncargosMonetarios {
 export interface JurosAm {
     dias: number;
     percentsJuros: number;
-    // moneyValue: number;
+    moneyValue: number;
 }
