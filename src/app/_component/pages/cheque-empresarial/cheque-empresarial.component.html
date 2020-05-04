@@ -283,13 +283,14 @@
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
                                     <td>
-                                        <input type="text" style="width: 120px" class="form-control col-md-11 col-sm-12"
-                                            name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
-                                            min="1000-01-01" [value]="formatDate(row.dataBase)" disabled>
+                                        <input type="text" style="width: 120px; font-size: 11px"
+                                            class="form-control col-md-11 col-sm-12" name="ce_data_calculo"
+                                            id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
+                                            [value]="formatDate(row.dataBase)" disabled>
                                     </td>
                                     <td width="80">
-                                        <select style="width: 80px" class="form-control custom-select" name="ce_indice"
-                                            id="ce_indice"
+                                        <select style="width: 80px; font-size: 11px" class="form-control custom-select"
+                                            name="ce_indice" id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceDB">
@@ -300,14 +301,14 @@
                                         {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value) || "---"}}
                                     </td>
                                     <td width="120">
-                                        <input type="date" class="form-control col-md-11 col-sm-12"
+                                        <input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12"
                                             name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
                                             min="1000-01-01" [value]="row.dataBaseAtual"
                                             (change)="changeDate($event, row)">
                                     </td>
                                     <td width="80">
-                                        <select style="width: 80px" class="form-control custom-select" name="ce_indice"
-                                            id="ce_indice"
+                                        <select style="width: 80px; font-size: 11px" class="form-control custom-select"
+                                            name="ce_indice" id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceBA">
@@ -353,14 +354,13 @@
                     <div class="card-footer" *ngIf="tableData.dataRows.length > 0 && !tableLoading">
                         <div class="row">
                             <div class="col-md-10">
-                                <p>Subtotal apurado em</p>
+                                <p>Subtotal apurado em {{total_date_now || total_data_calculo || "---------"}}</p>
                                 <p>Honorários {{ce_form_riscos.ce_honorarios.value || 0}}%</p>
-                                <p>Multa Sob Contrato</p>
+                                <p>Multa sob contrato aguardando retorno do Safra</p>
                                 <p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
                             </div>
                             <div class="col-md-2">
-                                <!-- <p>{{formatCurrency(total_subtotal)}}</p> -->
-                                <p>{{total_date_now || "---------"}}</p>
+                                <p>{{formatCurrency(total_subtotal || 0)}}</p>
                                 <p>{{formatCurrency(total_honorarios || 0)}}</p>
                                 <p>{{formatCurrency(total_multa_sob_contrato || 0)}}</p>
                                 <p>{{formatCurrency(total_grandtotal || 0)}}</p>

@@ -42,7 +42,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.filterContracts();
+    // this.filterContracts();
 
     this.ceForm = this.formBuilder.group({
       ce_pasta: [],
@@ -250,9 +250,14 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.tableLoading = false;
         return parseFloat(row['valorDevedorAtualizado']);
       });
+
       this.total_grandtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
         return acumulador + valorAtual;
       }) + this.total_multa_sob_contrato + this.total_honorarios;
+
+      this.total_subtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
+        return acumulador + valorAtual;
+      });
 
       console.log("tableDataUpdated", tableDataUpdated);
     }, 0);
@@ -324,7 +329,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   get Carga() {
     return [
       {
-        dataBase: "23/04/2020",
+        dataBase: "2020-04-23",
         indiceDB: null,
         indiceDataBase: null,
         indiceBA: null,
@@ -347,7 +352,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         contractRef: 0
       },
       {
-        dataBase: "25/04/2020",
+        dataBase: "2020-04-25",
         indiceDB: null,
         indiceDataBase: null,
         indiceBA: null,
