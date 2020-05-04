@@ -42,7 +42,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   ngOnInit() {
-    // this.filterContracts();
+    this.filterContracts();
 
     this.ceForm = this.formBuilder.group({
       ce_pasta: [],
@@ -52,7 +52,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ceFormRiscos = this.formBuilder.group({
       ce_indice: [],
       ce_encargos_monietarios: [],
-      ce_data_calculo: this.getCurrentDate('YYYY/MM/DD'),
+      ce_data_calculo: this.getCurrentDate('YYYY-MM-DD'),
       ce_encargos_contratuais: [],
       ce_multa: [],
       ce_juros_mora: [],
@@ -324,7 +324,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   get Carga() {
     return [
       {
-        dataBase: "2020-04-23",
+        dataBase: "23/04/2020",
         indiceDB: null,
         indiceDataBase: null,
         indiceBA: null,
@@ -347,7 +347,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         contractRef: 0
       },
       {
-        dataBase: "2020-04-25",
+        dataBase: "25/04/2020",
         indiceDB: null,
         indiceDataBase: null,
         indiceBA: null,

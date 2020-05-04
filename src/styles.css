@@ -59,6 +59,7 @@ table.dataTable thead .sorting_asc {
 /* width */
 ::-webkit-scrollbar {
     width: 6px;
+    height: 6px;
   }
   
   /* Track */

@@ -236,7 +236,7 @@
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="card-title">Lista de Lançamentos</h4>
+                        <h4 class="card-title">MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO</h4>
                     </div>
                     <div class="card-body" style="max-height: 100vh;overflow: scroll;">
                         <table [dtOptions]="dtOptions" datatable class="table table-hover"
@@ -254,12 +254,12 @@
                                     <th class="align-title-top" rowspan="2">Indíce
                                         <b>{{ce_form_riscos.ce_indice.value}}</b>
                                     </th>
-                                    <th class="align-title-top" rowspan="2">Indíce Data Base</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Indíce Data Base</th>
                                     <th class="align-title-top" rowspan="2">Data Base Atual</th>
                                     <th class="align-title-top" rowspan="2">Indíce
                                         <b>{{ce_form_riscos.ce_indice.value}}</b>
                                     </th>
-                                    <th class="align-title-top" rowspan="2">Indíce Data Base Atual</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Indíce Data Base Atual</th>
                                     <th class="align-title-top" rowspan="2">Valor devedor</th>
 
                                     <th width="100" rowspan="2">Correção pelo Índice</th>
@@ -271,25 +271,25 @@
                                     </th>
 
                                     <th class="align-title-top" rowspan="2">Lançamentos</th>
-                                    <th class="align-title-top" rowspan="2">Valor devedor atualizado</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Valor devedor atualizado</th>
                                 </tr>
                                 <tr align="center">
                                     <th>Dias</th>
-                                    <th>Juros
-                                        <b>{{( ce_form_riscos.ce_juros_mora.value || 0 ) + "%"}}</b>
+                                    <th><b>{{( ce_form_riscos.ce_juros_mora.value || 0 ) + "%"}}</b>
                                     </th>
                                     <th>R$</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let row of tableData.dataRows" style="font-size: 12px;" align="center">
+                                <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
                                     <td>
-                                        <input type="date" class="form-control col-md-11 col-sm-12"
+                                        <input type="text" style="width: 120px" class="form-control col-md-11 col-sm-12"
                                             name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
-                                            min="1000-01-01" [value]="row.dataBase" disabled>
+                                            min="1000-01-01" [value]="formatDate(row.dataBase)" disabled>
                                     </td>
-                                    <td width="100">
-                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice"
+                                    <td width="80">
+                                        <select style="width: 80px" class="form-control custom-select" name="ce_indice"
+                                            id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceDB">
@@ -297,7 +297,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value)}}
+                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value) || "---"}}
                                     </td>
                                     <td width="120">
                                         <input type="date" class="form-control col-md-11 col-sm-12"
@@ -305,8 +305,9 @@
                                             min="1000-01-01" [value]="row.dataBaseAtual"
                                             (change)="changeDate($event, row)">
                                     </td>
-                                    <td width="100">
-                                        <select class="form-control custom-select" name="ce_indice" id="ce_indice"
+                                    <td width="80">
+                                        <select style="width: 80px" class="form-control custom-select" name="ce_indice"
+                                            id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceBA">
@@ -314,7 +315,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBaseAtual || getIndiceDataBase(ce_form_riscos.ce_indice.value)}}
+                                        {{row.indiceDataBaseAtual || getIndiceDataBase(ce_form_riscos.ce_indice.value) || "---"}}
                                     </td>
                                     <td>
                                         {{formatCurrency(row.valorDevedor)}}
