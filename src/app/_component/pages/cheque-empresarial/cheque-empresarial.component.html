@@ -264,7 +264,8 @@
 
                                     <th width="100" rowspan="2">Correção pelo Índice</th>
 
-                                    <th colspan="3">Juros a.m.</th>
+                                    <th colspan="3">Juros a.m. {{( ce_form_riscos.ce_juros_mora.value || 0 ) + "%"}}
+                                    </th>
 
                                     <th width="100" rowspan="2">Multa
                                         <b>{{( ce_form_riscos.ce_multa.value || 0 ) + "%"}}</b>
@@ -275,8 +276,7 @@
                                 </tr>
                                 <tr align="center">
                                     <th>Dias</th>
-                                    <th><b>{{( ce_form_riscos.ce_juros_mora.value || 0 ) + "%"}}</b>
-                                    </th>
+                                    <th>%</th>
                                     <th>R$</th>
                                 </tr>
                             </thead>
