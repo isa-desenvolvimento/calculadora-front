@@ -214,30 +214,30 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           this.ce_form_riscos.ce_indice && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
           this.ce_form_riscos.ce_indice && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value));
+
+          this.ce_form_riscos.ce_encargos_contratuais && (row['indiceDataBaseAtual'] = this.ce_form_riscos.ce_encargos_contratuais.value);
         }
 
         // Table Values
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        row['encargosMonetarios']['correcaoPeloIndice'] = ((valorDevedor * row['indiceDataBaseAtual'] / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['correcaoPeloIndice'] = ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
 
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
         // -- juros 
         row['encargosMonetarios']['jurosAm']['percentsJuros'] = ((this.ce_form_riscos.ce_juros_mora.value / 30) * qtdDias).toFixed(2);
         // -- moneyValue
-        row['encargosMonetarios']['jurosAm']['moneyValue'] = ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias / 100) * (this.ce_form_riscos.ce_juros_mora.value || 0)).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['moneyValue'] = ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * ((this.ce_form_riscos.ce_juros_mora.value / 100))).toFixed(2);
 
         // -- multa 
-        row['encargosMonetarios']['multa'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros'])) * (this.ce_form_riscos.ce_multa.value / 100)).toFixed(2);
-        row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
+        row['encargosMonetarios']['multa'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * (this.ce_form_riscos.ce_multa.value / 100)).toFixed(2);
+        row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
 
         // Amortizacao
         // this.ce_form_amortizacao.ceFA_saldo_devedor && (row['valorDevedorAtualizado'] = this.ce_form_amortizacao.ceFA_saldo_devedor.value)
         // this.ce_form_amortizacao.ceFA_data_vencimento && (row['dataBase'] = this.ce_form_riscos.ceFA_data_vencimento.value);
-
-        // this.ce_form_riscos.ce_encargos_contratuais && (row['indiceEncargosContratuais'] = this.ce_form_riscos.ce_encargos_contratuais.value);
 
         // Forms Total
         this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
@@ -322,7 +322,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   },
   {
     type: "Encargos Contratuais %",
-    value: "1"
+    value: "6"
   }
   ];
 
