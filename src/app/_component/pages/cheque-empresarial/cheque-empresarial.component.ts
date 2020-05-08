@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
+
 import { Lancamento } from '../../../_models/ChequeEmpresarial';
+import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
+
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
 
@@ -38,11 +41,12 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
+    private chequeEmpresarialService: ChequeEmpresarialService,
   ) {
   }
 
   ngOnInit() {
-    // this.filterContracts();
+    // this.pesquisarContratos();
 
     this.ceForm = this.formBuilder.group({
       ce_pasta: [],
@@ -101,6 +105,29 @@ export class ChequeEmpresarialComponent implements OnInit {
     };
   }
 
+  atualizarRisco() {
+    this.tableData.dataRows.forEach(lancamento => {
+      lancamento['encargosMonetarios'] = JSON.stringify(lancamento['encargosMonetarios']);
+      lancamento['valorDevedorAtualizado'] = parseFloat(lancamento['valorDevedorAtualizado']);
+      lancamento['contractRef'] = parseFloat(lancamento['contractRef']);
+
+      if (lancamento["id"]) {
+        this.chequeEmpresarialService.updateLancamento(lancamento).subscribe(chequeEmpresarialList => {
+          console.log(chequeEmpresarialList);
+        }, err => {
+          this.errorMessage = err.error.message;
+        });
+      } else {
+        this.chequeEmpresarialService.addLancamento(lancamento).subscribe(chequeEmpresarialList => {
+          console.log(chequeEmpresarialList);
+        }, err => {
+          this.errorMessage = err.error.message;
+        });
+
+      }
+    })
+  }
+
   // convenience getter for easy access to form fields
   get ce_form() { return this.ceForm.controls; }
   get ce_form_riscos() { return this.ceFormRiscos.controls; }
@@ -145,9 +172,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         indiceDataBase: localTypeValue,
         indiceBA: localTypeIndice,
         indiceDataBaseAtual: localTypeValue,
-        indiceEncargosContratuais: null,
         dataBaseAtual: localDataBaseAtual,
-        indiceDataAtual: null,
         valorDevedor: localValorDevedor,
         encargosMonetarios: {
           correcaoPeloIndice: null,
@@ -161,7 +186,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         lancamentos: localLancamentos,
         tipoLancamento: localTipoLancamento,
         valorDevedorAtualizado: null,
-        contractRef: null
+        contractRef: this.ce_form.ce_contrato.value || 0
       });
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
@@ -170,12 +195,17 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.simularCalc(true);
   }
 
-  filterContracts() {
+  pesquisarContratos() {
     this.tableLoading = true;
-    setTimeout(() => {
-      this.tableData.dataRows = this.Carga.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0));
+    this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
+      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
+        cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+        return cheque;
+      });
       this.tableLoading = false;
-    }, 4);
+    }, err => {
+      this.errorMessage = err.error.message;
+    });
     this.simularCalc(true);
   }
 
@@ -259,7 +289,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         return acumulador + valorAtual;
       });
 
-      console.log("tableDataUpdated", tableDataUpdated);
     }, 0);
   }
 
@@ -334,9 +363,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         indiceDataBase: null,
         indiceBA: null,
         indiceDataBaseAtual: null,
-        indiceEncargosContratuais: null,
         dataBaseAtual: "2020-04-25",
-        indiceDataAtual: null,
         valorDevedor: 100000,
         encargosMonetarios: {
           correcaoPeloIndice: "0.00",
@@ -357,9 +384,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         indiceDataBase: null,
         indiceBA: null,
         indiceDataBaseAtual: null,
-        indiceEncargosContratuais: null,
         dataBaseAtual: "2020-04-28",
-        indiceDataAtual: null,
         valorDevedor: 100000,
         encargosMonetarios: {
           correcaoPeloIndice: "0.00",

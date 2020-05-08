@@ -5,11 +5,9 @@ export interface Lancamento {
     indiceDataBase: number;
     indiceBA: string;
     indiceDataBaseAtual: number;
-    indiceEncargosContratuais: number;
     dataBaseAtual: string;
-    indiceDataAtual: number;
     valorDevedor: number;
-    encargosMonetarios: EncargosMonetarios;
+    encargosMonetarios: any;
     lancamentos: number;
     tipoLancamento: string;
     valorDevedorAtualizado: number;

@@ -35,7 +35,7 @@
                             <div class="col-sm-3">
                                 <br />
                                 <div class="stats">
-                                    <button type="button" (click)="filterContracts()" class="btn btn-info btn-round"
+                                    <button type="button" (click)="pesquisarContratos()" class="btn btn-info btn-round"
                                         [disabled]="!ceForm.valid">Pesquisar</button>
                                 </div>
                             </div>
@@ -104,7 +104,7 @@
                     </div>
                     <div class="col-md-12 col-sm-12 form-inline mt-3">
                         <div class="stats form-group mb-2">
-                            <button type="button" [disabled]="true" class="btn btn-info btn-round">Atualizar
+                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="atualizarRisco()" class="btn btn-info btn-round">Atualizar
                                 Risco</button>
                         </div>
                         <div class="stats form-group mb-2 ml-md-2">
@@ -286,7 +286,7 @@
                                         <input type="text" style="width: 120px; font-size: 11px"
                                             class="form-control col-md-11 col-sm-12" name="ce_data_calculo"
                                             id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
-                                            [value]="formatDate(row.dataBase)" disabled>
+                                            [value]="formatDate(row)" disabled>
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px" class="form-control custom-select"
