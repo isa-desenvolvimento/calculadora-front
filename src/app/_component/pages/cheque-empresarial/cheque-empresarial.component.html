@@ -1,4 +1,9 @@
 <div class="row ">
+    <div *ngIf="updateLoading" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 100px; z-index: 999">
+        <div class="alert alert-primary" role="alert">
+            Risco atualizado
+        </div>
+    </div>
     <div class="col-md-12">
         <div class="card ">
             <div class="card-header ">
@@ -104,14 +109,14 @@
                     </div>
                     <div class="col-md-12 col-sm-12 form-inline mt-3">
                         <div class="stats form-group mb-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="atualizarRisco()" class="btn btn-info btn-round">Atualizar
+                            <button type="button" [disabled]="!(tableData.dataRows.length > 0) || updateLoadingBtn"
+                                (click)="atualizarRisco()" class="btn btn-info btn-round">Atualizar
                                 Risco</button>
                         </div>
                         <div class="stats form-group mb-2 ml-md-2">
                             <button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="simularCalc()"
                                 class="btn btn-info btn-round">Simular Cálculo</button>
                         </div>
-
 
                         <div class="col-lg-12  mt-3">
                             <hr>
@@ -301,10 +306,10 @@
                                         {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value) || "---"}}
                                     </td>
                                     <td width="120">
-                                        <input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12"
-                                            name="ce_data_calculo" id="ce_data_calculo" max="3000-12-31"
-                                            min="1000-01-01" [value]="row.dataBaseAtual"
-                                            (change)="changeDate($event, row)">
+                                        <input type="date" style="font-size: 11px"
+                                            class="form-control col-md-11 col-sm-12" name="ce_data_calculo"
+                                            id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
+                                            [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px" class="form-control custom-select"

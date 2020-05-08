@@ -28,6 +28,9 @@ export class ChequeEmpresarialComponent implements OnInit {
   payloadLancamento: Lancamento;
   tableData: TableData;
   tableLoading = false;
+  updateLoading = false;
+  updateLoadingBtn = false;
+  controleLancamentos = 0;
 
   // total
   total_date_now: any;
@@ -106,26 +109,41 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   atualizarRisco() {
+    this.controleLancamentos = 0;
     this.tableData.dataRows.forEach(lancamento => {
-      lancamento['encargosMonetarios'] = JSON.stringify(lancamento['encargosMonetarios']);
-      lancamento['valorDevedorAtualizado'] = parseFloat(lancamento['valorDevedorAtualizado']);
-      lancamento['contractRef'] = parseFloat(lancamento['contractRef']);
+      this.updateLoadingBtn = true;
+      let lancamentoLocal = { ...lancamento };
+      lancamentoLocal['encargosMonetarios'] = JSON.stringify(lancamentoLocal['encargosMonetarios']);
+      lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
+      lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
 
-      if (lancamento["id"]) {
-        this.chequeEmpresarialService.updateLancamento(lancamento).subscribe(chequeEmpresarialList => {
-          console.log(chequeEmpresarialList);
+      if (lancamentoLocal["id"]) {
+        this.chequeEmpresarialService.updateLancamento(lancamentoLocal).subscribe(chequeEmpresarialList => {
+          this.updateLoadingBtn = false;
+          this.controleLancamentos = this.controleLancamentos + 1;
+          if (this.tableData.dataRows.length === this.controleLancamentos) {
+            this.updateLoading = true;
+          }
         }, err => {
           this.errorMessage = err.error.message;
         });
       } else {
-        this.chequeEmpresarialService.addLancamento(lancamento).subscribe(chequeEmpresarialList => {
-          console.log(chequeEmpresarialList);
+        this.chequeEmpresarialService.addLancamento(lancamentoLocal).subscribe(chequeEmpresarialListUpdated => {
+          this.updateLoadingBtn = false;
+          this.controleLancamentos = this.controleLancamentos + 1;
+          if (this.tableData.dataRows.length === this.controleLancamentos) {
+            this.updateLoading = true;
+          }
+          lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
         }, err => {
           this.errorMessage = err.error.message;
         });
 
       }
     })
+    setTimeout(() => {
+      this.updateLoading = false;
+    }, 3000);
   }
 
   // convenience getter for easy access to form fields
