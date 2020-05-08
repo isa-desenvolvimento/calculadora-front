@@ -111,9 +111,11 @@ export class ChequeEmpresarialComponent implements OnInit {
   atualizarRisco() {
     this.controleLancamentos = 0;
     this.tableData.dataRows.forEach(lancamento => {
+
       this.updateLoadingBtn = true;
       let lancamentoLocal = { ...lancamento };
       lancamentoLocal['encargosMonetarios'] = JSON.stringify(lancamentoLocal['encargosMonetarios']);
+      lancamentoLocal['valorDevedor'] = parseFloat(lancamentoLocal['valorDevedor']);
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
       lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
 
@@ -125,7 +127,7 @@ export class ChequeEmpresarialComponent implements OnInit {
             this.updateLoading = true;
           }
         }, err => {
-          this.errorMessage = err.error.message;
+          this.errorMessage = "Falha ao atualizar risco.";
         });
       } else {
         this.chequeEmpresarialService.addLancamento(lancamentoLocal).subscribe(chequeEmpresarialListUpdated => {
@@ -136,11 +138,18 @@ export class ChequeEmpresarialComponent implements OnInit {
           }
           lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
         }, err => {
-          this.errorMessage = err.error.message;
+          this.errorMessage = "Falha ao atualizar risco.";
         });
 
       }
     })
+    setTimeout(() => {
+      this.updateLoading = false;
+    }, 3000);
+  }
+
+  toggleUpdateLoading() {
+    this.updateLoading = true;
     setTimeout(() => {
       this.updateLoading = false;
     }, 3000);
@@ -156,7 +165,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   formatCurrency(value) {
-    return `R$ ${(parseFloat(value)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}` || 0;
+    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}` || 0;
   }
 
   verifyNumber(value) {
@@ -224,7 +233,9 @@ export class ChequeEmpresarialComponent implements OnInit {
     }, err => {
       this.errorMessage = err.error.message;
     });
-    this.simularCalc(true);
+    setTimeout(() => {
+      this.simularCalc(true);
+    }, 1000);
   }
 
   getCurrentDate(format = "DD/MM/YYYY hh:mm") {
@@ -299,15 +310,19 @@ export class ChequeEmpresarialComponent implements OnInit {
         return parseFloat(row['valorDevedorAtualizado']);
       });
 
-      this.total_grandtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
-        return acumulador + valorAtual;
-      }) + this.total_multa_sob_contrato + this.total_honorarios;
+      if (this.tableData.dataRows.length > 0) {
+        this.total_grandtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
+          return acumulador + valorAtual;
+        }) + this.total_multa_sob_contrato + this.total_honorarios;
 
-      this.total_subtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
-        return acumulador + valorAtual;
-      });
+        this.total_subtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
+          return acumulador + valorAtual;
+        });
+      }
 
     }, 0);
+    this.tableData.dataRows.length === 0 && (this.tableLoading = false);
+    !isInlineChange && this.toggleUpdateLoading();
   }
 
   getIndiceDataBase(indice) {
@@ -317,6 +332,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
     row[innerIndice] = e.target.value;
     row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value);
+    row["indiceBA"] = e.target.value;
 
     this.simularCalc(true);
   }
