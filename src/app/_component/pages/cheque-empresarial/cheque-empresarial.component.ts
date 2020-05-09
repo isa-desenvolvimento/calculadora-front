@@ -329,6 +329,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => ind.value)[0]);
   }
 
+  deleteRow(id) {
+    this.chequeEmpresarialService.removeLancamento(id).subscribe(() => {
+      this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
+    })
+  }
+
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
     row[innerIndice] = e.target.value;
     row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value);
