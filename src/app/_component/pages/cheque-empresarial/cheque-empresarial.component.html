@@ -325,7 +325,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value) || "---"}}
+                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBaseAtual) || "---"}}
                                     </td>
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
@@ -343,7 +343,7 @@
                                         </select>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBaseAtual || getIndiceDataBase(ce_form_riscos.ce_indice.value) || "---"}}
+                                        {{row.indiceDataBaseAtual || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBaseAtual) || "---"}}
                                     </td>
                                     <td>
                                         {{formatCurrency(row.valorDevedor)}}
