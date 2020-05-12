@@ -68,6 +68,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       ce_indice: [],
       ce_encargos_monietarios: [],
       ce_data_calculo: this.getCurrentDate('YYYY-MM-DD'),
+      ce_ultima_atualizacao: '',
       ce_encargos_contratuais: [],
       ce_multa: [],
       ce_juros_mora: [],
@@ -126,7 +127,8 @@ export class ChequeEmpresarialComponent implements OnInit {
       lancamentoLocal['valorDevedor'] = parseFloat(lancamentoLocal['valorDevedor']);
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
       lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
-
+      lancamentoLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
+      
       if (lancamentoLocal["id"]) {
         this.chequeEmpresarialService.updateLancamento(lancamentoLocal).subscribe(chequeEmpresarialList => {
           this.updateLoadingBtn = false;
@@ -225,7 +227,8 @@ export class ChequeEmpresarialComponent implements OnInit {
         lancamentos: localLancamentos,
         tipoLancamento: localTipoLancamento,
         valorDevedorAtualizado: null,
-        contractRef: this.ce_form.ce_contrato.value || 0
+        contractRef: this.ce_form.ce_contrato.value || 0,
+        ultimaAtualizacao: '',
       });
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
@@ -280,7 +283,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     return moment(row['dataBase']).format("DD/MM/YYYY");
   }
 
-  simularCalc(isInlineChange = false) {
+  simularCalc(isInlineChange = false, origin = null) {
     this.tableLoading = true;
     setTimeout(() => {
       let tableDataUpdated = this.tableData.dataRows.map(row => {
@@ -334,6 +337,11 @@ export class ChequeEmpresarialComponent implements OnInit {
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
         this.tableLoading = false;
+        if (origin === 'btn') {
+          this.toggleUpdateLoading()
+          this.alertType = 'calculo-simulado';
+        }
+
         return parseFloat(row['valorDevedorAtualizado']);
       });
 

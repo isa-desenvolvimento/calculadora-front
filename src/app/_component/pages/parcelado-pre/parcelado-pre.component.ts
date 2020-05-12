@@ -214,7 +214,9 @@ export class ParceladoPreComponent implements OnInit {
         lancamentos: localLancamentos,
         tipoLancamento: localTipoLancamento,
         valorDevedorAtualizado: null,
-        contractRef: this.pre_form.pre_contrato.value || 0
+        contractRef: this.pre_form.pre_contrato.value || 0,
+        ultimaAtualizacao: '',
+
       });
       this.pre_form_amortizacao.preFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;

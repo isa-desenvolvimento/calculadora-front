@@ -1,20 +1,20 @@
 <div class="row ">
-    <div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-success" role="alert">
             Risco atualizado
         </div>
     </div>
-    <div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-success" role="alert">
             Cálculo Simulado
         </div>
     </div>
-    <div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-success" role="alert">
             Lançamento incluido!
         </div>
     </div>
-    <div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-danger" role="alert">
             Registro excluido!
         </div>
@@ -75,7 +75,7 @@
 
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="date" class="form-control col-md-11 col-sm-12" readonly>
+                                <input type="date" class="form-control col-md-11 col-sm-12" formControlName="ce_ultima_atualizacao"  readonly>
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Data do Cálculo</label>
@@ -134,7 +134,7 @@
                                 Risco</button>
                         </div>
                         <div class="stats form-group mb-2 ml-md-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="simularCalc()"
+                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="simularCalc(false, 'btn')"
                                 class="btn btn-info btn-round">Simular Cálculo</button>
                         </div>
 

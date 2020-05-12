@@ -214,7 +214,9 @@ export class ParceladoPosComponent implements OnInit {
         lancamentos: localLancamentos,
         tipoLancamento: localTipoLancamento,
         valorDevedorAtualizado: null,
-        contractRef: this.pos_form.pos_contrato.value || 0
+        contractRef: this.pos_form.pos_contrato.value || 0,
+        ultimaAtualizacao: '',
+
       });
       this.pos_form_amortizacao.posFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;

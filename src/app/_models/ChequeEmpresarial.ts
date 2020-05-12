@@ -12,6 +12,7 @@ export interface Lancamento {
     tipoLancamento: string;
     valorDevedorAtualizado: number;
     contractRef: number;
+    ultimaAtualizacao: string;
 }
 
 export interface EncargosMonetarios {
