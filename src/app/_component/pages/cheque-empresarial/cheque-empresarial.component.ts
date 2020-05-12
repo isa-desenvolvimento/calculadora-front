@@ -48,6 +48,8 @@ export class ChequeEmpresarialComponent implements OnInit {
   dtOptions: DataTables.Settings = {};
   last_data_table: Object;
   min_data: string;
+  min_data_base: String;
+  ultima_atualizacao: String;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -244,12 +246,20 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   pesquisarContratos() {
     this.tableLoading = true;
+    this.ultima_atualizacao ='';
+
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
 
+        if (chequeEmpresarialList.length) {
+          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
+          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        }
+
         setTimeout(() => {
           this.simularCalc(true);
+
         }, 1000);
 
         return cheque;
@@ -333,6 +343,8 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
         this.min_data = last_date;
+        
+        this.min_data_base = moment(row["dataBase"]).format("YYYY-MM-DD"); // '2020-05-27';
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 

@@ -75,7 +75,7 @@
 
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="date" class="form-control col-md-11 col-sm-12" formControlName="ce_ultima_atualizacao"  readonly>
+                                <input type="date" class="form-control col-md-11 col-sm-12" name="ce_ultima_atualizacao" [value]="ultima_atualizacao"  disabled>
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Data do Cálculo</label>
@@ -330,7 +330,7 @@
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12" name="ce_data_calculo"
-                                            id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
+                                            id="ce_data_calculo" max="3000-12-31" min="{{min_data_base}}"
                                             [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
                                     </td>
                                     <td width="80">
