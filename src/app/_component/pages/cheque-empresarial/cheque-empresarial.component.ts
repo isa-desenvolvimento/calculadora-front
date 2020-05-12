@@ -30,6 +30,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   tableData: TableData;
   tableLoading = false;
   updateLoading = false;
+  alertType = '';
   updateLoadingBtn = false;
   controleLancamentos = 0;
 
@@ -44,6 +45,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   dtOptions: DataTables.Settings = {};
   last_data_table: Object;
+  min_data: string;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -127,7 +129,8 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.updateLoading = true;
+            this.toggleUpdateLoading()
+            this.alertType = 'risco-atualizado';
           }
         }, err => {
           this.errorMessage = "Falha ao atualizar risco.";
@@ -137,7 +140,8 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.updateLoading = true;
+            this.toggleUpdateLoading()
+            this.alertType = 'risco-atualizado';
           }
           lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
         }, err => {
@@ -226,6 +230,8 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.resetFields('ceFormAmortizacao');
     
     setTimeout(() => {
+      this.toggleUpdateLoading()
+      this.alertType = 'lancamento-incluido';
       this.simularCalc(true)
     },500)
   }
@@ -318,6 +324,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
         
         this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
+        this.min_data = last_date;
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
@@ -347,14 +354,17 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
       if (this.tableData.dataRows.length) {
         this.simularCalc(true);
+        this.toggleUpdateLoading()
+        this.alertType = 'registro-excluido';
       }
       return;
     }
 
     this.chequeEmpresarialService.removeLancamento(id).subscribe(() => {
       this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
-
       this.simularCalc(true);
+      this.toggleUpdateLoading()
+      this.alertType = 'registro-excluido'
     })
   }
 

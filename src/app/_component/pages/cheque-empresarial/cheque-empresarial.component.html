@@ -1,7 +1,22 @@
 <div class="row ">
-    <div *ngIf="updateLoading" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
-        <div class="alert alert-primary" role="alert">
+    <div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+        <div class="alert alert-success" role="alert">
             Risco atualizado
+        </div>
+    </div>
+    <div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+        <div class="alert alert-success" role="alert">
+            Cálculo Simulado
+        </div>
+    </div>
+    <div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+        <div class="alert alert-success" role="alert">
+            Lançamento incluido!
+        </div>
+    </div>
+    <div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
+        <div class="alert alert-danger" role="alert">
+            Registro excluido!
         </div>
     </div>
     <div class="col-md-12">
@@ -155,7 +170,7 @@
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Data Base Atual</label>
                                 <input type="date" class="form-control col-md-12 col-sm-12" name="ceFA_data_base_atual"
-                                    id="ceFA_data_base_atual" formControlName="ceFA_data_base_atual">
+                                    id="ceFA_data_base_atual" formControlName="ceFA_data_base_atual" min="{{min_data}}">
                             </div>
                             <div class="col-md-4 col-sm-12">
                                 <label for="nome" class="col-form-label">Valor Lançamento</label>
