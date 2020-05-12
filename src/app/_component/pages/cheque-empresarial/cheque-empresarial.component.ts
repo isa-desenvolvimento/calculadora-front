@@ -5,6 +5,7 @@ import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
+import { timeout } from 'rxjs/operators';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -35,12 +36,14 @@ export class ChequeEmpresarialComponent implements OnInit {
   // total
   total_date_now: any;
   total_data_calculo: any;
+  subtotal_data_calculo: any;
   total_honorarios = 0;
   total_multa_sob_contrato = 0;
   total_subtotal = 0;
   total_grandtotal = 0;
 
   dtOptions: DataTables.Settings = {};
+  last_data_table: Object;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -165,7 +168,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   formatCurrency(value) {
-    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}` || 0;
+    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
   }
 
   verifyNumber(value) {
@@ -184,6 +187,8 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     this.total_date_now = moment(localDataBase).format("DD/MM/YYYY");
     this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate();
+    this.subtotal_data_calculo = this.total_date_now;
+    this.last_data_table = [];
 
     const localTypeIndice = this.ce_form_riscos.ce_indice.value;
     const localTypeValue = this.getIndiceDataBase(localTypeIndice);
@@ -219,7 +224,10 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableLoading = false;
     }, 0);
     this.resetFields('ceFormAmortizacao');
-    this.simularCalc(true);
+    
+    setTimeout(() => {
+      this.simularCalc(true)
+    },500)
   }
 
   pesquisarContratos() {
@@ -227,15 +235,18 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+
+        setTimeout(() => {
+          this.simularCalc(true);
+        }, 1000);
+
         return cheque;
       });
       this.tableLoading = false;
     }, err => {
       this.errorMessage = err.error.message;
     });
-    setTimeout(() => {
-      this.simularCalc(true);
-    }, 1000);
+
   }
 
   getCurrentDate(format = "DD/MM/YYYY hh:mm") {
@@ -303,6 +314,10 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.ce_form_riscos.ce_honorarios && (this.total_honorarios = (row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100));
         this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = this.ce_form_riscos.ce_multa_sobre_constrato.value);
 
+        this.last_data_table = [...this.tableData.dataRows].pop();
+        let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+        
+        this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
@@ -315,9 +330,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           return acumulador + valorAtual;
         }) + this.total_multa_sob_contrato + this.total_honorarios;
 
-        this.total_subtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
-          return acumulador + valorAtual;
-        });
+        this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
       }
 
     }, 0);
@@ -330,8 +343,18 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   deleteRow(id) {
+    if (!id) {
+      this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
+      if (this.tableData.dataRows.length) {
+        this.simularCalc(true);
+      }
+      return;
+    }
+
     this.chequeEmpresarialService.removeLancamento(id).subscribe(() => {
       this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
+
+      this.simularCalc(true);
     })
   }
 
