@@ -397,7 +397,6 @@ export class ChequeEmpresarialComponent implements OnInit {
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
     row[innerIndice] = e.target.value;
     row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value, row["dataBaseAtual"]);
-    row["indiceBA"] = e.target.value;
 
     this.simularCalc(true);
   }
