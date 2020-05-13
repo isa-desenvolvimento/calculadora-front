@@ -75,7 +75,7 @@
 
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="date" class="form-control col-md-11 col-sm-12" name="ce_ultima_atualizacao" [value]="ultima_atualizacao"  disabled>
+                                <input type="date" class="form-control col-md-11 col-sm-12" formControlName="ce_ultima_atualizacao"  readonly>
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Data do Cálculo</label>
@@ -119,9 +119,9 @@
                                     class="form-control col-md-11 col-sm-12" name="ce_honorarios" id="ce_honorarios"
                                     formControlName="ce_honorarios">
                             </div>
-                            <div  class="col-md-3 col-sm-12" data-toggle="tooltip" data-placement="top" title="Multa sob contrato aguardando retorno do Safra">
+                            <div  class="col-md-3 col-sm-12" >
                                 <label for="nome" class="col-form-label">Multa sob contrato</label>
-                                <input disabled type="number" (change)="verifyNumber($event)" min="0"
+                                <input type="number" (change)="verifyNumber($event)" min="0"
                                     class="form-control col-md-11 col-sm-12" name="ce_multa_sobre_constrato"
                                     id="ce_multa_sobre_constrato" formControlName="ce_multa_sobre_constrato">
                             </div>
@@ -317,7 +317,7 @@
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px" class="form-control custom-select"
-                                            name="ce_indice" id="ce_indice"
+                                            name="ce_indiceDB" id="ce_indiceDB"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceDB">
@@ -325,12 +325,12 @@
                                         </select>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBaseAtual) || "---"}}
+                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBase) || "---"}}
                                     </td>
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12" name="ce_data_calculo"
-                                            id="ce_data_calculo" max="3000-12-31" min="{{min_data_base}}"
+                                            id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
                                             [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
                                     </td>
                                     <td width="80">
@@ -384,7 +384,7 @@
                             <div class="col-md-10">
                                 <p>Subtotal apurado em {{ subtotal_data_calculo || "---------"}}</p>
                                 <p>Honorários {{ce_form_riscos.ce_honorarios.value || 0}}%</p>
-                                <p>Multa sob contrato aguardando retorno do Safra</p>
+                                <p>Multa sob contrato {{ce_form_riscos.ce_multa_sobre_constrato.value || 0}}%</p>
                                 <p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
                             </div>
                             <div class="col-md-2">

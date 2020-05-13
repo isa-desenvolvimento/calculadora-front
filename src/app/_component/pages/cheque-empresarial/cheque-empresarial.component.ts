@@ -48,8 +48,6 @@ export class ChequeEmpresarialComponent implements OnInit {
   dtOptions: DataTables.Settings = {};
   last_data_table: Object;
   min_data: string;
-  min_data_base: String;
-  ultima_atualizacao: String;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -246,20 +244,12 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   pesquisarContratos() {
     this.tableLoading = true;
-    this.ultima_atualizacao ='';
-
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
 
-        if (chequeEmpresarialList.length) {
-          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
-          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
-        }
-
         setTimeout(() => {
           this.simularCalc(true);
-
         }, 1000);
 
         return cheque;
@@ -336,15 +326,12 @@ export class ChequeEmpresarialComponent implements OnInit {
         // Forms Total
         this.ce_form_riscos.ce_data_calculo && (this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
         this.ce_form_riscos.ce_honorarios && (this.total_honorarios = (row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100));
-        this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = this.ce_form_riscos.ce_multa_sobre_constrato.value);
 
         this.last_data_table = [...this.tableData.dataRows].pop();
         let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
 
         this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
         this.min_data = last_date;
-        
-        this.min_data_base = moment(row["dataBase"]).format("YYYY-MM-DD"); // '2020-05-27';
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
@@ -353,17 +340,20 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.toggleUpdateLoading()
           this.alertType = 'calculo-simulado';
         }
+        
+        if (this.tableData.dataRows.length > 0) {
+          this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
+          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato =((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
+          console.log(this.total_multa_sob_contrato,this.total_honorarios);
+          
+          
+          this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios +  parseFloat(this.last_data_table['valorDevedorAtualizado']);
+  
+        }
 
         return parseFloat(row['valorDevedorAtualizado']);
       });
 
-      if (this.tableData.dataRows.length > 0) {
-        this.total_grandtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
-          return acumulador + valorAtual;
-        }) + this.total_multa_sob_contrato + this.total_honorarios;
-
-        this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
-      }
 
     }, 0);
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);
