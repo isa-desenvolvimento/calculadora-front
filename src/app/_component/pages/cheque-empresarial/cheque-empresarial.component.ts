@@ -368,7 +368,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       let date = moment(dataBaseAtual).format("DD/MM/YYYY");
 
       switch (ind.type) {
-        case "INPC":
+        case "INPC/IBGE":
           return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
           break;
         case "CDI":
@@ -449,7 +449,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     type: "---",
     value: "1"
   }, {
-    type: "INPC",
+    type: "INPC/IBGE",
     value: "60.872914"
   },
   {
