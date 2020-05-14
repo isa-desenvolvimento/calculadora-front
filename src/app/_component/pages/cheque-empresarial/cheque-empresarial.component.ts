@@ -332,7 +332,9 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // Forms Total
         this.ce_form_riscos.ce_data_calculo.value && (this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
-        this.ce_form_riscos.ce_honorarios.value && (this.total_honorarios = (row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100));
+        const honorarios = row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100;
+        
+        this.ce_form_riscos.ce_honorarios.value && (this.total_honorarios = honorarios);
 
         this.last_data_table = [...this.tableData.dataRows].pop();
         let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
@@ -350,8 +352,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         if (this.tableData.dataRows.length > 0) {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
-          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = ((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
-          this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + parseFloat(this.last_data_table['valorDevedorAtualizado']);
+          const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
+          console.log(valorDevedorAtualizado, honorarios);
+
+          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0;
+          this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + valorDevedorAtualizado;
         }
 
         return parseFloat(row['valorDevedorAtualizado']);
@@ -386,9 +391,11 @@ export class ChequeEmpresarialComponent implements OnInit {
     })[0]);
   }
 
-  deleteRow(id) {
-    if (!id) {
-      this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
+  deleteRow(row) {
+    if (!row.id) {
+      const index = this.tableData.dataRows.indexOf(row);
+      this.tableData.dataRows.splice(index, 1);
+      
       if (this.tableData.dataRows.length) {
         this.simularCalc(true);
         this.toggleUpdateLoading()
@@ -397,8 +404,11 @@ export class ChequeEmpresarialComponent implements OnInit {
       return;
     }
 
-    this.chequeEmpresarialService.removeLancamento(id).subscribe(() => {
-      this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
+    const index = this.tableData.dataRows.indexOf(row);
+    this.tableData.dataRows.splice(row);
+
+    this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
+      this.tableData.dataRows.splice(index, 1);
       this.simularCalc(true);
       this.toggleUpdateLoading()
       this.alertType = 'registro-excluido'
