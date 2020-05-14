@@ -48,6 +48,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   dtOptions: DataTables.Settings = {};
   last_data_table: Object;
   min_data: string;
+  ultima_atualizacao: String;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -244,9 +245,15 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   pesquisarContratos() {
     this.tableLoading = true;
+    this.ultima_atualizacao ='';
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+
+        if (chequeEmpresarialList.length) {
+          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
+          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        }
 
         setTimeout(() => {
           this.simularCalc(true);
