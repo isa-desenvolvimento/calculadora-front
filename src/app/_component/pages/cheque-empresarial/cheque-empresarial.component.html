@@ -162,7 +162,7 @@
                                     name="ceFa_saldo_devedor" style="height: 35px" id="ceFa_saldo_devedor"
                                     formControlName="ceFa_saldo_devedor">
                                 <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    R$ {{tableData.dataRows[0]["valorDevedor"]}}
+                                    {{formatCurrency(tableData.dataRows[0]["valorDevedor"])}}
                                 </p>
                             </div>
                             <div class="col-md-4 col-sm-12">
