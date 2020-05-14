@@ -352,7 +352,6 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = ((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
           this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + parseFloat(this.last_data_table['valorDevedorAtualizado']);
-
         }
 
         return parseFloat(row['valorDevedorAtualizado']);
@@ -463,7 +462,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   },
   {
     type: "Encargos Contratuais %",
-    value: "6"
+    value: "1"
   }
   ];
 
