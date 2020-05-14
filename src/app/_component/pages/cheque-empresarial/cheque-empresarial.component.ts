@@ -351,9 +351,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         if (this.tableData.dataRows.length > 0) {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = ((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
-          console.log(this.total_multa_sob_contrato, this.total_honorarios);
-
-
           this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + parseFloat(this.last_data_table['valorDevedorAtualizado']);
 
         }
@@ -371,14 +368,22 @@ export class ChequeEmpresarialComponent implements OnInit {
     return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
       let date = moment(dataBaseAtual).format("DD/MM/YYYY");
 
-      if (ind.type === "INPC") {
-        return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
-      } else if (ind.type === "CDI") {
-        return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
-      } else if (ind.type === "IGPM") {
-        return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
+      switch (ind.type) {
+        case "INPC":
+          return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
+          break;
+        case "CDI":
+          return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
+          break;
+        case "IGPM":
+          return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
+          break;
+        case "Encargos Contratuais %":
+          return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
+          break;
+        default:
+          break;
       }
-
     })[0]);
   }
 

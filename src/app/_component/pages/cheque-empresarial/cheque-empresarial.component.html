@@ -330,7 +330,7 @@
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12" name="ce_data_calculo"
-                                            id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
+                                            id="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}"
                                             [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
                                     </td>
                                     <td width="80">
