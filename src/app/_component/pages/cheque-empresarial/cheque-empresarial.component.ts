@@ -128,7 +128,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
       lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
       lancamentoLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
-      
+
       if (lancamentoLocal["id"]) {
         this.chequeEmpresarialService.updateLancamento(lancamentoLocal).subscribe(chequeEmpresarialList => {
           this.updateLoadingBtn = false;
@@ -285,10 +285,17 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   simularCalc(isInlineChange = false, origin = null) {
     this.tableLoading = true;
+
     setTimeout(() => {
-      let tableDataUpdated = this.tableData.dataRows.map(row => {
+      let tableDataUpdated = this.tableData.dataRows.map((row, index) => {
 
         const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
+
+        if (index > 0) {
+          (row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado']);
+          (row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual']);
+        }
+
         const valorDevedor = parseFloat(row['valorDevedor']);
 
         // - Indices
@@ -340,15 +347,15 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.toggleUpdateLoading()
           this.alertType = 'calculo-simulado';
         }
-        
+
         if (this.tableData.dataRows.length > 0) {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
-          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato =((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
-          console.log(this.total_multa_sob_contrato,this.total_honorarios);
-          
-          
-          this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios +  parseFloat(this.last_data_table['valorDevedorAtualizado']);
-  
+          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = ((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
+          console.log(this.total_multa_sob_contrato, this.total_honorarios);
+
+
+          this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + parseFloat(this.last_data_table['valorDevedorAtualizado']);
+
         }
 
         return parseFloat(row['valorDevedorAtualizado']);
@@ -363,7 +370,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   getIndiceDataBase(indice, dataBaseAtual) {
     return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
       let date = moment(dataBaseAtual).format("DD/MM/YYYY");
-      
+
       if (ind.type === "INPC") {
         return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
       } else if (ind.type === "CDI") {
@@ -398,7 +405,9 @@ export class ChequeEmpresarialComponent implements OnInit {
     row[innerIndice] = e.target.value;
     row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value, row["dataBaseAtual"]);
 
-    this.simularCalc(true);
+    setTimeout(() => {
+      this.simularCalc(true);
+    }, 500);
   }
 
   // Mock formulário de riscos
