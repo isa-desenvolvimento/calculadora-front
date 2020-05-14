@@ -352,7 +352,6 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = ((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
           this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + parseFloat(this.last_data_table['valorDevedorAtualizado']);
-
         }
 
         return parseFloat(row['valorDevedorAtualizado']);
@@ -369,7 +368,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       let date = moment(dataBaseAtual).format("DD/MM/YYYY");
 
       switch (ind.type) {
-        case "INPC":
+        case "INPC/IBGE":
           return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
           break;
         case "CDI":
@@ -450,7 +449,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     type: "---",
     value: "1"
   }, {
-    type: "INPC",
+    type: "INPC/IBGE",
     value: "60.872914"
   },
   {
@@ -463,7 +462,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   },
   {
     type: "Encargos Contratuais %",
-    value: "6"
+    value: "1"
   }
   ];
 
