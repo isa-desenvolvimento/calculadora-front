@@ -320,7 +320,7 @@
                                             name="ce_indiceDB" id="ce_indiceDB"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceDB">
+                                                [selected]="indice.type === row.indiceDB">
                                                 {{indice.type}}</option>
                                         </select>
                                     </td>
@@ -338,7 +338,7 @@
                                             name="ce_indice" id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceBA">
+                                                [selected]="indice.type === row.indiceBA">
                                                 {{indice.type}}</option>
                                         </select>
                                     </td>
