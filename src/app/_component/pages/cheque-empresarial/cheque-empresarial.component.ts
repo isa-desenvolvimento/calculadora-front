@@ -363,7 +363,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
 
-          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0;
+          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * this.ce_form_riscos.ce_multa_sobre_constrato.value / 100) || 0;
           this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizado;
         }
 
