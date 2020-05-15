@@ -247,7 +247,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   pesquisarContratos() {
     this.tableLoading = true;
-    this.ultima_atualizacao ='';
+    this.ultima_atualizacao = '';
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
@@ -342,7 +342,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         // Forms Total
         this.ce_form_riscos.ce_data_calculo.value && (this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
         const honorarios = row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100;
-        
+
         this.ce_form_riscos.ce_honorarios.value && (this.total_honorarios = honorarios);
 
         this.last_data_table = [...this.tableData.dataRows].pop();
@@ -400,25 +400,24 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   deleteRow(row) {
-    if (!row.id) {
-      const index = this.tableData.dataRows.indexOf(row);
-      this.tableData.dataRows.splice(index, 1);
-      
-      if (this.tableData.dataRows.length) {
-        this.simularCalc(false);
-        this.toggleUpdateLoading()
-        this.alertType = 'registro-excluido';
-      }
-      return;
-    }
-
     const index = this.tableData.dataRows.indexOf(row);
-    this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
+    if (!row.id) {
       this.tableData.dataRows.splice(index, 1);
-      this.simularCalc(true);
-      this.toggleUpdateLoading()
-      this.alertType = 'registro-excluido'
-    })
+      setTimeout(() => {
+        this.simularCalc(true);
+        this.toggleUpdateLoading()
+        this.alertType = 'registro-excluido'
+      }, 0)
+    } else {
+      this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
+        this.tableData.dataRows.splice(index, 1);
+        setTimeout(() => {
+          this.simularCalc(true);
+          this.toggleUpdateLoading()
+          this.alertType = 'registro-excluido'
+        }, 0)
+      })
+    }
   }
 
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
