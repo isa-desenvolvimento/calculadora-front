@@ -135,6 +135,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
+            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
             this.toggleUpdateLoading()
             this.alertType = 'risco-atualizado';
           }
@@ -146,6 +147,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
+            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
             this.toggleUpdateLoading()
             this.alertType = 'risco-atualizado';
           }
@@ -360,10 +362,9 @@ export class ChequeEmpresarialComponent implements OnInit {
         if (this.tableData.dataRows.length > 0) {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
-          console.log(valorDevedorAtualizado, honorarios);
 
           this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0;
-          this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + valorDevedorAtualizado;
+          this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizado;
         }
 
         return parseFloat(row['valorDevedorAtualizado']);
@@ -404,7 +405,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableData.dataRows.splice(index, 1);
       
       if (this.tableData.dataRows.length) {
-        this.simularCalc(true);
+        this.simularCalc(false);
         this.toggleUpdateLoading()
         this.alertType = 'registro-excluido';
       }
@@ -412,8 +413,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     }
 
     const index = this.tableData.dataRows.indexOf(row);
-    this.tableData.dataRows.splice(row);
-
     this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
       this.tableData.dataRows.splice(index, 1);
       this.simularCalc(true);
