@@ -298,13 +298,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       let tableDataUpdated = this.tableData.dataRows.map((row, index) => {
 
-        const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
-
         if (index > 0) {
           (row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado']);
           (row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual']);
         }
 
+        const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
 
         // - Indices
