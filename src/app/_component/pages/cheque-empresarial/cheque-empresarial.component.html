@@ -75,7 +75,7 @@
 
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="date" class="form-control col-md-11 col-sm-12" formControlName="ce_ultima_atualizacao"  readonly>
+                                <input type="date" class="form-control col-md-11 col-sm-12" name="ce_ultima_atualizacao" [value]="ultima_atualizacao"  disabled>
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Data do Cálculo</label>
@@ -87,7 +87,7 @@
                             <div class="col-md-3 col-sm-12">
                             </div>
                             <div class="col-md-3 col-sm-12">
-                                <label for="ce_indice" class="col-form-label">Indice</label>
+                                <label for="ce_indice" class="col-form-label">Índice</label>
                                 <select class="form-control custom-select col-md-12 col-sm-12" name="ce_indice"
                                     id="ce_indice" formControlName="ce_indice">
                                     <option *ngFor="let indice of indice_field" [value]="indice.type">
@@ -162,7 +162,7 @@
                                     name="ceFa_saldo_devedor" style="height: 35px" id="ceFa_saldo_devedor"
                                     formControlName="ceFa_saldo_devedor">
                                 <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    R$ {{tableData.dataRows[0]["valorDevedor"]}}
+                                    {{formatCurrency(tableData.dataRows[0]["valorDevedor"])}}
                                 </p>
                             </div>
                             <div class="col-md-4 col-sm-12">
@@ -277,15 +277,15 @@
                                 </tr>
                                 <tr align="center">
                                     <th class="align-title-top" rowspan="2">Data Base</th>
-                                    <th class="align-title-top" rowspan="2">Indíce
+                                    <th class="align-title-top" rowspan="2">Índice
                                         <b>{{ce_form_riscos.ce_indice.value}}</b>
                                     </th>
-                                    <th width="80" class="align-title-top" rowspan="2">Indíce Data Base</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Índice Data Base</th>
                                     <th class="align-title-top" rowspan="2">Data Base Atual</th>
-                                    <th class="align-title-top" rowspan="2">Indíce
+                                    <th class="align-title-top" rowspan="2">Índice
                                         <b>{{ce_form_riscos.ce_indice.value}}</b>
                                     </th>
-                                    <th width="80" class="align-title-top" rowspan="2">Indíce Data Base Atual</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Índice Data Base Atual</th>
                                     <th class="align-title-top" rowspan="2">Valor devedor</th>
 
                                     <th width="100" rowspan="2">Correção pelo Índice</th>
@@ -320,7 +320,7 @@
                                             name="ce_indiceDB" id="ce_indiceDB"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceDB">
+                                                [selected]="indice.type === row.indiceDB">
                                                 {{indice.type}}</option>
                                         </select>
                                     </td>
@@ -330,7 +330,7 @@
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12" name="ce_data_calculo"
-                                            id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
+                                            id="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}"
                                             [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
                                     </td>
                                     <td width="80">
@@ -338,7 +338,7 @@
                                             name="ce_indice" id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="ce_form_riscos.ce_indice.value === indice.type || indice.type === row.indiceBA">
+                                                [selected]="indice.type === row.indiceBA">
                                                 {{indice.type}}</option>
                                         </select>
                                     </td>
@@ -369,7 +369,7 @@
                                     <td>
                                         {{formatCurrency(row.valorDevedorAtualizado)}}
                                     </td>
-                                    <td (click)="deleteRow(row.id)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
+                                    <td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
                                 </tr>
                             </tbody>
                         </table>

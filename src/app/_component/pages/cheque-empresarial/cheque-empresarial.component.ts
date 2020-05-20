@@ -48,6 +48,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   dtOptions: DataTables.Settings = {};
   last_data_table: Object;
   min_data: string;
+  ultima_atualizacao: String;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -134,6 +135,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
+            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
             this.toggleUpdateLoading()
             this.alertType = 'risco-atualizado';
           }
@@ -145,6 +147,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
+            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
             this.toggleUpdateLoading()
             this.alertType = 'risco-atualizado';
           }
@@ -244,12 +247,18 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   pesquisarContratos() {
     this.tableLoading = true;
+    this.ultima_atualizacao = '';
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
 
+        if (chequeEmpresarialList.length) {
+          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
+          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        }
+
         setTimeout(() => {
-          this.simularCalc(true);
+          this.simularCalc(true, null, true);
         }, 1000);
 
         return cheque;
@@ -283,19 +292,18 @@ export class ChequeEmpresarialComponent implements OnInit {
     return moment(row['dataBase']).format("DD/MM/YYYY");
   }
 
-  simularCalc(isInlineChange = false, origin = null) {
+  simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
 
     setTimeout(() => {
       let tableDataUpdated = this.tableData.dataRows.map((row, index) => {
-
-        const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
 
         if (index > 0) {
           (row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado']);
           (row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual']);
         }
 
+        const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
 
         // - Indices
@@ -313,17 +321,17 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        row['encargosMonetarios']['correcaoPeloIndice'] = ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
 
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
         // -- juros 
-        row['encargosMonetarios']['jurosAm']['percentsJuros'] = ((this.ce_form_riscos.ce_juros_mora.value / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['percentsJuros'] = search ? row['encargosMonetarios']['jurosAm']['percentsJuros'] : ((this.ce_form_riscos.ce_juros_mora.value / 30) * qtdDias).toFixed(2);
         // -- moneyValue
-        row['encargosMonetarios']['jurosAm']['moneyValue'] = ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * ((this.ce_form_riscos.ce_juros_mora.value / 100))).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['moneyValue'] = search ? row['encargosMonetarios']['jurosAm']['moneyValue'] : ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * ((this.ce_form_riscos.ce_juros_mora.value / 100))).toFixed(2);
 
         // -- multa 
-        row['encargosMonetarios']['multa'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * (this.ce_form_riscos.ce_multa.value / 100)).toFixed(2);
+        row['encargosMonetarios']['multa'] = search ? row['encargosMonetarios']['multa'] : ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * (this.ce_form_riscos.ce_multa.value / 100)).toFixed(2);
         row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
 
         // Amortizacao
@@ -332,7 +340,9 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // Forms Total
         this.ce_form_riscos.ce_data_calculo.value && (this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
-        this.ce_form_riscos.ce_honorarios.value && (this.total_honorarios = (row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100));
+        const honorarios = row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100;
+
+        this.ce_form_riscos.ce_honorarios.value && (this.total_honorarios = honorarios);
 
         this.last_data_table = [...this.tableData.dataRows].pop();
         let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
@@ -350,12 +360,10 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         if (this.tableData.dataRows.length > 0) {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
-          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = ((this.last_data_table['valorDevedorAtualizado'] + this.ce_form_riscos.ce_honorarios.value) * this.ce_form_riscos.ce_multa_sobre_constrato.value) || 0);
-          console.log(this.total_multa_sob_contrato, this.total_honorarios);
+          const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
 
-
-          this.total_grandtotal = this.total_multa_sob_contrato + this.total_honorarios + parseFloat(this.last_data_table['valorDevedorAtualizado']);
-
+          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * this.ce_form_riscos.ce_multa_sobre_constrato.value / 100) || 0;
+          this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizado;
         }
 
         return parseFloat(row['valorDevedorAtualizado']);
@@ -371,34 +379,44 @@ export class ChequeEmpresarialComponent implements OnInit {
     return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
       let date = moment(dataBaseAtual).format("DD/MM/YYYY");
 
-      if (ind.type === "INPC") {
-        return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
-      } else if (ind.type === "CDI") {
-        return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
-      } else if (ind.type === "IGPM") {
-        return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
+      switch (ind.type) {
+        case "INPC/IBGE":
+          return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
+          break;
+        case "CDI":
+          return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
+          break;
+        case "IGPM":
+          return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
+          break;
+        case "Encargos Contratuais %":
+          return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
+          break;
+        default:
+          break;
       }
-
     })[0]);
   }
 
-  deleteRow(id) {
-    if (!id) {
-      this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
-      if (this.tableData.dataRows.length) {
+  deleteRow(row) {
+    const index = this.tableData.dataRows.indexOf(row);
+    if (!row.id) {
+      this.tableData.dataRows.splice(index, 1);
+      setTimeout(() => {
         this.simularCalc(true);
         this.toggleUpdateLoading()
-        this.alertType = 'registro-excluido';
-      }
-      return;
+        this.alertType = 'registro-excluido'
+      }, 0)
+    } else {
+      this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
+        this.tableData.dataRows.splice(index, 1);
+        setTimeout(() => {
+          this.simularCalc(true);
+          this.toggleUpdateLoading()
+          this.alertType = 'registro-excluido'
+        }, 0)
+      })
     }
-
-    this.chequeEmpresarialService.removeLancamento(id).subscribe(() => {
-      this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
-      this.simularCalc(true);
-      this.toggleUpdateLoading()
-      this.alertType = 'registro-excluido'
-    })
   }
 
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
@@ -445,7 +463,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     type: "---",
     value: "1"
   }, {
-    type: "INPC",
+    type: "INPC/IBGE",
     value: "60.872914"
   },
   {
@@ -458,7 +476,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   },
   {
     type: "Encargos Contratuais %",
-    value: "6"
+    value: "1"
   }
   ];
 
