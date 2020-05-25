@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Lancamento } from '../../../_models/ChequeEmpresarial';
+import { Lancamento, InfoParaCalculo } from '../../../_models/ChequeEmpresarial';
 import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -116,6 +116,7 @@ export class ParceladoPreComponent implements OnInit {
       this.updateLoadingBtn = true;
       let lancamentoLocal = { ...lancamento };
       lancamentoLocal['encargosMonetarios'] = JSON.stringify(lancamentoLocal['encargosMonetarios']);
+      lancamentoLocal['infoParaCalculo'] = JSON.stringify(lancamentoLocal['infoParaCalculo']);
       lancamentoLocal['valorDevedor'] = parseFloat(lancamentoLocal['valorDevedor']);
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
       lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
@@ -193,6 +194,13 @@ export class ParceladoPreComponent implements OnInit {
     const localTipoLancamento = this.pre_form_amortizacao.preFA_tipo_lancamento.value;
     const localDataBaseAtual = this.pre_form_amortizacao.preFA_data_base_atual.value;
 
+    const localInfoParaCalculo: InfoParaCalculo = {
+      formMulta: this.pre_form_riscos.ce_multa.value,
+      formJuros: this.pre_form_riscos.ce_juros_mora.value,
+      formHonorarios: this.pre_form_riscos.ce_honorarios.value,
+      formMultaSobContrato: this.pre_form_riscos.ce_multa_sobre_constrato.value
+    };
+
     setTimeout(() => {
       this.payloadLancamento = ({
         dataBase: localDataBase,
@@ -216,7 +224,7 @@ export class ParceladoPreComponent implements OnInit {
         valorDevedorAtualizado: null,
         contractRef: this.pre_form.pre_contrato.value || 0,
         ultimaAtualizacao: '',
-
+        infoParaCalculo: { ...localInfoParaCalculo }
       });
       this.pre_form_amortizacao.preFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
@@ -230,6 +238,7 @@ export class ParceladoPreComponent implements OnInit {
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+        cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
         return cheque;
       });
       this.tableLoading = false;

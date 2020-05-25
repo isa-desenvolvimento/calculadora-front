@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Lancamento } from '../../../_models/ChequeEmpresarial';
+import { Lancamento, InfoParaCalculo } from '../../../_models/ChequeEmpresarial';
 import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
 
 import { IndicesService } from '../../../_services/indices.service';
@@ -49,6 +49,13 @@ export class ChequeEmpresarialComponent implements OnInit {
   last_data_table: Object;
   min_data: string;
   ultima_atualizacao: String;
+
+  formDefaultValues: InfoParaCalculo = {
+    formMulta: 0,
+    formJuros: 0,
+    formHonorarios: 0,
+    formMultaSobContrato: 0
+  };
 
   constructor(
     private formBuilder: FormBuilder,
@@ -120,11 +127,13 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   atualizarRisco() {
     this.controleLancamentos = 0;
+    this.changeFormValues(this.formDefaultValues);
     this.tableData.dataRows.forEach(lancamento => {
 
       this.updateLoadingBtn = true;
       let lancamentoLocal = { ...lancamento };
       lancamentoLocal['encargosMonetarios'] = JSON.stringify(lancamentoLocal['encargosMonetarios']);
+      lancamentoLocal['infoParaCalculo'] = JSON.stringify(this.formDefaultValues);
       lancamentoLocal['valorDevedor'] = parseFloat(lancamentoLocal['valorDevedor']);
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
       lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
@@ -209,6 +218,13 @@ export class ChequeEmpresarialComponent implements OnInit {
     const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
     const localDataBaseAtual = this.ce_form_amortizacao.ceFA_data_base_atual.value;
 
+    const localInfoParaCalculo: InfoParaCalculo = {
+      formMulta: this.ce_form_riscos.ce_multa.value,
+      formJuros: this.ce_form_riscos.ce_juros_mora.value,
+      formHonorarios: this.ce_form_riscos.ce_honorarios.value,
+      formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value
+    };
+
     setTimeout(() => {
       this.payloadLancamento = ({
         dataBase: localDataBase,
@@ -232,6 +248,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         valorDevedorAtualizado: null,
         contractRef: this.ce_form.ce_contrato.value || 0,
         ultimaAtualizacao: '',
+        infoParaCalculo: { ...localInfoParaCalculo }
       });
       this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
@@ -251,6 +268,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+        cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
 
         if (chequeEmpresarialList.length) {
           const ultimaAtualizacao = [...chequeEmpresarialList].pop();
@@ -258,6 +276,8 @@ export class ChequeEmpresarialComponent implements OnInit {
         }
 
         setTimeout(() => {
+
+          this.changeFormValues(cheque.infoParaCalculo);
           this.simularCalc(true, null, true);
         }, 1000);
 
@@ -292,10 +312,28 @@ export class ChequeEmpresarialComponent implements OnInit {
     return moment(row['dataBase']).format("DD/MM/YYYY");
   }
 
+  changeFormValues(infoParaCalculo) {
+
+    this.ceFormRiscos.patchValue({
+      ce_multa: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
+      ce_juros_mora: this.ce_form_riscos.ce_juros_mora.value || infoParaCalculo["formJuros"],
+      ce_honorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
+      ce_multa_sobre_constrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
+    });
+
+    this.formDefaultValues = {
+      formMulta: this.ce_form_riscos.ce_multa.value,
+      formJuros: this.ce_form_riscos.ce_juros_mora.value,
+      formHonorarios: this.ce_form_riscos.ce_honorarios.value,
+      formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value
+    };
+
+  }
+
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
-
     setTimeout(() => {
+
       let tableDataUpdated = this.tableData.dataRows.map((row, index) => {
 
         if (index > 0) {

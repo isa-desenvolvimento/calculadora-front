@@ -13,6 +13,7 @@ export interface Lancamento {
     valorDevedorAtualizado: number;
     contractRef: number;
     ultimaAtualizacao: string;
+    infoParaCalculo: any
 }
 
 export interface EncargosMonetarios {
@@ -25,4 +26,11 @@ export interface JurosAm {
     dias: number;
     percentsJuros: number;
     moneyValue: number;
+}
+
+export interface InfoParaCalculo {
+    formMulta: number;
+    formJuros: number;
+    formHonorarios: number;
+    formMultaSobContrato: number;
 }
