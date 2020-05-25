@@ -364,12 +364,12 @@ export class ChequeEmpresarialComponent implements OnInit {
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
         // -- juros 
-        row['encargosMonetarios']['jurosAm']['percentsJuros'] = search ? row['encargosMonetarios']['jurosAm']['percentsJuros'] : ((this.ce_form_riscos.ce_juros_mora.value / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['percentsJuros'] = search ? row['encargosMonetarios']['jurosAm']['percentsJuros'] : (((this.ce_form_riscos.ce_juros_mora.value || this.formDefaultValues.formJuros) / 30) * qtdDias).toFixed(2);
         // -- moneyValue
         row['encargosMonetarios']['jurosAm']['moneyValue'] = search ? row['encargosMonetarios']['jurosAm']['moneyValue'] : ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * ((this.ce_form_riscos.ce_juros_mora.value / 100))).toFixed(2);
 
         // -- multa 
-        row['encargosMonetarios']['multa'] = search ? row['encargosMonetarios']['multa'] : ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * (this.ce_form_riscos.ce_multa.value / 100)).toFixed(2);
+        row['encargosMonetarios']['multa'] = search ? row['encargosMonetarios']['multa'] : ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * ((this.ce_form_riscos.ce_multa.value || this.formDefaultValues.formMulta) / 100)).toFixed(2);
         row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
 
         // Amortizacao
@@ -378,9 +378,9 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // Forms Total
         this.ce_form_riscos.ce_data_calculo.value && (this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
-        const honorarios = row['valorDevedorAtualizado'] * this.ce_form_riscos.ce_honorarios.value / 100;
+        const honorarios = row['valorDevedorAtualizado'] * (this.ce_form_riscos.ce_honorarios.value || this.formDefaultValues.formHonorarios) / 100;
 
-        this.ce_form_riscos.ce_honorarios.value && (this.total_honorarios = honorarios);
+        (this.formDefaultValues.formHonorarios || this.ce_form_riscos.ce_honorarios.value) && (this.total_honorarios = honorarios);
 
         this.last_data_table = [...this.tableData.dataRows].pop();
         let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
@@ -400,7 +400,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
 
-          this.ce_form_riscos.ce_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * this.ce_form_riscos.ce_multa_sobre_constrato.value / 100) || 0;
+          (this.ce_form_riscos.ce_multa_sobre_constrato || this.formDefaultValues.formMultaSobContrato) && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * (this.ce_form_riscos.ce_multa_sobre_constrato.value || this.formDefaultValues.formMultaSobContrato) / 100) || 0;
           this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizado;
         }
 
