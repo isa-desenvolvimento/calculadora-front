@@ -127,7 +127,6 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   atualizarRisco() {
     this.controleLancamentos = 0;
-    this.changeFormValues(this.formDefaultValues);
     this.tableData.dataRows.forEach(lancamento => {
 
       this.updateLoadingBtn = true;
@@ -314,24 +313,25 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   changeFormValues(infoParaCalculo) {
 
-    this.ceFormRiscos.patchValue({
-      ce_multa: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
-      ce_juros_mora: this.ce_form_riscos.ce_juros_mora.value || infoParaCalculo["formJuros"],
-      ce_honorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
-      ce_multa_sobre_constrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
-    });
+    // this.ceFormRiscos.patchValue({
+    //   ce_multa: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
+    //   ce_juros_mora: this.ce_form_riscos.ce_juros_mora.value || infoParaCalculo["formJuros"],
+    //   ce_honorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
+    //   ce_multa_sobre_constrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
+    // });
 
     this.formDefaultValues = {
-      formMulta: this.ce_form_riscos.ce_multa.value,
-      formJuros: this.ce_form_riscos.ce_juros_mora.value,
-      formHonorarios: this.ce_form_riscos.ce_honorarios.value,
-      formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value
+      formMulta: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
+      formJuros: this.ce_form_riscos.ce_juros_mora.value || infoParaCalculo["formJuros"],
+      formHonorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
+      formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
     };
 
   }
 
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
+    this.changeFormValues(this.formDefaultValues);
     setTimeout(() => {
 
       let tableDataUpdated = this.tableData.dataRows.map((row, index) => {

@@ -1,20 +1,24 @@
 <div class="row ">
-    <div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3"
+        style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-success" role="alert">
             Risco atualizado
         </div>
     </div>
-    <div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3"
+        style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-success" role="alert">
             Cálculo Simulado
         </div>
     </div>
-    <div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3"
+        style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-success" role="alert">
             Lançamento incluido!
         </div>
     </div>
-    <div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+    <div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3"
+        style="position: fixed; right: 10px; top: 10px; z-index: 999">
         <div class="alert alert-danger" role="alert">
             Registro excluido!
         </div>
@@ -57,11 +61,13 @@
                                 <div class="stats">
                                     <button type="button" (click)="pesquisarContratos()" class="btn btn-info btn-round"
                                         [disabled]="!ceForm.valid || tableLoading">Pesquisar</button>
-                                        <div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
-                                            <div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status">
-                                                <span class="sr-only">Loading...</span>
-                                            </div>
+                                    <div class="d-flex justify-content-center" *ngIf="tableLoading"
+                                        style="position: absolute; top: 33px; right: 80px">
+                                        <div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;"
+                                            role="status">
+                                            <span class="sr-only">Loading...</span>
                                         </div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -75,7 +81,8 @@
 
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="date" class="form-control col-md-11 col-sm-12" name="ce_ultima_atualizacao" [value]="ultima_atualizacao"  disabled>
+                                <input type="date" class="form-control col-md-11 col-sm-12" name="ce_ultima_atualizacao"
+                                    [value]="ultima_atualizacao" disabled>
                             </div>
                             <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Data do Cálculo</label>
@@ -119,7 +126,7 @@
                                     class="form-control col-md-11 col-sm-12" name="ce_honorarios" id="ce_honorarios"
                                     formControlName="ce_honorarios">
                             </div>
-                            <div  class="col-md-3 col-sm-12" >
+                            <div class="col-md-3 col-sm-12">
                                 <label for="nome" class="col-form-label">Multa sob contrato</label>
                                 <input type="number" (change)="verifyNumber($event)" min="0"
                                     class="form-control col-md-11 col-sm-12" name="ce_multa_sobre_constrato"
@@ -134,8 +141,9 @@
                                 Risco</button>
                         </div>
                         <div class="stats form-group mb-2 ml-md-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="simularCalc(false, 'btn')"
-                                class="btn btn-info btn-round">Simular Cálculo</button>
+                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)"
+                                (click)="simularCalc(false, 'btn')" class="btn btn-info btn-round">Simular
+                                Cálculo</button>
                         </div>
 
                         <div class="col-lg-12  mt-3">
@@ -290,11 +298,12 @@
 
                                     <th width="100" rowspan="2">Correção pelo Índice</th>
 
-                                    <th colspan="3">Juros a.m. {{( ce_form_riscos.ce_juros_mora.value || 0 ) + "%"}}
+                                    <th colspan="3">Juros a.m.
+                                        {{(formDefaultValues.formJuros ||  0 ) + "%"}}
                                     </th>
 
                                     <th width="100" rowspan="2">Multa
-                                        <b>{{( ce_form_riscos.ce_multa.value || 0 ) + "%"}}</b>
+                                        <b>{{(formDefaultValues.formMulta || 0 ) + "%"}}</b>
                                     </th>
 
                                     <th class="align-title-top" rowspan="2">Lançamentos</th>
@@ -369,7 +378,8 @@
                                     <td>
                                         {{formatCurrency(row.valorDevedorAtualizado)}}
                                     </td>
-                                    <td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
+                                    <td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;"
+                                            class="nc-icon nc-simple-remove"></i></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -383,8 +393,8 @@
                         <div class="row">
                             <div class="col-md-10">
                                 <p>Subtotal apurado em {{ subtotal_data_calculo || "---------"}}</p>
-                                <p>Honorários {{ce_form_riscos.ce_honorarios.value || 0}}%</p>
-                                <p>Multa sob contrato {{ce_form_riscos.ce_multa_sobre_constrato.value || 0}}%</p>
+                                <p>Honorários {{formDefaultValues.formHonorarios || 0}}%</p>
+                                <p>Multa sob contrato {{formDefaultValues.formMultaSobContrato || 0}}%</p>
                                 <p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
                             </div>
                             <div class="col-md-2">
