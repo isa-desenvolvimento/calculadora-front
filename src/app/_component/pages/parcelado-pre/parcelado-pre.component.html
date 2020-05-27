@@ -1,401 +1,316 @@
 <div class="row ">
-    <div *ngIf="updateLoading" class="col-lg-3  mt-3" style="position: fixed; right: 10px; bottom: 10px; z-index: 999">
-        <div class="alert alert-primary" role="alert">
-            Risco atualizado
-        </div>
-    </div>
-    <div class="col-md-12">
-        <div class="card ">
-            <div class="card-body ">
-                <div class="row">
-                    <div class="col-md-12">
-                        <form class="row" [formGroup]="preForm">
-                            <div class="col-sm-3">
-                                <label for="pre_pasta" class="col-form-label">Pasta</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="pre_pasta"
-                                    id="pre_pasta" formControlName="pre_pasta">
-                                    <option *ngFor="let folder of folderData_field" [value]="folder">
-                                        {{folder}}</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-3">
-                                <label for="pre_contrato" class="col-form-label">Contrato</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="pre_contrato"
-                                    id="pre_contrato" formControlName="pre_contrato" required>
-                                    <option *ngFor="let contract of contractList_field" [value]="contract.id">
-                                        {{contract.title}}</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-3">
-                                <label for="nome" class="col-form-label">Tipo de Contrato</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="pre_tipo_contrato"
-                                    id="pre_tipo_contrato" formControlName="pre_tipo_contrato">
-                                    <option *ngFor="let typeContract of typeContractList_field" [value]="typeContract">
-                                        {{typeContract}}</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-3">
-                                <br />
-                                <div class="stats">
-                                    <button type="button" (click)="pesquisarContratos()" class="btn btn-info btn-round"
-                                        [disabled]="!preForm.valid || tableLoading">Pesquisar</button>
-                                        <div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
-                                            <div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status">
-                                                <span class="sr-only">Loading...</span>
-                                            </div>
-                                        </div>
-                                </div>
-                            </div>
+	<div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+		<div class="alert alert-success" role="alert"> Risco atualizado </div>
+	</div>
+	<div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+		<div class="alert alert-success" role="alert"> Cálculo Simulado </div>
+	</div>
+	<div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+		<div class="alert alert-success" role="alert"> Lançamento incluido! </div>
+	</div>
+	<div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+		<div class="alert alert-danger" role="alert"> Registro excluido! </div>
+	</div>
+	<div class="col-md-12">
+		<div class="card ">
+			<div class="card-header ">
+				<h5 class="card-title">Cheque Empresarial / Conta Garantida</h5> </div>
+			<div class="card-body ">
+				<div class="row">
+					<div class="col-md-12">
+						<form class="row" [formGroup]="preForm">
+							<div class="col-sm-3">
+								<label for="pre_pasta" class="col-form-label">Pasta</label>
+								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_pasta" id="pre_pasta" formControlName="pre_pasta">
+									<option *ngFor="let folder of folderData_field" [value]="folder"> {{folder}}</option>
+								</select>
+							</div>
+							<div class="col-sm-3">
+								<label for="pre_contrato" class="col-form-label">Contrato</label>
+								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_contrato" id="pre_contrato" formControlName="pre_contrato" required>
+									<option *ngFor="let contract of contractList_field" [value]="contract.id"> {{contract.title}}</option>
+								</select>
+							</div>
+							<div class="col-sm-3">
+								<label for="nome" class="col-form-label">Tipo de Contrato</label>
+								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_tipo_contrato" id="pre_tipo_contrato" formControlName="pre_tipo_contrato">
+									<option *ngFor="let typeContract of typeContractList_field" [value]="typeContract"> {{typeContract}}</option>
+								</select>
+							</div>
+							<div class="col-sm-3">
+								<br />
+								<div class="stats">
+									<button type="button" (click)="pesquisarContratos()" class="btn btn-info btn-round" [disabled]="!preForm.valid || tableLoading">Pesquisar</button>
+									<div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
+										<div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status"> <span class="sr-only">Loading...</span> </div>
+									</div>
+								</div>
+							</div>
+							<div class="col-lg-12 mb-3 mt-3">
+								<hr> </div>
+						</form>
+					</div>
+					<div class="col-md-12 col-sm-12">
+						<form class="row" [formGroup]="preFormRiscos">
+							<div class="col-md-3 col-sm-12">
+								<label for="nome" class="col-form-label">Última Atualização</label>
+								<input type="date" class="form-control col-md-11 col-sm-12" name="pre_ultima_atualizacao" [value]="ultima_atualizacao" disabled> </div>
+							<div class="col-md-3 col-sm-12">
+								<label for="nome" class="col-form-label">Data do Cálculo</label>
+								<input type="date" class=" form-control col-md-11 col-sm-12" name="pre_data_calculo" id="pre_data_calculo" formControlName="pre_data_calculo"> </div>
+							<div class="col-md-3 col-sm-12"> </div>
+							<div class="col-md-3 col-sm-12"> </div>
+							<div class="col-md-3 col-sm-12">
+								<label for="pre_indice" class="col-form-label">Índice</label>
+								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_indice" id="pre_indice" formControlName="pre_indice">
+									<option *ngFor="let indice of indipre_field" [value]="indice.type"> {{indice.type}}</option>
+								</select>
+							</div>
+							<div class="col-md-3 col-sm-12" [hidden]="pre_form_riscos.pre_indice.value !== 'Encargos Contratuais %'">
+								<label for="nome" class="col-form-label">Encargos Contratuais %</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12 " name="pre_encargos_contratuais" id="pre_encargos_contratuais" formControlName="pre_encargos_contratuais"> </div>
+							<div class="col-md-3 col-sm-12">
+								<label for="nome" class="col-form-label">Multa %</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_multa" id="pre_multa" formControlName="pre_multa" value> </div>
+							<div class="col-md-3 col-sm-12">
+								<label for="nome" class="col-form-label">Juros Mora %</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_juros_mora" id="pre_juros_mora" formControlName="pre_juros_mora"> </div>
+							<div class="col-md-3 col-sm-12">
+								<label for="nome" class="col-form-label">Honorários %</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_honorarios" id="pre_honorarios" formControlName="pre_honorarios"> </div>
+							<div class="col-md-3 col-sm-12">
+								<label for="nome" class="col-form-label">Multa sob contrato</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_multa_sobre_constrato" id="pre_multa_sobre_constrato" formControlName="pre_multa_sobre_constrato"> </div>
+							<div class="col-md-3 col-sm-12">
+								<label for="nome" class="col-form-label">Deságio %</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_desagio" id="pre_desagio" formControlName="pre_desagio"> </div>
+						</form>
+					</div>
+					<div class="col-md-12 col-sm-12 form-inline mt-3">
+						<div class="stats form-group mb-2">
+							<button type="button" [disabled]="!(tableData.dataRows.length > 0) || updateLoadingBtn" (click)="atualizarRisco()" class="btn btn-info btn-round">Atualizar Risco</button>
+						</div>
+						<div class="stats form-group mb-2 ml-md-2">
+							<button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="simularCalc(false, 'btn')" class="btn btn-info btn-round">Simular Cálculo</button>
+						</div>
+					</div>
+				</div>
+				<br>
+				<div class="d-flex justify-content-center" *ngIf="tableLoading && (tableData.dataRows.length === 0)">
+					<div class="spinner-grow text-primary" role="status"> <span class="sr-only">Loading...</span> </div>
+				</div>
+			</div>
+		</div>
+	</div>
 
-                            <div class="col-lg-12 mb-3 mt-3">
-                                <hr>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-md-12 col-sm-12">
-                        <form class="row" [formGroup]="preFormRiscos">
 
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="date" class="form-control col-md-11 col-sm-12" readonly>
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Data do Cálculo</label>
-                                <input type="date" class=" form-control col-md-11 col-sm-12" name="pre_data_calculo"
-                                    id="pre_data_calculo" formControlName="pre_data_calculo">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="pre_indice" class="col-form-label">Indice</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="pre_indice"
-                                    id="pre_indice" formControlName="pre_indice">
-                                    <option *ngFor="let indice of indipre_field" [value]="indice.type">
-                                        {{indice.type}}</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 col-sm-12"
-                                [hidden]="pre_form_riscos.pre_indice.value !== 'Encargos Contratuais %'">
-                                <label for="nome" class="col-form-label">Encargos Contratuais %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12 " name="pre_encargos_contratuais"
-                                    id="pre_encargos_contratuais" formControlName="pre_encargos_contratuais">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Multa %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="pre_multa" id="pre_multa"
-                                    formControlName="pre_multa" value>
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Juros Mora %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="pre_juros_mora" id="pre_juros_mora"
-                                    formControlName="pre_juros_mora">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Honorários %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="pre_honorarios" id="pre_honorarios"
-                                    formControlName="pre_honorarios">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Multa sob contrato</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="pre_multa_sobre_constrato"
-                                    id="pre_multa_sobre_constrato" formControlName="pre_multa_sobre_constrato">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Deságio %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="pre_desagio" id="pre_desagio"
-                                    formControlName="pre_desagio">
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-md-12 col-sm-12 form-inline mt-3">
-                        <div class="stats form-group mb-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0) || updateLoadingBtn"
-                                (click)="atualizarRisco()" class="btn btn-info btn-round">Atualizar
-                                Risco</button>
-                        </div>
-                        <div class="stats form-group mb-2 ml-md-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)" (click)="simularCalc()"
-                                class="btn btn-info btn-round">Simular Cálculo</button>
-                        </div>
 
-                        <div class="col-lg-12  mt-3">
-                            <hr>
-                        </div>
-                    </div>
 
-                    <div class="col-lg-12 col-sm-12">
-                        <form class="row" [formGroup]="preFormAmortizacao">
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Data Vencimento</label>
-                                <input *ngIf="(tableData.dataRows.length === 0)" type="date"
-                                    class="form-control col-md-12 col-sm-12" name="preFA_data_vencimento"
-                                    id="preFA_data_vencimento" formControlName="preFA_data_vencimento" max="3000-12-31"
-                                    min="1000-01-01">
-                                <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    {{formatDate(tableData.dataRows[0])}}
-                                </p>
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Saldo Devedor</label>
-                                <input *ngIf="(tableData.dataRows.length === 0)" type="number"
-                                    (change)="verifyNumber($event)" min="0" class="form-control col-md-12 col-sm-12"
-                                    name="preFa_saldo_devedor" style="height: 35px" id="preFa_saldo_devedor"
-                                    formControlName="preFa_saldo_devedor">
-                                <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    R$ {{tableData.dataRows[0]["valorDevedor"]}}
-                                </p>
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Data Base Atual</label>
-                                <input type="date" class="form-control col-md-12 col-sm-12" name="preFA_data_base_atual"
-                                    id="preFA_data_base_atual" formControlName="preFA_data_base_atual">
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Valor Lançamento</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-12 col-sm-12" name="preFA_valor_lancamento"
-                                    style="height: 35px" id="preFA_valor_lancamento"
-                                    formControlName="preFA_valor_lancamento">
-                            </div>
-                            <div class="col-md-2 col-sm-12">
-                                <fieldset class="form-group ml-sm-3">
-                                    <div class="form-group row">
-                                        <legend class="col-form-label">
-                                            <label class="form-check-label" for="profile2">Tipo de Lançamento</label>
-                                        </legend>
-                                        <div class="col-sm-7 ml-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="preFA_tipo_lancamento"
-                                                    formControlName="preFA_tipo_lancamento" id="status1"
-                                                    [value]="'credit'">
-                                                <label class="form-check-label" for="status1" style="margin: -30px">
-                                                    Crédito
-                                                </label>
-                                            </div>
-                                            <div class="form-check ">
-                                                <input class="form-check-input" type="radio" name="preFA_tipo_lancamento"
-                                                    formControlName="preFA_tipo_lancamento" id="status2"
-                                                    [value]="'debit'">
-                                                <label class="form-check-label" for="status2" style="margin: -30px">
-                                                    Débito
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                            <div class="col-md-2 col-sm-12"
-                                *ngIf="pre_form_amortizacao.preFA_tipo_lancamento.value === 'credit'">
-                                <fieldset class="form-group ml-sm-3">
-                                    <div class="form-group row">
-                                        <legend class="col-form-label">
-                                            <label class="form-check-label" for="profile2">Amortização</label>
-                                        </legend>
-                                        <div class="col-sm-7 ml-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio"
-                                                    name="preFA_tipo_amortizacao" formControlName="preFA_tipo_amortizacao"
-                                                    id="status3" [value]="true">
-                                                <label class="form-check-label" for="status3" style="margin: -30px">
-                                                    Ínicio
-                                                </label>
-                                            </div>
-                                            <div class="form-check ">
-                                                <input class="form-check-input" type="radio"
-                                                    name="preFA_tipo_amortizacao" formControlName="preFA_tipo_amortizacao"
-                                                    id="status4" [value]="false">
-                                                <label class="form-check-label" for="status4" style="margin: -30px">
-                                                    Fim
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-lg-12 mt-4">
-                        <div class="col-lg-12" style="padding: 0">
-                            <div class="stats" style="margin-top: -50px">
-                                <button type="button" (click)="incluirLancamentos()" class="btn btn-info btn-round"
-                                    [disabled]="!preFormAmortizacao.valid">Incluir
-                                    Parcelas</button>
-                            </div>
-                        </div>
-                    </div>
-
-                </div>
-                <br>
-                <div class="d-flex justify-content-center" *ngIf="tableLoading && (tableData.dataRows.length === 0)">
-                    <div class="spinner-grow text-primary" role="status">
-                        <span class="sr-only">Loading...</span>
-                    </div>
-                </div>
+    <div class="col-md-6">
+		<div class="card " style="min-height: 250px;">
+			<div class="card-header ">
+                <h5 class="card-title">Cadastro de Parcelas</h5> 
             </div>
-        </div>
+			<div class="card-body ">
+				<div class="row">
+					<div class="col-md-12">
+						<form class="row" [formGroup]="preFormCadastroParcelas">
+							<div class="col-md-4 col-sm-12">
+								<label for="nome" class="col-form-label">Nº Parcelas</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_n_parcelas" id="pre_n_parcelas" formControlName="pre_n_parcelas" value> </div>
+							<div class="col-md-4 col-sm-12">
+								<label for="nome" class="col-form-label">Parcela inicial</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_parcela_inicial" id="pre_parcela_inicial" formControlName="pre_parcela_inicial" value> </div>
+							<div class="col-md-4 col-sm-12">
+								<label for="nome" class="col-form-label">Data Vencimento</label>
+								<input type="date" class="form-control col-md-12 col-sm-12" name="pre_data_vencimento" id="pre_data_vencimento" formControlName="pre_data_vencimento" max="3000-12-31" min="1000-01-01"> </div>
+							<div class="col-md-4 col-sm-12">
+								<label for="nome" class="col-form-label">Valor no Vencimento</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_valor_vecimento" id="pre_valor_vecimento" formControlName="pre_valor_vecimento" value> </div>
+							<div class="col-md-4 col-sm-12">
+								<label for="nome" class="col-form-label">Status</label>
+								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_status" id="pre_status" formControlName="pre_status">
+									<option *ngFor="let status of pre_status_field" [value]="status.type"> {{status.type}}</option>
+								</select>
+							</div>
+							<div class="col-sm-4">
+								<br />
+								<div class="stats">
+									<button type="button" (click)="pesquisarContratos()" class="btn btn-info btn-round" [disabled]="!preForm.valid || tableLoading">Adicionar</button>
+									<div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
+										<div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status"> <span class="sr-only">Loading...</span> </div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
     </div>
-    <div class="col-md-12 col-sm-12 pt-0" *ngIf="!(tableData.dataRows.length === 0)">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4 class="card-title">MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO</h4>
-                    </div>
-                    <div class="card-body" style="max-height: 100vh;overflow: scroll;">
-                        <table [dtOptions]="dtOptions" datatable class="table table-hover"
-                            *ngIf="tableData && tableData.dataRows && !tableLoading">
-                            <thead>
-                                <tr align="center">
-                                    <th colspan="3"></th>
-                                    <th colspan="4"></th>
-                                    <th width="400" colspan="4">Encargos Moratórios</th>
-                                    <th colspan="3">
-                                    <th colspan="3">
-                                    </th>
+    
+
+
+	<div class="col-md-6">
+		<div class="card " style="min-height: 250px;">
+			<div class="card-header ">
+				<h5 class="card-title">Amortização</h5> </div>
+			<div class="card-body ">
+				<div class="row">
+					<div class="col-lg-12 col-sm-12">
+						<form class="row" [formGroup]="preFormAmortizacao">
+							<div class="col-md-4 col-sm-12">
+								<label for="nome" class="col-form-label">Data</label>
+								<input type="date" class="form-control col-md-12 col-sm-12" name="preFA_data_vencimento" id="preFA_data_vencimento" formControlName="preFA_data_vencimento" max="3000-12-31" min="1000-01-01"> </div>
+							<div class="col-md-4 col-sm-12">
+								<label for="nome" class="col-form-label">Valor</label>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-12 col-sm-12" name="preFA_saldo_devedor" style="height: 35px" id="preFA_saldo_devedor" formControlName="preFA_saldo_devedor"> </div>
+							<div class="col-sm-4">
+								<br />
+								<div class="stats">
+									<button type="button" (click)="incluirLancamentos()" class="btn btn-info btn-round" [disabled]="!preFormAmortizacao.valid || tableLoading">Adicionar</button>
+									<div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
+										<div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status"> <span class="sr-only">Loading...</span> </div>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+				<br> </div>
+		</div>
+	</div>
+	<div class="col-md-12 col-sm-12 pt-0" *ngIf="!(tableData.dataRows.length === 0)">
+		<div class="row">
+			<div class="col-md-12">
+				<div class="card">
+					<div class="card-header">
+						<h4 class="card-title">MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO</h4> </div>
+					<div class="card-body" style="max-height: 100vh;overflow: scroll;">
+						<table [dtOptions]="dtOptions" datatable class="table table-hover" *ngIf="tableData && tableData.dataRows && !tableLoading">
+							<thead>
+								<tr align="center">
+									<th colspan="8"></th>
+									<th width="400" colspan="5">Encargos Moratórios</th>
+									<th colspan="5">
+										<th colspan="3"> </th>
+								</tr>
+								<tr align="center">
+                                    <th class="align-title-top" rowspan="2">Nº Parcelas</th>
+									<th class="align-title-top" rowspan="2">Data Vencimento</th>
+									<th class="align-title-top" rowspan="2">Índice <b>{{pre_form_riscos.pre_indice.value}}</b> </th>
+									<th width="80" class="align-title-top" rowspan="2">Índice Data Vencimento</th>
+									<th class="align-title-top" rowspan="2">Data Cálculo / Amort.</th>
+									<th class="align-title-top" rowspan="2">Índice <b>{{pre_form_riscos.pre_indice.value}}</b> </th>
+									<th width="80" class="align-title-top" rowspan="2">Índice Data Cálculo / Amort.</th>
+									<th class="align-title-top" rowspan="2">Valor no Vencimento R$</th>
+									<th width="100" rowspan="2">Correção pelo Índice</th>
+									<th colspan="3">Juros a.m. {{( pre_form_riscos.pre_juros_mora.value || 0 ) + "%"}} </th>
+									<th width="100" rowspan="2">Multa <b>{{( pre_form_riscos.pre_multa.value || 0 ) + "%"}}</b> </th>
+									<th class="align-title-top" rowspan="2">Subtotal</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Valor da PMT Vincenda em <b>{{formatDate(tableData.dataRows[0])}}</b></th>
+                                    <th width="80" class="align-title-top" rowspan="2">Amortização</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Total Devedor</th>
+                                    <th width="80" class="align-title-top" rowspan="2">Status</th>
+									<th width="80" class="align-title-top" rowspan="2">Ação</th>
+								</tr>
+								<tr align="center">
+									<th>Dias</th>
+									<th>%</th>
+									<th>R$</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
+									<td>
+										<input type="text" style="width: 120px; font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_data_calculo" id="pre_data_calculo" max="3000-12-31" min="1000-01-01" [value]="formatDate(row)" disabled> </td>
+									<td width="80">
+										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indiceDB" id="pre_indiceDB" (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
+											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDB"> {{indice.type}}</option>
+										</select>
+									</td>
+									<td> {{row.indiceDataBase || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataBase) || "---"}} </td>
+									<td width="120">
+										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_data_calculo" id="pre_data_calculo" max="3000-12-31" min="{{row.dataBase}}" [value]="row.dataBaseAtual" (change)="changeDate($event, row)"> </td>
+									<td width="80">
+										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
+											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceBA"> {{indice.type}}</option>
+										</select>
+									</td>
+									<td> {{row.indiceDataBaseAtual || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataBaseAtual) || "---"}} </td>
+									<td> {{formatCurrency(row.valorDevedor)}} </td>
+									<td> {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}} </td>
+									<td> {{row.encargosMonetarios.jurosAm.dias || 0}} </td>
+									<td> {{row.encargosMonetarios.jurosAm.percentsJuros}} </td>
+									<td> {{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}} </td>
+									<td> {{formatCurrency(row.encargosMonetarios.multa)}} </td>
+									<td> {{row.tipoLancamento === 'debit' ? formatCurrency(row.lancamentos) : "(" + formatCurrency(row.lancamentos) + ")"}} </td>
+                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
+                                    
+                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
+                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
+                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
+                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
+									<td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
+								</tr>
+								<tr align="center">
+									<th style="background-color: #e9ecef;" colspan="4">TOTAL DE PARCELAS VENCIDAS</th>
+									<th style="background-color: #e9ecef;" colspan="1"></th>
+									<th style="background-color: #e9ecef;" width="100" colspan="1">{{formatCurrency(71000)}}</th>
+									<th style="background-color: #e9ecef;" width="100" colspan="1">{{formatCurrency(716)}}</th>
+									<th style="background-color: #e9ecef;" colspan="1"></th>
+									<th style="background-color: #e9ecef;" colspan="1"></th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(2215)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(1489)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(75978)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
+                                    <th width="100" colspan="3" style="background-color: #e9ecef;"></th>
                                 </tr>
                                 <tr align="center">
-                                    <th class="align-title-top" rowspan="2">Data Base</th>
-                                    <th class="align-title-top" rowspan="2">Índice
-                                        <b>{{pre_form_riscos.pre_indice.value}}</b>
-                                    </th>
-                                    <th width="80" class="align-title-top" rowspan="2">Índice Data Base</th>
-                                    <th class="align-title-top" rowspan="2">Data Base Atual</th>
-                                    <th class="align-title-top" rowspan="2">Índice
-                                        <b>{{pre_form_riscos.pre_indice.value}}</b>
-                                    </th>
-                                    <th width="80" class="align-title-top" rowspan="2">Índice Data Base Atual</th>
-                                    <th class="align-title-top" rowspan="2">Valor devedor</th>
-
-                                    <th width="100" rowspan="2">Correção pelo Índice</th>
-
-                                    <th colspan="3">Juros a.m. {{( pre_form_riscos.pre_juros_mora.value || 0 ) + "%"}}
-                                    </th>
-
-                                    <th width="100" rowspan="2">Multa
-                                        <b>{{( pre_form_riscos.pre_multa.value || 0 ) + "%"}}</b>
-                                    </th>
-
-                                    <th class="align-title-top" rowspan="2">Lançamentos</th>
-                                    <th width="80" class="align-title-top" rowspan="2">Valor devedor atualizado</th>
-                                    <th width="80" class="align-title-top" rowspan="2">Ação</th>
-                                </tr>
-                                <tr align="center">
-                                    <th>Dias</th>
-                                    <th>%</th>
-                                    <th>R$</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
-                                    <td>
-                                        <input type="text" style="width: 120px; font-size: 11px"
-                                            class="form-control col-md-11 col-sm-12" name="pre_data_calculo"
-                                            id="pre_data_calculo" max="3000-12-31" min="1000-01-01"
-                                            [value]="formatDate(row)" disabled>
-                                    </td>
-                                    <td width="80">
-                                        <select style="width: 80px; font-size: 11px" class="form-control custom-select"
-                                            name="pre_indice" id="pre_indice"
-                                            (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
-                                            <option *ngFor="let indice of indipre_field" [value]="indice.type"
-                                                [selected]="pre_form_riscos.pre_indice.value === indice.type || indice.type === row.indiceDB">
-                                                {{indice.type}}</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        {{row.indiceDataBase || getIndiceDataBase(pre_form_riscos.pre_indice.value) || "---"}}
-                                    </td>
-                                    <td width="120">
-                                        <input type="date" style="font-size: 11px"
-                                            class="form-control col-md-11 col-sm-12" name="pre_data_calculo"
-                                            id="pre_data_calculo" max="3000-12-31" min="1000-01-01"
-                                            [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
-                                    </td>
-                                    <td width="80">
-                                        <select style="width: 80px; font-size: 11px" class="form-control custom-select"
-                                            name="pre_indice" id="pre_indice"
-                                            (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
-                                            <option *ngFor="let indice of indipre_field" [value]="indice.type"
-                                                [selected]="pre_form_riscos.pre_indice.value === indice.type || indice.type === row.indiceBA">
-                                                {{indice.type}}</option>
-                                        </select>
-                                    </td>
-                                    <td>
-                                        {{row.indiceDataBaseAtual || getIndiceDataBase(pre_form_riscos.pre_indice.value) || "---"}}
-                                    </td>
-                                    <td>
-                                        {{formatCurrency(row.valorDevedor)}}
-                                    </td>
-                                    <td>
-                                        {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}}
-                                    </td>
-                                    <td>
-                                        {{row.encargosMonetarios.jurosAm.dias || 0}}
-                                    </td>
-                                    <td>
-                                        {{row.encargosMonetarios.jurosAm.percentsJuros}}
-                                    </td>
-                                    <td>
-                                        {{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}}
-                                    </td>
-                                    <td>
-                                        {{formatCurrency(row.encargosMonetarios.multa)}}
-                                    </td>
-                                    <td>
-                                        {{row.tipoLancamento  === 'debit' ? formatCurrency(row.lancamentos) : "(" + formatCurrency(row.lancamentos) + ")"}}
-                                    </td>
-                                    <td>
-                                        {{formatCurrency(row.valorDevedorAtualizado)}}
-                                    </td>
-                                    <td (click)="deleteRow(row.id)"><i class="nc-icon nc-simple-remove"></i></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                        <div class="d-flex justify-content-center" *ngIf="tableLoading" style="padding: 200px">
-                            <div class="spinner-grow text-primary" style="width: 4rem; height: 4rem;" role="status">
-                                <span class="sr-only">Loading...</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="card-footer" *ngIf="tableData.dataRows.length > 0 && !tableLoading">
-                        <div class="row">
-                            <div class="col-md-10">
-                                <p>Subtotal apurado em {{total_date_now || total_data_calculo || "---------"}}</p>
-                                <p>Honorários {{pre_form_riscos.pre_honorarios.value || 0}}%</p>
-                                <p>Multa sob contrato aguardando retorno do Safra</p>
-                                <p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
-                            </div>
-                            <div class="col-md-2">
-                                <p>{{formatCurrency(total_subtotal || 0)}}</p>
-                                <p>{{formatCurrency(total_honorarios || 0)}}</p>
-                                <p>{{formatCurrency(total_multa_sob_contrato || 0)}}</p>
-                                <p>{{formatCurrency(total_grandtotal || 0)}}</p>
-                            </div>
-                        </div>
-
-                    </div>
-                    <div class="col-lg-12 col-sm-12">
-                        <form class=" float-right form-inline">
-                            <div class="stats float-right">
-                                <button type="button" class="disabled btn btn-link btn-round">Exportar Pdf</button>
-                            </div>
-                            <div class="stats float-right">
-                                <button type="button" class="disabled btn btn-link btn-round">Exportar Xls</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+									<th colspan="4" style="background-color: #e9ecef;">TOTAL DE PARCELAS VINCENDAS</th>
+									<th width="100" colspan="11" style="background-color: #e9ecef;"></th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(2215)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(2215)}}</th>
+                                    <th width="100" colspan="3" style="background-color: #e9ecef;"></th>
+								</tr>
+							</tbody>
+						</table>
+						<div class="d-flex justify-content-center" *ngIf="tableLoading" style="padding: 200px">
+							<div class="spinner-grow text-primary" style="width: 4rem; height: 4rem;" role="status"> <span class="sr-only">Loading...</span> </div>
+						</div>
+					</div>
+					<div class="card-footer" *ngIf="tableData.dataRows.length > 0 && !tableLoading">
+						<div class="row">
+							<div class="col-md-10">
+								<p>Subtotal apurado em {{ subtotal_data_calculo || "---------"}}</p>
+								<p>Honorários {{pre_form_riscos.pre_honorarios.value || 0}}%</p>
+								<p>Multa sob contrato {{pre_form_riscos.pre_multa_sobre_constrato.value || 0}}%</p>
+								<p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
+							</div>
+							<div class="col-md-2">
+								<p>{{formatCurrency(total_subtotal || 0)}}</p>
+								<p>{{formatCurrency(total_honorarios || 0)}}</p>
+								<p>{{formatCurrency(total_multa_sob_contrato || 0)}}</p>
+								<p>{{formatCurrency(total_grandtotal || 0)}}</p>
+							</div>
+						</div>
+					</div>
+					<div class="col-lg-12 col-sm-12">
+						<form class=" float-right form-inline">
+							<div class="stats float-right">
+								<button type="button" class="disabled btn btn-link btn-round">Exportar Pdf</button>
+							</div>
+							<div class="stats float-right">
+								<button type="button" class="disabled btn btn-link btn-round">Exportar Xls</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>

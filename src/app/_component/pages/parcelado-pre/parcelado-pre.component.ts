@@ -3,8 +3,11 @@ import { Component, OnInit } from '@angular/core';
 import { Lancamento } from '../../../_models/ChequeEmpresarial';
 import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
 
+import { IndicesService } from '../../../_services/indices.service';
+
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
+import { timeout } from 'rxjs/operators';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -21,6 +24,7 @@ export class ParceladoPreComponent implements OnInit {
   preForm: FormGroup;
   preFormRiscos: FormGroup;
   preFormAmortizacao: FormGroup;
+  preFormCadastroParcelas: FormGroup;
   loading = false;
   submitted = false;
   returnUrl: string;
@@ -29,22 +33,28 @@ export class ParceladoPreComponent implements OnInit {
   tableData: TableData;
   tableLoading = false;
   updateLoading = false;
+  alertType = '';
   updateLoadingBtn = false;
   controleLancamentos = 0;
 
   // total
   total_date_now: any;
   total_data_calculo: any;
+  subtotal_data_calculo: any;
   total_honorarios = 0;
   total_multa_sob_contrato = 0;
   total_subtotal = 0;
   total_grandtotal = 0;
 
   dtOptions: DataTables.Settings = {};
+  last_data_table: Object;
+  min_data: string;
+  ultima_atualizacao: String;
 
   constructor(
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
+    private indicesService: IndicesService,
   ) {
   }
 
@@ -60,6 +70,7 @@ export class ParceladoPreComponent implements OnInit {
       pre_indice: [],
       pre_encargos_monietarios: [],
       pre_data_calculo: this.getCurrentDate('YYYY-MM-DD'),
+      pre_ultima_atualizacao: '',
       pre_encargos_contratuais: [],
       pre_multa: [],
       pre_juros_mora: [],
@@ -72,12 +83,15 @@ export class ParceladoPreComponent implements OnInit {
     }
     this.preFormAmortizacao = this.formBuilder.group({
       preFA_data_vencimento: [],
-      preFa_saldo_devedor: [],
-      preFA_data_base_atual: ['', Validators.required],
-      preFA_valor_lancamento: ['', Validators.required],
-      preFA_tipo_lancamento: ['', Validators.required],
-      preFA_tipo_amortizacao: []
+      preFA_saldo_devedor: []
     });
+    this.preFormCadastroParcelas = this.formBuilder.group({
+      pre_n_parcelas: [],
+      pre_parcela_inicial: [],
+      pre_data_vencimento: [],
+      pre_valor_vecimento: [],
+      pre_status: []
+    })
 
     this.dtOptions = {
       paging: false,
@@ -119,13 +133,16 @@ export class ParceladoPreComponent implements OnInit {
       lancamentoLocal['valorDevedor'] = parseFloat(lancamentoLocal['valorDevedor']);
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
       lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
+      lancamentoLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
 
       if (lancamentoLocal["id"]) {
         this.chequeEmpresarialService.updateLancamento(lancamentoLocal).subscribe(chequeEmpresarialList => {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.updateLoading = true;
+            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
+            this.toggleUpdateLoading()
+            this.alertType = 'risco-atualizado';
           }
         }, err => {
           this.errorMessage = "Falha ao atualizar risco.";
@@ -135,7 +152,9 @@ export class ParceladoPreComponent implements OnInit {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.updateLoading = true;
+            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
+            this.toggleUpdateLoading()
+            this.alertType = 'risco-atualizado';
           }
           lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
         }, err => {
@@ -160,13 +179,14 @@ export class ParceladoPreComponent implements OnInit {
   get pre_form() { return this.preForm.controls; }
   get pre_form_riscos() { return this.preFormRiscos.controls; }
   get pre_form_amortizacao() { return this.preFormAmortizacao.controls; }
+  get pre_form_cadastro_parcelas() { return this.preFormCadastroParcelas.controls;}
 
   resetFields(form) {
     this[form].reset()
   }
 
   formatCurrency(value) {
-    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,')}` || 0;
+    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
   }
 
   verifyNumber(value) {
@@ -185,9 +205,11 @@ export class ParceladoPreComponent implements OnInit {
 
     this.total_date_now = moment(localDataBase).format("DD/MM/YYYY");
     this.total_data_calculo = moment(this.pre_form_riscos.pre_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate();
+    this.subtotal_data_calculo = this.total_date_now;
+    this.last_data_table = [];
 
     const localTypeIndice = this.pre_form_riscos.pre_indice.value;
-    const localTypeValue = this.getIndiceDataBase(localTypeIndice);
+    const localTypeValue = this.getIndiceDataBase(localTypeIndice, this.pre_form_amortizacao.preFA_data_base_atual.value);
 
     const localLancamentos = this.pre_form_amortizacao.preFA_valor_lancamento.value;
     const localTipoLancamento = this.pre_form_amortizacao.preFA_tipo_lancamento.value;
@@ -216,29 +238,42 @@ export class ParceladoPreComponent implements OnInit {
         valorDevedorAtualizado: null,
         contractRef: this.pre_form.pre_contrato.value || 0,
         ultimaAtualizacao: '',
-
       });
       this.pre_form_amortizacao.preFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
       this.tableLoading = false;
     }, 0);
     this.resetFields('preFormAmortizacao');
-    this.simularCalc(true);
+
+    setTimeout(() => {
+      this.toggleUpdateLoading()
+      this.alertType = 'lancamento-incluido';
+      this.simularCalc(true)
+    }, 500)
   }
 
   pesquisarContratos() {
     this.tableLoading = true;
+    this.ultima_atualizacao = '';
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+
+        if (chequeEmpresarialList.length) {
+          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
+          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        }
+
+        setTimeout(() => {
+          this.simularCalc(true, null, true);
+        }, 1000);
+
         return cheque;
       });
       this.tableLoading = false;
     }, err => {
       this.errorMessage = err.error.message;
     });
-    setTimeout(() => {
-      this.simularCalc(true);
-    }, 1000);
+
   }
 
   getCurrentDate(format = "DD/MM/YYYY hh:mm") {
@@ -254,6 +289,8 @@ export class ParceladoPreComponent implements OnInit {
   changeDate(e, row) {
     row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
 
+    row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value || row["indiceBA"], row["dataBaseAtual"]);
+
     this.simularCalc(true);
   }
 
@@ -261,21 +298,27 @@ export class ParceladoPreComponent implements OnInit {
     return moment(row['dataBase']).format("DD/MM/YYYY");
   }
 
-  simularCalc(isInlineChange = false) {
+  simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
+
     setTimeout(() => {
-      let tableDataUpdated = this.tableData.dataRows.map(row => {
+      let tableDataUpdated = this.tableData.dataRows.map((row, index) => {
+
+        if (index > 0) {
+          (row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado']);
+          (row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual']);
+        }
 
         const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
 
         // - Indices
         if (!isInlineChange) {
-          this.pre_form_riscos.pre_indice && (row['indiceDB'] = this.pre_form_riscos.pre_indice.value);
-          this.pre_form_riscos.pre_indice && (row['indiceBA'] = this.pre_form_riscos.pre_indice.value);
+          this.pre_form_riscos.pre_indice.value && (row['indiceDB'] = this.pre_form_riscos.pre_indice.value);
+          this.pre_form_riscos.pre_indice.value && (row['indiceBA'] = this.pre_form_riscos.pre_indice.value);
 
-          this.pre_form_riscos.pre_indice && (row['indiceDataBase'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value));
-          this.pre_form_riscos.pre_indice && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value));
+          this.pre_form_riscos.pre_indice.value && (row['indiceDataBase'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value, row['dataBaseAtual']));
+          this.pre_form_riscos.pre_indice.value && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value, row['dataBaseAtual']));
 
           this.pre_form_riscos.pre_indice.value === "Encargos Contratuais %" && this.pre_form_riscos.pre_encargos_contratuais && (row['indiceDataBaseAtual'] = this.pre_form_riscos.pre_encargos_contratuais.value);
         }
@@ -284,17 +327,17 @@ export class ParceladoPreComponent implements OnInit {
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        row['encargosMonetarios']['correcaoPeloIndice'] = ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
 
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
         // -- juros 
-        row['encargosMonetarios']['jurosAm']['percentsJuros'] = ((this.pre_form_riscos.pre_juros_mora.value / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['percentsJuros'] = search ? row['encargosMonetarios']['jurosAm']['percentsJuros'] : ((this.pre_form_riscos.pre_juros_mora.value / 30) * qtdDias).toFixed(2);
         // -- moneyValue
-        row['encargosMonetarios']['jurosAm']['moneyValue'] = ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * ((this.pre_form_riscos.pre_juros_mora.value / 100))).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['moneyValue'] = search ? row['encargosMonetarios']['jurosAm']['moneyValue'] : ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * ((this.pre_form_riscos.pre_juros_mora.value / 100))).toFixed(2);
 
         // -- multa 
-        row['encargosMonetarios']['multa'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * (this.pre_form_riscos.pre_multa.value / 100)).toFixed(2);
+        row['encargosMonetarios']['multa'] = search ? row['encargosMonetarios']['multa'] : ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * (this.pre_form_riscos.pre_multa.value / 100)).toFixed(2);
         row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
 
         // Amortizacao
@@ -302,48 +345,93 @@ export class ParceladoPreComponent implements OnInit {
         // this.pre_form_amortizacao.preFA_data_vencimento && (row['dataBase'] = this.pre_form_riscos.preFA_data_vencimento.value);
 
         // Forms Total
-        this.pre_form_riscos.pre_data_calculo && (this.total_data_calculo = moment(this.pre_form_riscos.pre_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
-        this.pre_form_riscos.pre_honorarios && (this.total_honorarios = (row['valorDevedorAtualizado'] * this.pre_form_riscos.pre_honorarios.value / 100));
-        this.pre_form_riscos.pre_multa_sobre_constrato && (this.total_multa_sob_contrato = this.pre_form_riscos.pre_multa_sobre_constrato.value);
+        this.pre_form_riscos.pre_data_calculo.value && (this.total_data_calculo = moment(this.pre_form_riscos.pre_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
+        const honorarios = row['valorDevedorAtualizado'] * this.pre_form_riscos.pre_honorarios.value / 100;
 
+        this.pre_form_riscos.pre_honorarios.value && (this.total_honorarios = honorarios);
+
+        this.last_data_table = [...this.tableData.dataRows].pop();
+        let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+
+        this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
+        this.min_data = last_date;
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
         this.tableLoading = false;
+        if (origin === 'btn') {
+          this.toggleUpdateLoading()
+          this.alertType = 'calculo-simulado';
+        }
+
+        if (this.tableData.dataRows.length > 0) {
+          this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
+          const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
+
+          this.pre_form_riscos.pre_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * this.pre_form_riscos.pre_multa_sobre_constrato.value / 100) || 0;
+          this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizado;
+        }
+
         return parseFloat(row['valorDevedorAtualizado']);
       });
 
-      if (this.tableData.dataRows.length > 0) {
-        this.total_grandtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
-          return acumulador + valorAtual;
-        }) + this.total_multa_sob_contrato + this.total_honorarios;
-
-        this.total_subtotal = tableDataUpdated.reduce(function (acumulador, valorAtual) {
-          return acumulador + valorAtual;
-        });
-      }
 
     }, 0);
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);
     !isInlineChange && this.toggleUpdateLoading();
   }
 
-  getIndiceDataBase(indice) {
-    return parseFloat(this.indipre_field.filter(ind => ind.type === indice).map(ind => ind.value)[0]);
+  getIndiceDataBase(indice, dataBaseAtual) {
+    return parseFloat(this.indipre_field.filter(ind => ind.type === indice).map(ind => {
+      let date = moment(dataBaseAtual).format("DD/MM/YYYY");
+
+      switch (ind.type) {
+        case "INPC/IBGE":
+          return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
+          break;
+        case "CDI":
+          return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
+          break;
+        case "IGPM":
+          return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
+          break;
+        case "Encargos Contratuais %":
+          return !!this.pre_form_riscos.pre_encargos_contratuais.value ? this.pre_form_riscos.pre_encargos_contratuais.value : ind.value;
+          break;
+        default:
+          break;
+      }
+    })[0]);
   }
 
-  deleteRow(id) {
-    this.chequeEmpresarialService.removeLancamento(id).subscribe(() => {
-      this.tableData.dataRows.splice(this.tableData.dataRows.indexOf(id));
-    })
+  deleteRow(row) {
+    const index = this.tableData.dataRows.indexOf(row);
+    if (!row.id) {
+      this.tableData.dataRows.splice(index, 1);
+      setTimeout(() => {
+        this.simularCalc(true);
+        this.toggleUpdateLoading()
+        this.alertType = 'registro-excluido'
+      }, 0)
+    } else {
+      this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
+        this.tableData.dataRows.splice(index, 1);
+        setTimeout(() => {
+          this.simularCalc(true);
+          this.toggleUpdateLoading()
+          this.alertType = 'registro-excluido'
+        }, 0)
+      })
+    }
   }
 
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
     row[innerIndice] = e.target.value;
-    row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value);
-    row["indiceBA"] = e.target.value;
+    row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value, row["dataBaseAtual"]);
 
-    this.simularCalc(true);
+    setTimeout(() => {
+      this.simularCalc(true);
+    }, 500);
   }
 
   // Mock formulário de riscos
@@ -381,7 +469,7 @@ export class ParceladoPreComponent implements OnInit {
     type: "---",
     value: "1"
   }, {
-    type: "INPC",
+    type: "INPC/IBGE",
     value: "60.872914"
   },
   {
@@ -394,54 +482,27 @@ export class ParceladoPreComponent implements OnInit {
   },
   {
     type: "Encargos Contratuais %",
-    value: "6"
+    value: "1"
   }
   ];
 
-  get Carga() {
-    return [
-      {
-        dataBase: "2020-04-23",
-        indiceDB: null,
-        indiceDataBase: null,
-        indiceBA: null,
-        indiceDataBaseAtual: null,
-        dataBaseAtual: "2020-04-25",
-        valorDevedor: 100000,
-        encargosMonetarios: {
-          correcaoPeloIndice: "0.00",
-          jurosAm: {
-            dias: 2,
-            percentsJuros: "66.67"
-          },
-          multa: "0.00"
-        },
-        lancamentos: 1000,
-        tipoLancamento: "debit",
-        valorDevedorAtualizado: "101066.67",
-        contractRef: 0
-      },
-      {
-        dataBase: "2020-04-25",
-        indiceDB: null,
-        indiceDataBase: null,
-        indiceBA: null,
-        indiceDataBaseAtual: null,
-        dataBaseAtual: "2020-04-28",
-        valorDevedor: 100000,
-        encargosMonetarios: {
-          correcaoPeloIndice: "0.00",
-          jurosAm: {
-            dias: 2,
-            percentsJuros: "66.67"
-          },
-          multa: "0.00"
-        },
-        lancamentos: 1000,
-        tipoLancamento: "debit",
-        valorDevedorAtualizado: "101066.67",
-        contractRef: 0
-      }];
-  }
+  pre_status_field = [{
+    type: "Aberto",
+    value: "1"
+  },
+  {
+    type: "Pago",
+    value: "2"
+  }]
+
+  get datasCDI() {
+    return this.indicesService.getCDI();
+  };
+  get datasIGPM() {
+    return this.indicesService.getIGPM();
+  };
+  get datasINPC() {
+    return this.indicesService.getINPC();
+  };
 
 }
