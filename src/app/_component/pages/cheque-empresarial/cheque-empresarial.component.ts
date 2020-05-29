@@ -92,7 +92,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       ceFA_data_base_atual: ['', Validators.required],
       ceFA_valor_lancamento: ['', Validators.required],
       ceFA_tipo_lancamento: ['', Validators.required],
-      ceFA_tipo_amortizacao: []
+      // ceFA_tipo_amortizacao: []
     });
 
     this.dtOptions = {
@@ -249,7 +249,9 @@ export class ChequeEmpresarialComponent implements OnInit {
         ultimaAtualizacao: '',
         infoParaCalculo: { ...localInfoParaCalculo }
       });
-      this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
+      // Removendo inicio e fim amortizacao
+      // this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
+      this.tableData.dataRows.push(this.payloadLancamento)
       this.tableLoading = false;
     }, 0);
     this.resetFields('ceFormAmortizacao');
@@ -359,7 +361,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
+        if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %") {
+          row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
+        } else {
+          row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : (((valorDevedor / row['indiceDataBase']) * (row['indiceDataBaseAtual'] / 100)) * qtdDias).toFixed(2);
+        }
 
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
