@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 
 import { Lancamento } from '../../../_models/ChequeEmpresarial';
-import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
+import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 
 import { IndicesService } from '../../../_services/indices.service';
 
@@ -53,7 +53,7 @@ export class ParceladoPreComponent implements OnInit {
 
   constructor(
     private formBuilder: FormBuilder,
-    private chequeEmpresarialService: ChequeEmpresarialService,
+    private parceladoPre: ParceladoPreService,
     private indicesService: IndicesService,
   ) {
   }
@@ -136,7 +136,7 @@ export class ParceladoPreComponent implements OnInit {
       lancamentoLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
 
       if (lancamentoLocal["id"]) {
-        this.chequeEmpresarialService.updateLancamento(lancamentoLocal).subscribe(chequeEmpresarialList => {
+        this.parceladoPre.updateLancamento(lancamentoLocal).subscribe(parceladopreList => {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
@@ -148,7 +148,7 @@ export class ParceladoPreComponent implements OnInit {
           this.errorMessage = "Falha ao atualizar risco.";
         });
       } else {
-        this.chequeEmpresarialService.addLancamento(lancamentoLocal).subscribe(chequeEmpresarialListUpdated => {
+        this.parceladoPre.addLancamento(lancamentoLocal).subscribe(parceladopreListUpdated => {
           this.updateLoadingBtn = false;
           this.controleLancamentos = this.controleLancamentos + 1;
           if (this.tableData.dataRows.length === this.controleLancamentos) {
@@ -156,7 +156,7 @@ export class ParceladoPreComponent implements OnInit {
             this.toggleUpdateLoading()
             this.alertType = 'risco-atualizado';
           }
-          lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
+          lancamento["id"] = lancamentoLocal["id"] = parceladopreListUpdated["id"];
         }, err => {
           this.errorMessage = "Falha ao atualizar risco.";
         });
@@ -200,7 +200,7 @@ export class ParceladoPreComponent implements OnInit {
   incluirLancamentos() {
     this.tableLoading = true;
 
-    const localDataBase = this.tableData.dataRows.length === 0 ? this.pre_form_amortizacao.preFA_data_vencimento.value : this.tableData.dataRows[this.getLastLine()]["dataBaseAtual"];
+    const localDataBase = this.tableData.dataRows.length === 0 ? this.pre_form_amortizacao.preFA_data_vencimento.value : this.tableData.dataRows[this.getLastLine()]["indiceDataCalcAmor"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? this.pre_form_amortizacao.preFa_saldo_devedor.value : this.tableData.dataRows[this.getLastLine()]["valorDevedorAtualizado"];
 
     this.total_date_now = moment(localDataBase).format("DD/MM/YYYY");
@@ -217,12 +217,12 @@ export class ParceladoPreComponent implements OnInit {
 
     setTimeout(() => {
       this.payloadLancamento = ({
-        dataBase: localDataBase,
+        dataVencimento: localDataBase,
         indiceDB: localTypeIndice,
         indiceDataBase: localTypeValue,
         indiceBA: localTypeIndice,
         indiceDataBaseAtual: localTypeValue,
-        dataBaseAtual: localDataBaseAtual,
+        indiceDataCalcAmor: localDataBaseAtual,
         valorDevedor: localValorDevedor,
         encargosMonetarios: {
           correcaoPeloIndice: null,
@@ -254,25 +254,31 @@ export class ParceladoPreComponent implements OnInit {
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
-    this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
-      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(cheque => {
-        cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+    this.tableData.dataRows =  this.parceladoPre.getAll().map(parcela => {
+      parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios);
+      return parcela;
+    })
+    console.log( this.tableData.dataRows);
+    this.simularCalc(true, null, true);
+    // this.parceladoPre.getAll().subscribe(parceladopreList => {
+    //   this.tableData.dataRows = parceladopreList.filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(parcela => {
+    //     parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
 
-        if (chequeEmpresarialList.length) {
-          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
-          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
-        }
+    //     if (parceladopreList.length) {
+    //       const ultimaAtualizacao = [...parceladopreList].pop();
+    //       this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+    //     }
 
-        setTimeout(() => {
-          this.simularCalc(true, null, true);
-        }, 1000);
+    //     setTimeout(() => {
+    //       this.simularCalc(true, null, true);
+    //     }, 1000);
 
-        return cheque;
-      });
-      this.tableLoading = false;
-    }, err => {
-      this.errorMessage = err.error.message;
-    });
+    //     return parcela;
+    //   });
+    //   this.tableLoading = false;
+    // }, err => {
+    //   this.errorMessage = err.error.message;
+    // });
 
   }
 
@@ -286,16 +292,18 @@ export class ParceladoPreComponent implements OnInit {
     return Math.abs(b.diff(a, 'days'));
   }
 
-  changeDate(e, row) {
-    row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
 
-    row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value || row["indiceBA"], row["dataBaseAtual"]);
+  changeDate(e, row, data, tipoIndice, tipoIndiceValue) {
+    row[data] = moment(e.target.value).format("YYYY-MM-DD");
+    row[tipoIndice] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value || tipoIndiceValue, row[data]);
+
+    this.updateInlineIndice(e, row, tipoIndiceValue);
 
     this.simularCalc(true);
   }
 
   formatDate(row) {
-    return moment(row['dataBase']).format("DD/MM/YYYY");
+    return moment(row['dataVencimento']).format("DD/MM/YYYY");
   }
 
   simularCalc(isInlineChange = false, origin = null, search = false) {
@@ -306,28 +314,28 @@ export class ParceladoPreComponent implements OnInit {
 
         if (index > 0) {
           (row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado']);
-          (row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual']);
+          (row['dataVencimento'] = this.tableData.dataRows[index - 1]['indiceDataCalcAmor']);
         }
 
-        const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
+        const qtdDias = this.getQtdDias(moment(row["dataVencimento"]).format("DD/MM/YYYY"), moment(row["indiceDataCalcAmor"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
 
         // - Indices
         if (!isInlineChange) {
-          this.pre_form_riscos.pre_indice.value && (row['indiceDB'] = this.pre_form_riscos.pre_indice.value);
-          this.pre_form_riscos.pre_indice.value && (row['indiceBA'] = this.pre_form_riscos.pre_indice.value);
+          this.pre_form_riscos.pre_indice.value && (row['indiceDV'] = this.pre_form_riscos.pre_indice.value);
+          this.pre_form_riscos.pre_indice.value && (row['indiceDCA'] = this.pre_form_riscos.pre_indice.value);
 
-          this.pre_form_riscos.pre_indice.value && (row['indiceDataBase'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value, row['dataBaseAtual']));
-          this.pre_form_riscos.pre_indice.value && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value, row['dataBaseAtual']));
+          this.pre_form_riscos.pre_indice.value && (row['indiceDataVencimento'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value, row['indiceDataVencimento']));
+          this.pre_form_riscos.pre_indice.value && (row['indiceDataCalcAmor'] = this.getIndiceDataBase(this.pre_form_riscos.pre_indice.value, row['indiceDataCalcAmor']));
 
-          this.pre_form_riscos.pre_indice.value === "Encargos Contratuais %" && this.pre_form_riscos.pre_encargos_contratuais && (row['indiceDataBaseAtual'] = this.pre_form_riscos.pre_encargos_contratuais.value);
+          this.pre_form_riscos.pre_indice.value === "Encargos Contratuais %" && this.pre_form_riscos.pre_encargos_contratuais && (row['indiceDataCalcAmor'] = this.pre_form_riscos.pre_encargos_contratuais.value);
         }
 
         // Table Values
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataCalcAmor'] / 100) / 30) * qtdDias).toFixed(2);
 
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
@@ -342,7 +350,7 @@ export class ParceladoPreComponent implements OnInit {
 
         // Amortizacao
         // this.pre_form_amortizacao.preFA_saldo_devedor && (row['valorDevedorAtualizado'] = this.pre_form_amortizacao.preFA_saldo_devedor.value)
-        // this.pre_form_amortizacao.preFA_data_vencimento && (row['dataBase'] = this.pre_form_riscos.preFA_data_vencimento.value);
+        // this.pre_form_amortizacao.preFA_data_vencimento && (row['dataVencimento'] = this.pre_form_riscos.preFA_data_vencimento.value);
 
         // Forms Total
         this.pre_form_riscos.pre_data_calculo.value && (this.total_data_calculo = moment(this.pre_form_riscos.pre_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate());
@@ -351,7 +359,7 @@ export class ParceladoPreComponent implements OnInit {
         this.pre_form_riscos.pre_honorarios.value && (this.total_honorarios = honorarios);
 
         this.last_data_table = [...this.tableData.dataRows].pop();
-        let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+        let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['indiceDataCalcAmor'] : this.total_date_now;
 
         this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
         this.min_data = last_date;
@@ -381,9 +389,9 @@ export class ParceladoPreComponent implements OnInit {
     !isInlineChange && this.toggleUpdateLoading();
   }
 
-  getIndiceDataBase(indice, dataBaseAtual) {
+  getIndiceDataBase(indice, indiceDataCalcAmor) {
     return parseFloat(this.indipre_field.filter(ind => ind.type === indice).map(ind => {
-      let date = moment(dataBaseAtual).format("DD/MM/YYYY");
+      let date = moment(indiceDataCalcAmor).format("DD/MM/YYYY");
 
       switch (ind.type) {
         case "INPC/IBGE":
@@ -414,7 +422,7 @@ export class ParceladoPreComponent implements OnInit {
         this.alertType = 'registro-excluido'
       }, 0)
     } else {
-      this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
+      this.parceladoPre.removeLancamento(row.id).subscribe(() => {
         this.tableData.dataRows.splice(index, 1);
         setTimeout(() => {
           this.simularCalc(true);
@@ -425,9 +433,9 @@ export class ParceladoPreComponent implements OnInit {
     }
   }
 
-  updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
+  updateInlineIndice(e, row, innerIndice) {
     row[innerIndice] = e.target.value;
-    row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value, row["dataBaseAtual"]);
+    row[innerIndice] = this.getIndiceDataBase(e.target.value, row[innerIndice]);
 
     setTimeout(() => {
       this.simularCalc(true);

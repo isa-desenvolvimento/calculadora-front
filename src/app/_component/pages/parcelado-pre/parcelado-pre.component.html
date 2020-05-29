@@ -222,35 +222,35 @@
 							</thead>
 							<tbody>
 								<tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
+									<td> {{row.nparcelas}} </td>
 									<td>
-										<input type="text" style="width: 120px; font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_data_calculo" id="pre_data_calculo" max="3000-12-31" min="1000-01-01" [value]="formatDate(row)" disabled> </td>
+										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataVencimento" max="{{row.dataCalcAmor}"min="1000-01-01" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento', row.indiceDV)"> </td>
 									<td width="80">
-										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indiceDB" id="pre_indiceDB" (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
-											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDB"> {{indice.type}}</option>
+										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event, row, 'indiceDataVencimento')">
+											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
 										</select>
 									</td>
-									<td> {{row.indiceDataBase || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataBase) || "---"}} </td>
+									<td> {{row.indiceDataVencimento || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataVencimento) || "---"}} </td>
 									<td width="120">
-										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_data_calculo" id="pre_data_calculo" max="3000-12-31" min="{{row.dataBase}}" [value]="row.dataBaseAtual" (change)="changeDate($event, row)"> </td>
+										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" min="{{row.dataVencimento}}" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  row.indiceDCA)"> </td>
 									<td width="80">
-										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
-											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceBA"> {{indice.type}}</option>
+										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event, row, 'indiceDataCalcAmor')">
+											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
 										</select>
 									</td>
-									<td> {{row.indiceDataBaseAtual || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataBaseAtual) || "---"}} </td>
-									<td> {{formatCurrency(row.valorDevedor)}} </td>
+									<td> {{row.indiceDataCalcAmor || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataCalcAmor) || "---"}} </td>
+									<td> {{formatCurrency(row.valorNoVencimento)}} </td>
 									<td> {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}} </td>
 									<td> {{row.encargosMonetarios.jurosAm.dias || 0}} </td>
 									<td> {{row.encargosMonetarios.jurosAm.percentsJuros}} </td>
 									<td> {{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}} </td>
 									<td> {{formatCurrency(row.encargosMonetarios.multa)}} </td>
-									<td> {{row.tipoLancamento === 'debit' ? formatCurrency(row.lancamentos) : "(" + formatCurrency(row.lancamentos) + ")"}} </td>
-                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
+									<td> {{row.subtotal}} </td>
+                                    <td> {{formatCurrency(row.valorPMTVincenda)}} </td>
                                     
-                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
-                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
-                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
-                                    <td> {{formatCurrency(row.valorDevedorAtualizado)}} </td>
+                                    <td> {{formatCurrency(row.amortizacao)}} </td>
+                                    <td> {{formatCurrency(row.totalDevedor)}} </td>
+                                    <td> {{row.status}} </td>
 									<td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
 								</tr>
 								<tr align="center">
