@@ -278,7 +278,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         setTimeout(() => {
 
-          this.changeFormValues(cheque.infoParaCalculo);
+          this.changeFormValues(cheque.infoParaCalculo, true);
           this.simularCalc(true, null, true);
         }, 1000);
 
@@ -313,7 +313,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     return moment(row['dataBase']).format("DD/MM/YYYY");
   }
 
-  changeFormValues(infoParaCalculo) {
+  changeFormValues(infoParaCalculo, search = false) {
 
     // this.ceFormRiscos.patchValue({
     //   ce_multa: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
@@ -321,19 +321,27 @@ export class ChequeEmpresarialComponent implements OnInit {
     //   ce_honorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
     //   ce_multa_sobre_constrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
     // });
-
-    this.formDefaultValues = {
-      formMulta: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
-      formJuros: this.ce_form_riscos.ce_juros_mora.value || infoParaCalculo["formJuros"],
-      formHonorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
-      formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
-    };
+    if (!search) {
+      this.formDefaultValues = {
+        formMulta: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
+        formJuros: this.ce_form_riscos.ce_juros_mora.value || infoParaCalculo["formJuros"],
+        formHonorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
+        formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
+      };
+    } else {
+      this.formDefaultValues = {
+        formMulta: infoParaCalculo["formMulta"] || 0,
+        formJuros: infoParaCalculo["formJuros"] || 0,
+        formHonorarios: infoParaCalculo["formHonorarios"] || 0,
+        formMultaSobContrato: infoParaCalculo["formMultaSobContrato"] || 0
+      };
+    }
 
   }
 
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
-    this.changeFormValues(this.formDefaultValues);
+    this.changeFormValues(this.formDefaultValues, search);
     setTimeout(() => {
 
       let tableDataUpdated = this.tableData.dataRows.map((row, index) => {
