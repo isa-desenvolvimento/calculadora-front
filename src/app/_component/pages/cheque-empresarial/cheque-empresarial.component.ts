@@ -57,6 +57,8 @@ export class ChequeEmpresarialComponent implements OnInit {
     formMultaSobContrato: 0
   };
 
+  formIndice: String = "";
+
   constructor(
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
@@ -341,6 +343,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
+    !search && (this.formIndice = this.ce_form_riscos.ce_indice.value)
     this.changeFormValues(this.formDefaultValues, search);
     setTimeout(() => {
 
@@ -369,7 +372,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %") {
+        if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" || row["indiceDataBaseAtual"] === 6) {
           row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
         } else {
           row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : (((valorDevedor / row['indiceDataBase']) * (row['indiceDataBaseAtual'] / 100)) * qtdDias).toFixed(2);
@@ -378,12 +381,12 @@ export class ChequeEmpresarialComponent implements OnInit {
         // -- dias
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
         // -- juros 
-        row['encargosMonetarios']['jurosAm']['percentsJuros'] = search ? row['encargosMonetarios']['jurosAm']['percentsJuros'] : (((this.ce_form_riscos.ce_juros_mora.value || this.formDefaultValues.formJuros) / 30) * qtdDias).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['percentsJuros'] = search ? row['encargosMonetarios']['jurosAm']['percentsJuros'] : (((this.formDefaultValues.formJuros || this.ce_form_riscos.ce_juros_mora.value) / 30) * qtdDias).toFixed(2);
         // -- moneyValue
-        row['encargosMonetarios']['jurosAm']['moneyValue'] = search ? row['encargosMonetarios']['jurosAm']['moneyValue'] : ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * ((this.ce_form_riscos.ce_juros_mora.value / 100))).toFixed(2);
+        row['encargosMonetarios']['jurosAm']['moneyValue'] = search ? row['encargosMonetarios']['jurosAm']['moneyValue'] : ((((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice'])) / 30) * qtdDias) * (((this.formDefaultValues.formJuros || this.ce_form_riscos.ce_juros_mora.value) / 100))).toFixed(2);
 
         // -- multa 
-        row['encargosMonetarios']['multa'] = search ? row['encargosMonetarios']['multa'] : ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * ((this.ce_form_riscos.ce_multa.value || this.formDefaultValues.formMulta) / 100)).toFixed(2);
+        row['encargosMonetarios']['multa'] = search ? row['encargosMonetarios']['multa'] : ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue'])) * ((this.formDefaultValues.formMulta || this.ce_form_riscos.ce_multa.value) / 100)).toFixed(2);
         row['valorDevedorAtualizado'] = ((valorDevedor + parseFloat(row['encargosMonetarios']['correcaoPeloIndice']) + parseFloat(row['encargosMonetarios']['jurosAm']['moneyValue']) + parseFloat(row['encargosMonetarios']['multa']) + (row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos']))).toFixed(2);
 
         // Amortizacao
@@ -528,7 +531,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   },
   {
     type: "Encargos Contratuais %",
-    value: "1"
+    value: "6"
   }
   ];
 
