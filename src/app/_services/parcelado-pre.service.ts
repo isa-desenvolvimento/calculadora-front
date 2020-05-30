@@ -28,17 +28,19 @@ export class ParceladoPreService {
           status: 'ABERTO',
           contractRef: 1,
           ultimaAtualizacao: '',
+          totalParcelasVencidas: '{"valorNoVencimento": "1147.12", "correcaoPeloIndice":  "716.00", "moneyValue": "2.215,00", "multa": "254", "subtotal": "255", "valorPMTVincenda": "256", "amortizacao": "25", "totalDevedor": "256.653,00"}',
+          totalParcelasVincendas: '{"valorPMTVincenda": "1147.12", "totalDevedor": "1147.12"}'
         },
         {
           id: 22,
           nparcelas: 4,
           parcelaInicial: 3,
-          dataVencimento: "2017-12-29",
+          dataVencimento: "2017-12-28",
           indiceDV: "CDI",
           indiceDataVencimento: 658.2287,
           indiceDCA: 'CDI',
           indiceDataCalcAmor: 658.2287,
-          dataCalcAmor: "2017-12-29",
+          dataCalcAmor: "2017-12-30",
           valorNoVencimento: 114712.14,
           encargosMonetarios: '{"correcaoPeloIndice":"1147.12","jurosAm":{"dias":1,"percentsJuros":"0.03","moneyValue":"38.62"},"multa":"2317.96"}',
           subtotal: 134,
@@ -48,6 +50,8 @@ export class ParceladoPreService {
           status: 'ABERTO',
           contractRef: 1,
           ultimaAtualizacao: '',
+          totalParcelasVencidas: '{"valorNoVencimento": "1147.12", "correcaoPeloIndice":  "716.00", "moneyValue": "2.215,00", "multa": "254", "subtotal": "255", "valorPMTVincenda": "256", "amortizacao": "25", "totalDevedor": "256.653,00"}',
+          totalParcelasVincendas: '{"valorPMTVincenda": "1147.12", "totalDevedor": "1147.12"}'
         }]
     }
 

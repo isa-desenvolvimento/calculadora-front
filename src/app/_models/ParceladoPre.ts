@@ -17,6 +17,8 @@ export interface Parcela {
     status: string;
     contractRef: number;
     ultimaAtualizacao: string;
+    totalParcelasVencidas: any;
+    totalParcelasVincendas: any;
 }
 
 export interface EncargosMonetarios {

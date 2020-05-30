@@ -224,17 +224,18 @@
 								<tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
 									<td> {{row.nparcelas}} </td>
 									<td>
-										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataVencimento" max="{{row.dataCalcAmor}"min="1000-01-01" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento', row.indiceDV)"> </td>
+										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataCalcAmor"  max="{{row.dataCalcAmor}}" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')"> </td>
+
 									<td width="80">
-										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event, row, 'indiceDataVencimento')">
+										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
 										</select>
 									</td>
 									<td> {{row.indiceDataVencimento || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataVencimento) || "---"}} </td>
 									<td width="120">
-										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" min="{{row.dataVencimento}}" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  row.indiceDCA)"> </td>
+										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" min="{{row.dataVencimento}}" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')"> </td>
 									<td width="80">
-										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event, row, 'indiceDataCalcAmor')">
+										<select style="width: 80px; font-size: 11px" class="form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
 										</select>
 									</td>
@@ -253,29 +254,35 @@
                                     <td> {{row.status}} </td>
 									<td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
 								</tr>
-								<tr align="center">
-									<th style="background-color: #e9ecef;" colspan="4">TOTAL DE PARCELAS VENCIDAS</th>
+								<tr align="left">
+									<th style="background-color: #e9ecef;" colspan="7">TOTAL DE PARCELAS VENCIDAS</th>
+									<th style="background-color: #e9ecef;" width="100" colspan="1">{{formatCurrency(totalParcelasVencidas.valorNoVencimento)}}</th>
+									<th style="background-color: #e9ecef;" width="100" colspan="1">{{formatCurrency(totalParcelasVencidas.correcaoPeloIndice)}}</th>
 									<th style="background-color: #e9ecef;" colspan="1"></th>
-									<th style="background-color: #e9ecef;" width="100" colspan="1">{{formatCurrency(71000)}}</th>
-									<th style="background-color: #e9ecef;" width="100" colspan="1">{{formatCurrency(716)}}</th>
 									<th style="background-color: #e9ecef;" colspan="1"></th>
-									<th style="background-color: #e9ecef;" colspan="1"></th>
-									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(2215)}}</th>
-									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(1489)}}</th>
-									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(75978)}}</th>
-									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
-                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
-                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
-                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
-                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(0)}}</th>
-                                    <th width="100" colspan="3" style="background-color: #e9ecef;"></th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVencidas.moneyValue)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVencidas.multa)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVencidas.valorPMTVincenda)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVencidas.amortizacao)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVencidas.totalDevedor)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;"></th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;"></th>
                                 </tr>
-                                <tr align="center">
-									<th colspan="4" style="background-color: #e9ecef;">TOTAL DE PARCELAS VINCENDAS</th>
-									<th width="100" colspan="11" style="background-color: #e9ecef;"></th>
-                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(2215)}}</th>
-									<th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(2215)}}</th>
-                                    <th width="100" colspan="3" style="background-color: #e9ecef;"></th>
+                                <tr align="left">
+									<th style="background-color: #e9ecef;" colspan="7">TOTAL DE PARCELAS VINCENDAS</th>
+									<th style="background-color: #e9ecef;" width="100" colspan="1"></th>
+									<th style="background-color: #e9ecef;" width="100" colspan="1"></th>
+									<th style="background-color: #e9ecef;" colspan="1"></th>
+									<th style="background-color: #e9ecef;" colspan="1"></th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;"></th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;"></th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;"></th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVincendas.valorPMTVincenda)}}</th>
+									<th width="100" colspan="1" style="background-color: #e9ecef;"></th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;">{{formatCurrency(totalParcelasVincendas.totalDevedor)}}</th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;"></th>
+                                    <th width="100" colspan="1" style="background-color: #e9ecef;"></th>
 								</tr>
 							</tbody>
 						</table>
