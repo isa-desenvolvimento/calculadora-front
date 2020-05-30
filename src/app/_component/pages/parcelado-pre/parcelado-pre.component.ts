@@ -31,6 +31,7 @@ export class ParceladoPreComponent implements OnInit {
   errorMessage = '';
   payloadLancamento: Lancamento;
   tableData: TableData;
+  tableDataParcelas: TableData;
   tableLoading = false;
   updateLoading = false;
   alertType = '';
@@ -83,6 +84,9 @@ export class ParceladoPreComponent implements OnInit {
     this.tableData = {
       dataRows: []
     }
+    this.tableDataParcelas = {
+      dataRows: []
+    }
     this.totalParcelasVencidas =  [];
     this.totalParcelasVincendas = [];
     this.preFormAmortizacao = this.formBuilder.group({
@@ -90,11 +94,11 @@ export class ParceladoPreComponent implements OnInit {
       preFA_saldo_devedor: []
     });
     this.preFormCadastroParcelas = this.formBuilder.group({
-      pre_n_parcelas: [],
-      pre_parcela_inicial: [],
-      pre_data_vencimento: [],
-      pre_valor_vecimento: [],
-      pre_status: []
+      pre_n_parcelas: ['', Validators.required],
+      pre_parcela_inicial: ['', Validators.required],
+      pre_data_vencimento: ['', Validators.required],
+      pre_valor_vecimento: ['', Validators.required],
+      pre_status: ['', Validators.required]
     })
 
     this.dtOptions = {
@@ -255,6 +259,16 @@ export class ParceladoPreComponent implements OnInit {
     }, 500)
   }
 
+  adicionarParcelas() {
+    const nParcelas = this.pre_form_cadastro_parcelas.pre_n_parcelas.value;
+    const parcelaInicial = this.pre_form_cadastro_parcelas.pre_parcela_inicial.value;
+
+    for (let index = parcelaInicial; index < (nParcelas + parcelaInicial); index++) {
+     this.tableDataParcelas.dataRows.push({...this.preFormCadastroParcelas.value, pre_parcela_inicial: index});
+    }
+  }
+
+
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
@@ -308,8 +322,8 @@ export class ParceladoPreComponent implements OnInit {
     this.updateInlineIndice(indice, row, tipoIndice, tipoIndiceValue);
   }
 
-  formatDate(row) {
-    return moment(row['dataVencimento']).format("DD/MM/YYYY");
+  formatDate(date) {
+    return moment(date).format("DD/MM/YYYY");
   }
 
   simularCalc(isInlineChange = false, origin = null, search = false) {
@@ -448,6 +462,15 @@ export class ParceladoPreComponent implements OnInit {
         }, 0)
       })
     }
+  }
+
+  deleteRowParcelas(row) {
+    const index = this.tableDataParcelas.dataRows.indexOf(row);
+    this.tableDataParcelas.dataRows.splice(index, 1);
+    setTimeout(() => {
+      this.toggleUpdateLoading()
+      this.alertType = 'registro-excluido'
+    }, 0)
   }
 
   updateInlineIndice(value, row, innerDataIndice, indiceColumn ) {
