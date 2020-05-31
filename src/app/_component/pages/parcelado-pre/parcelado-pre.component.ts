@@ -308,7 +308,7 @@ export class ParceladoPreComponent implements OnInit {
       const dataVencimento = parcela['dataVencimento'];
       const indiceValor = this.getIndiceDataBase(indice, dataVencimento);
       const amortizacao = this.tableDataAmortizacao.dataRows.length && this.tableDataAmortizacao.dataRows[key] ? 
-        this.tableDataAmortizacao.dataRows[key] : {preFA_saldo_devedor: 0, preFA_data_vencimento: dataVencimento};
+        this.tableDataAmortizacao.dataRows[key] : {preFA_saldo_devedor: 0, preFA_data_vencimento: this.getCurrentDate()};
       const indiceDataCalcAmor =  this.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento']);
      
       this.total_date_now = moment(dataVencimento).format("DD/MM/YYYY");
@@ -344,6 +344,7 @@ export class ParceladoPreComponent implements OnInit {
         ultimaAtualizacao: 0,
         totalParcelasVencidas: 0,
         totalParcelasVincendas: 0,   
+        vincendas: false
       })
     })
 
@@ -408,8 +409,8 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   getQtdDias(fistDate, secondDate) {
-    const a = moment(fistDate, 'DD/MM/YYYY');
-    const b = moment(secondDate, 'DD/MM/YYYY');
+    const a = moment(fistDate, 'YYYY-MM-DD');
+    const b = moment(secondDate, 'YYYY-MM-DD');
     return Math.abs(b.diff(a, 'days'));
   }
 
@@ -452,12 +453,13 @@ export class ParceladoPreComponent implements OnInit {
         const inputExternoMultaSobContrato = this.pre_form_riscos.pre_multa_sobre_constrato.value / 100;
 
         // Valores brutos
-        const dataVencimento = moment(row["dataVencimento"]).format("DD/MM/YYYY");
-        const dataCalcAmor = moment(row["dataCalcAmor"]).format("DD/MM/YYYY");
+        const dataVencimento = moment(row["dataVencimento"]).format("YYYY-MM-DD");
+        const dataCalcAmor = moment(row["dataCalcAmor"]).format("YYYY-MM-DD");
         const indiceDataVencimento = this.getIndiceDataBase((inputExternoIndice || row['indiceDV']), row['dataVencimento']) / 100;
         const indiceDataCalcAmor = this.getIndiceDataBase((inputExternoIndice || row['indiceDCA']), row['dataCalcAmor']) / 100;
         const valorNoVencimento = parseFloat(row['valorNoVencimento']);
-        const vincenda = valorNoVencimento < inputExternoDataCalculo;
+        const vincenda = dataVencimento > inputExternoDataCalculo;
+        
         const amortizacao = parseFloat(row['amortizacao']);
         let porcentagem = inputExternoPorcentagem || parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']);
       

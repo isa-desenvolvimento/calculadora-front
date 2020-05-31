@@ -276,35 +276,35 @@
 							</thead>
 							<tbody>
 								<tr *ngFor="let row of tableData.dataRows" class="parcelado-font-size" align="center">
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{row.nparcelas}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}">
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.nparcelas}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<input type="date" class=" parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataCalcAmor" max="{{row.dataCalcAmor}}" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')"> </td>
-									<td width="80" class="{{row.vincendas ?  'parcelas-vincendas' : ''}}">
+									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<select  class="parcelado-font-size form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
 										</select>
 									</td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{row.indiceDataVencimento || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataVencimento) || "---"}} </td>
-									<td width="120" class="{{row.vincendas ?  'parcelas-vincendas' : ''}}">
-										<input type="date" class="parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" min="{{row.dataVencimento}}" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')"> </td>
-									<td width="80" class="{{row.vincendas ?  'parcelas-vincendas' : ''}}">
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.indiceDataVencimento || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataVencimento) || "---"}} </td>
+									<td width="120" [ngClass]="{'parcelas-vincendas': row.vincenda}">
+										<input type="date" class="parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')"> </td>
+									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<select  class="parcelado-font-size form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
 										</select>
 									</td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{row.indiceDataCalcAmor || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataCalcAmor) || "---"}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{formatCurrency(row.valorNoVencimento)}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{row.encargosMonetarios.jurosAm.dias || 0}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{row.encargosMonetarios.jurosAm.percentsJuros}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{formatCurrency(row.encargosMonetarios.multa)}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{row.subtotal}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{formatCurrency(row.valorPMTVincenda)}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{formatCurrency(row.amortizacao)}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{formatCurrency(row.totalDevedor)}} </td>
-									<td class="{{row.vincendas ?  'parcelas-vincendas' : ''}}"> {{row.status}} </td>
-									<td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.indiceDataCalcAmor || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataCalcAmor) || "---"}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.valorNoVencimento)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.encargosMonetarios.jurosAm.dias || 0}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.encargosMonetarios.jurosAm.percentsJuros}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.encargosMonetarios.multa)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.subtotal)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.valorPMTVincenda)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.amortizacao)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.totalDevedor)}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.status}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}" (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
 								</tr>
 								<tr align="left" class="parcelado-font-size">
 									<th class="footer-table" colspan="7">TOTAL DE PARCELAS VENCIDAS</th>
