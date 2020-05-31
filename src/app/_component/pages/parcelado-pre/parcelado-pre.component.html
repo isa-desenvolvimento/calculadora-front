@@ -8,6 +8,9 @@
 	<div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
 		<div class="alert alert-success" role="alert"> Lançamento incluido! </div>
 	</div>
+	<div *ngIf="updateLoading && alertType === 'amortizacao-incluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
+		<div class="alert alert-success" role="alert"> Amortização incluida! </div>
+	</div>
 	<div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 999">
 		<div class="alert alert-danger" role="alert"> Registro excluido! </div>
 	</div>
@@ -106,81 +109,73 @@
 		<div class="card " >
 			<div class="card-header ">
 				<h5 class="card-title">Cadastro de Parcelas</h5> </div>
-			<div class="card-body " style="min-height: 250px; max-height: 800px;">
+			<div class="card-body " style="min-height: 285px; max-height: 800px;">
 				<div class="row">
 					<div class="col-md-12">
 						<form class="row" [formGroup]="preFormCadastroParcelas">
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Nº Parcelas</label>
-								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_n_parcelas" id="pre_n_parcelas" formControlName="pre_n_parcelas" value> </div>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12"formControlName="nparcelas" value> </div>
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Parcela inicial</label>
-								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_parcela_inicial" id="pre_parcela_inicial" formControlName="pre_parcela_inicial" value> </div>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" formControlName="parcelaInicial" value> </div>
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Data Vencimento</label>
-								<input type="date" class="form-control col-md-12 col-sm-12" name="pre_data_vencimento" id="pre_data_vencimento" formControlName="pre_data_vencimento" max="3000-12-31" min="1000-01-01"> </div>
+								<input type="date" class="form-control col-md-12 col-sm-12" formControlName="dataVencimento" max="3000-12-31" min="1000-01-01"> </div>
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Valor no Vencimento</label>
-								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_valor_vecimento" id="pre_valor_vecimento" formControlName="pre_valor_vecimento" value> </div>
+								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" formControlName="valorNoVencimento" value> </div>
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Status</label>
-								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_status" id="pre_status" formControlName="pre_status">
+								<select class="form-control custom-select col-md-12 col-sm-12"formControlName="status">
 									<option *ngFor="let status of pre_status_field" [value]="status.type"> {{status.type}}</option>
 								</select>
 							</div>
-							<div class="col-sm-4">
-								<br />
-								<div class="stats">
-									<button type="button" (click)="adicionarParcelas()" class="btn btn-info btn-round" [disabled]="!preFormCadastroParcelas.valid || !preForm.valid">Adicionar</button>
-									<div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
-										<div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status"> <span class="sr-only">Loading...</span> </div>
-									</div>
+
+							<div class="col-md-12 col-sm-12 form-inline mt-3">
+								<div class="stats form-group mb-2">
+									<button type="button" (click)="adicionarParcelas()" class="btn btn-info btn-round" [disabled]="!preFormCadastroParcelas.valid || !preForm.valid || tableData.dataRows.length !== 0 ">Adicionar</button>
+								</div>
+								<div class="stats form-group mb-2 ml-md-2">
+									<button type="button" (click)="incluirParcelas()" class="btn btn-info btn-round" [disabled]="tableDataParcelas.dataRows.length === 0 || tableData.dataRows.length !== 0 " >Incluir Parcelas</button>
 								</div>
 							</div>
+
 						</form>
-						<br>
 						<br>
 						<br>
 					</div>
 					<!-- Table cadastro de parcelas -->
-					<div class="col-md-12"> <!--</div> *ngIf="!(tableDataParcelas.dataRows.length === 0)" -->
+					<div class="col-md-12" *ngIf="!(tableDataParcelas.dataRows.length === 0)" >
 						<table [dtOptions]="dtOptions" datatable class="table table-hover">
 							<thead>
 								<tr align="center">
-									<th>Parcela</th>
+									<th>Nº Parcela</th>
 									<th>Data Vencimento</th>
-									<th>Valor Vencimento</th>
+									<th>Valor no Vencimento</th>
 									<th>Status</th>
 									<th>Ações</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr *ngFor="let row of tableDataParcelas.dataRows" align="center" >
-									<td>{{row.pre_parcela_inicial}}</td>
+									<td>{{row.nparcelas}}</td>
 									<td>
-										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12"  [value]="row.pre_data_vencimento">
+										<input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12"  (change)="changeCadastroParcelas($event, row, 'dataVencimento')" [value]="row.dataVencimento">
 									</td>
 									<td>
-										<input style="font-size: 11px" class="form-control col-md-11 col-sm-12"  [value]="formatCurrency(row.pre_valor_vecimento)">
+										<input style="font-size: 11px" class="form-control col-md-11 col-sm-12"  (change)="changeCadastroParcelas($event, row, 'valorNoVencimento')" [value]="formatCurrency(row.valorNoVencimento)">
 									</td>
 									<td>
-										<select style="width: 80px; font-size: 11px" class="form-control custom-select">
-											<option *ngFor="let status of pre_status_field" [value]="status.type" [selected]="status.type === row.pre_status"> {{status.type}}</option>
+										<select style="width: 80px; font-size: 11px" class="form-control custom-select"  (change)="changeCadastroParcelas($event, row, 'status')">
+											<option *ngFor="let status of pre_status_field" [value]="status.type" [selected]="status.type === row.status"> {{status.type}}</option>
 										</select>
 									</td>
 									<td (click)="deleteRowParcelas(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
 								</tr>
 							</tbody>
 						</table>
-						<div class="col-sm-12">
-							<br />
-							<div class="stats">
-								<button type="button" (click)="adicionarParcelas()" class="btn btn-info btn-round" >Gerar Parcelas</button>
-								<div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
-									<div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status"> <span class="sr-only">Loading...</span> </div>
-								</div>
-							</div>
-						</div>
+
 					</div>
 					<!-- Fim Table cadastro de parcelas-->
 				</div>
@@ -188,7 +183,7 @@
 		</div>
 	</div>
 	<div class="col-md-6">
-		<div class="card " style="min-height: 250px;">
+		<div class="card " style="min-height: 350px;">
 			<div class="card-header ">
 				<h5 class="card-title">Amortização</h5> </div>
 			<div class="card-body ">
@@ -197,26 +192,49 @@
 						<form class="row" [formGroup]="preFormAmortizacao">
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Data</label>
-								<input type="date" class="form-control col-md-12 col-sm-12" name="preFA_data_vencimento" id="preFA_data_vencimento" formControlName="preFA_data_vencimento" max="3000-12-31" min="1000-01-01"> </div>
+								<input type="date" class="form-control col-md-12 col-sm-12" formControlName="preFA_data_vencimento" max="3000-12-31" min="1000-01-01"> </div>
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Valor</label>
 								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-12 col-sm-12" name="preFA_saldo_devedor" style="height: 35px" id="preFA_saldo_devedor" formControlName="preFA_saldo_devedor"> </div>
 							<div class="col-sm-4">
 								<br />
 								<div class="stats">
-									<button type="button" (click)="incluirLancamentos()" class="btn btn-info btn-round" [disabled]="!preFormAmortizacao.valid || tableLoading">Adicionar</button>
+									<button type="button" (click)="adicionarAmortizacao()" class="btn btn-info btn-round" [disabled]="!preFormAmortizacao.valid || !preForm.valid">Adicionar</button>
 									<div class="d-flex justify-content-center" *ngIf="tableLoading" style="position: absolute; top: 33px; right: 80px">
 										<div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status"> <span class="sr-only">Loading...</span> </div>
 									</div>
 								</div>
 							</div>
 						</form>
+						<br>
+						<br>
 					</div>
+						<!-- Table amortização -->
+						<div class="col-md-12" *ngIf="!(tableDataAmortizacao.dataRows.length === 0)">
+						<table [dtOptions]="dtOptions" datatable class="table table-hover" >
+							<thead>
+								<tr align="center">
+									<th>Data Vencimento</th>
+									<th>Valor</th>
+									<th>Ações</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr *ngFor="let row of tableDataAmortizacao.dataRows" align="center" >
+									<td>{{formatDate(row.preFA_data_vencimento)}}</td>
+									<td>{{formatCurrency(row.preFA_saldo_devedor)}}</td>
+									<td (click)="deleteRowAmortizacao(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					<!-- Fim Table amortização-->
 				</div>
-				<br> </div>
+				<br> 
+			</div>
 		</div>
 	</div>
-	<div class="col-md-12 col-sm-12 pt-0" >
+	<div class="col-md-12 col-sm-12 pt-0" *ngIf="!(tableData.dataRows.length === 0)">
 		<div class="row">
 			<div class="col-md-12">
 				<div class="card">
@@ -232,7 +250,7 @@
 										<th colspan="3"> </th>
 								</tr>
 								<tr align="center">
-									<th class="align-title-top" rowspan="2">Nº Parcelas</th>
+									<th class="align-title-top" rowspan="2">Nº Parcela</th>
 									<th class="align-title-top" rowspan="2">Data Vencimento</th>
 									<th class="align-title-top" rowspan="2">Índice <b>{{pre_form_riscos.pre_indice.value}}</b> </th>
 									<th width="80" class="align-title-top" rowspan="2">Índice Data Vencimento</th>
@@ -244,7 +262,7 @@
 									<th colspan="3">Juros a.m. {{( pre_form_riscos.pre_juros_mora.value || 0 ) + "%"}} </th>
 									<th width="100" rowspan="2">Multa <b>{{( pre_form_riscos.pre_multa.value || 0 ) + "%"}}</b> </th>
 									<th class="align-title-top" rowspan="2">Subtotal</th>
-									<th width="80" class="align-title-top" rowspan="2">Valor da PMT Vincenda em <b>{{formatDate(tableData.dataRows[0]['dataVencimento'])}}</b></th>
+									<th width="80" class="align-title-top" rowspan="2">Valor da PMT Vincenda em <b>{{tableData.dataRows.length ? formatDate(tableData.dataRows[0]['dataVencimento']) : ''}}</b></th>
 									<th width="80" class="align-title-top" rowspan="2">Amortização</th>
 									<th width="80" class="align-title-top" rowspan="2">Total Devedor</th>
 									<th width="80" class="align-title-top" rowspan="2">Status</th>
