@@ -1,0 +1,19 @@
+
+.footer-table {
+    background-color: #e9ecef;
+}
+
+.alert {
+    position: fixed; 
+    right: 10px; 
+    top: 10px; 
+    z-index: 999
+}
+
+.parcelado-font-size {
+    font-size: 11px !important;
+}
+
+.parcelas-vincendas {
+    background-color: #f9f0dc;
+}

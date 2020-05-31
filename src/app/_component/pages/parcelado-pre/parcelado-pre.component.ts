@@ -438,6 +438,8 @@ export class ParceladoPreComponent implements OnInit {
       correcaoPeloIndiceTotal = 0,
       valorNoVencimentoTotal = 0;
 
+      let valorPMTVincendaTotalVincendas = 0, totalDevedorTotalVincendas = 0;
+
       this.tableData.dataRows.map((row, index) => {
         // Valores inputs
         const inputExternoDataCalculo = this.pre_form_riscos.pre_data_calculo.value;
@@ -485,14 +487,19 @@ export class ParceladoPreComponent implements OnInit {
         row['vincenda'] = vincenda;
 
  
-        moneyValueTotal += valor;
-        multaTotal += multa;
-        subtotalTotal += subtotal;
-        valorPMTVincendaTotal += valorPMTVincenda;
-        amortizacaoTotal += amortizacao;
-        totalDevedorTotal += totalDevedor;
-        correcaoPeloIndiceTotal += correcaoPeloIndice;
-        valorNoVencimentoTotal += valorNoVencimento;
+        if (vincenda) {
+          valorPMTVincendaTotalVincendas += valorPMTVincenda;
+          totalDevedorTotalVincendas += totalDevedor;
+        } else {
+          moneyValueTotal += valor;
+          multaTotal += multa;
+          subtotalTotal += subtotal;
+          valorPMTVincendaTotal += valorPMTVincenda;
+          amortizacaoTotal += amortizacao;
+          totalDevedorTotal += totalDevedor;
+          correcaoPeloIndiceTotal += correcaoPeloIndice;
+          valorNoVencimentoTotal += valorNoVencimento;
+        }
 
         
         // Forms Total
@@ -529,6 +536,11 @@ export class ParceladoPreComponent implements OnInit {
         totalDevedor: totalDevedorTotal,
         correcaoPeloIndice: correcaoPeloIndiceTotal,
         valorNoVencimento: valorNoVencimentoTotal
+      }
+
+      this.totalParcelasVincendas = {
+        totalDevedor: totalDevedorTotal ,
+        valorPMTVincenda: valorPMTVincendaTotalVincendas
       }
     }, 0);
     
