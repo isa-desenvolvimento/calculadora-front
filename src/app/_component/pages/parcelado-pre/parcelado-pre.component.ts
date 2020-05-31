@@ -370,7 +370,7 @@ export class ParceladoPreComponent implements OnInit {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
     this.tableDataParcelas.dataRows = [];
-    this.tableData.dataRows =  this.parceladoPre.getAll().map(parcela => {
+    this.tableData.dataRows =  this.parceladoPre.getAll().filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(parcela => {
       parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios);
       this.totalParcelasVencidas = JSON.parse(parcela.totalParcelasVencidas);
       this.totalParcelasVincendas = JSON.parse(parcela.totalParcelasVincendas);
