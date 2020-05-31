@@ -304,18 +304,20 @@ export class ParceladoPreComponent implements OnInit {
   incluirParcelas() {
     this.tableDataParcelas.dataRows.map((parcela, key) => {
 
+      
       const indice = this.pre_form_riscos.pre_indice.value || null;
       const dataVencimento = parcela['dataVencimento'];
-      const indiceValor = this.getIndiceDataBase(indice, dataVencimento);
-      const amortizacao = this.tableDataAmortizacao.dataRows.length && this.tableDataAmortizacao.dataRows[key] ? 
-        this.tableDataAmortizacao.dataRows[key] : {preFA_saldo_devedor: 0, preFA_data_vencimento: this.getCurrentDate()};
-      const indiceDataCalcAmor =  this.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento']);
-     
+      const inputExternoDataCalculo = this.pre_form_riscos.pre_data_calculo.value;
       this.total_date_now = moment(dataVencimento).format("DD/MM/YYYY");
-      this.total_data_calculo = moment(this.pre_form_riscos.pre_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate();
+      this.total_data_calculo = moment(inputExternoDataCalculo).format("DD/MM/YYYY")
       this.subtotal_data_calculo = this.total_date_now;
       this.last_data_table = [];
-      
+
+      const indiceValor = this.getIndiceDataBase(indice, dataVencimento);
+      const amortizacao = this.tableDataAmortizacao.dataRows.length && this.tableDataAmortizacao.dataRows[key] ? 
+        this.tableDataAmortizacao.dataRows[key] : {preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo};
+      const indiceDataCalcAmor =  this.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento']);
+     
       this.tableData.dataRows.push({
         nparcelas: parcela['nparcelas'],
         parcelaInicial: parcela['parcelaInicial'],
@@ -452,6 +454,12 @@ export class ParceladoPreComponent implements OnInit {
         const inputExternoHonorarios = this.pre_form_riscos.pre_honorarios.value / 100;
         const inputExternoMultaSobContrato = this.pre_form_riscos.pre_multa_sobre_constrato.value / 100;
 
+
+        if (!isInlineChange) {
+          row['indiceDV'] = inputExternoIndice;
+          row['indiceDCA'] = inputExternoIndice;
+        }
+
         // Valores brutos
         const dataVencimento = moment(row["dataVencimento"]).format("YYYY-MM-DD");
         const dataCalcAmor = moment(row["dataCalcAmor"]).format("YYYY-MM-DD");
@@ -479,7 +487,7 @@ export class ParceladoPreComponent implements OnInit {
         // Table Values
         row['encargosMonetarios']['correcaoPeloIndice'] = correcaoPeloIndice.toFixed(2);
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
-        row['encargosMonetarios']['jurosAm']['percentsJuros'] = porcentagem.toFixed(2);
+        row['encargosMonetarios']['jurosAm']['percentsJuros'] = porcentagem.toFixed(2) === "NaN" ? "---" : porcentagem.toFixed(2) || 0;
         row['encargosMonetarios']['jurosAm']['moneyValue'] = valor.toFixed(2);
         row['encargosMonetarios']['multa'] = multa.toFixed(2);
         row['subtotal'] = subtotal.toFixed(2);
@@ -487,7 +495,6 @@ export class ParceladoPreComponent implements OnInit {
         row['amortizacao'] = amortizacao.toFixed(2);
         row['totalDevedor'] = totalDevedor.toFixed(2);
         row['vincenda'] = vincenda;
-
  
         if (vincenda) {
           valorPMTVincendaTotalVincendas += valorPMTVincenda;

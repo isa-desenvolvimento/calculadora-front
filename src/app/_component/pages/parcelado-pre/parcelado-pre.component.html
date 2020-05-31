@@ -1,17 +1,17 @@
 <div class="row ">
-	<div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3 alert">
+	<div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3 alert-parcelas">
 		<div class="alert alert-success" role="alert"> Risco atualizado </div>
 	</div>
-	<div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3 alert">
+	<div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3 alert-parcelas">
 		<div class="alert alert-success" role="alert"> Cálculo Simulado </div>
 	</div>
-	<div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3 alert">
+	<div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3 alert-parcelas">
 		<div class="alert alert-success" role="alert"> Lançamento incluido! </div>
 	</div>
-	<div *ngIf="updateLoading && alertType === 'amortizacao-incluido'" class="col-lg-3  mt-3 alert">
+	<div *ngIf="updateLoading && alertType === 'amortizacao-incluido'" class="col-lg-3  mt-3 alert-parcelas">
 		<div class="alert alert-success" role="alert"> Amortização incluida! </div>
 	</div>
-	<div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3 alert">
+	<div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3 alert-parcelas">
 		<div class="alert alert-danger" role="alert"> Registro excluido! </div>
 	</div>
 	<div class="col-md-12">
@@ -278,17 +278,17 @@
 								<tr *ngFor="let row of tableData.dataRows" class="parcelado-font-size" align="center">
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.nparcelas}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<input type="date" class=" parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataCalcAmor" max="{{row.dataCalcAmor}}" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')"> </td>
+										<input type="date"[ngClass]="{'parcelas-vincendas': row.vincenda}"  class=" parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataCalcAmor" max="{{row.dataCalcAmor}}" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')"> </td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<select  class="parcelado-font-size form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV')">
+										<select [ngClass]="{'parcelas-vincendas': row.vincenda}" class="parcelado-font-size form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
 										</select>
 									</td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.indiceDataVencimento || getIndiceDataBase(pre_form_riscos.pre_indice.value, row.dataVencimento) || "---"}} </td>
 									<td width="120" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<input type="date" class="parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')"> </td>
+										<input [ngClass]="{'parcelas-vincendas': row.vincenda}" type="date" class="parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')"> </td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<select  class="parcelado-font-size form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA')">
+										<select [ngClass]="{'parcelas-vincendas': row.vincenda}" class="parcelado-font-size form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
 										</select>
 									</td>
@@ -296,7 +296,7 @@
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.valorNoVencimento)}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.encargosMonetarios.jurosAm.dias || 0}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.encargosMonetarios.jurosAm.percentsJuros}} </td>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.encargosMonetarios.jurosAm.percentsJuros || 0}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.encargosMonetarios.multa)}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{formatCurrency(row.subtotal)}} </td>

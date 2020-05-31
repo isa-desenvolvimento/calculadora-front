@@ -3,7 +3,7 @@
     background-color: #e9ecef;
 }
 
-.alert {
+.alert-parcelas {
     position: fixed; 
     right: 10px; 
     top: 10px; 
@@ -15,5 +15,5 @@
 }
 
 .parcelas-vincendas {
-    background-color: #f4f3ef;
+    background-color: #f4f3ef !important;
 }
