@@ -14,6 +14,11 @@
 	<div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3 alert-parcelas">
 		<div class="alert alert-danger" role="alert"> Registro excluido! </div>
 	</div>
+
+	<div *ngIf="updateLoading && alertType === 'sem-registros'" class="col-lg-3  mt-3 alert-parcelas">
+		<div class="alert alert-warning" role="alert"> Nenhuma parcela encontrada! </div>
+	</div>
+
 	<div class="col-md-12">
 		<div class="card ">
 			<div class="card-header ">
@@ -82,7 +87,7 @@
 								<label for="nome" class="col-form-label">Honorários %</label>
 								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_honorarios" id="pre_honorarios" formControlName="pre_honorarios"> </div>
 							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Multa sob contrato</label>
+								<label for="nome" class="col-form-label">Multa sob contrato %</label>
 								<input type="number" (change)="verifyNumber($event)" min="0" class="form-control col-md-11 col-sm-12" name="pre_multa_sobre_constrato" id="pre_multa_sobre_constrato" formControlName="pre_multa_sobre_constrato"> </div>
 							<div class="col-md-3 col-sm-12">
 								<label for="nome" class="col-form-label">Deságio %</label>
@@ -109,7 +114,7 @@
 		<div class="card " >
 			<div class="card-header ">
 				<h5 class="card-title">Cadastro de Parcelas</h5> </div>
-			<div class="card-body " style="min-height: 285px; max-height: 800px;">
+			<div class="card-body " style="min-height: 285px;">
 				<div class="row">
 					<div class="col-md-12">
 						<form class="row" [formGroup]="preFormCadastroParcelas">
@@ -134,10 +139,10 @@
 
 							<div class="col-md-12 col-sm-12 form-inline mt-3">
 								<div class="stats form-group mb-2">
-									<button type="button" (click)="adicionarParcelas()" class="btn btn-info btn-round" [disabled]="!preFormCadastroParcelas.valid || !preForm.valid || tableData.dataRows.length !== 0 ">Adicionar</button>
+									<button type="button" (click)="adicionarParcelas()" class="btn btn-info btn-round" [disabled]="!preFormCadastroParcelas.valid || !preForm.valid">Adicionar</button>
 								</div>
 								<div class="stats form-group mb-2 ml-md-2">
-									<button type="button" (click)="incluirParcelas()" class="btn btn-info btn-round" [disabled]="tableDataParcelas.dataRows.length === 0 || tableData.dataRows.length !== 0 " >Incluir Parcelas</button>
+									<button type="button" (click)="incluirParcelas()" class="btn btn-info btn-round" [disabled]="tableDataParcelas.dataRows.length === 0" >Incluir Parcelas</button>
 								</div>
 							</div>
 
@@ -239,7 +244,7 @@
 			<div class="col-md-12">
 				<div class="card">
 					<div class="card-header">
-						<h4 class="card-title">MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO</h4> </div>
+						<h4 class="card-title">DEMONSTRATIVO DE SALDO DEVEDOR</h4> </div>
 					<div class="card-body" style="max-height: 100vh;overflow: scroll;">
 						<table [dtOptions]="dtOptions" datatable class="table table-hover" *ngIf="tableData && tableData.dataRows && !tableLoading">
 							<thead>
