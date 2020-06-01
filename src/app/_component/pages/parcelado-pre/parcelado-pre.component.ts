@@ -215,60 +215,6 @@ export class ParceladoPreComponent implements OnInit {
     return this.tableData.dataRows.length === 0 ? this.tableData.dataRows.length : this.tableData.dataRows.length - 1;
   }
 
-  incluirLancamentos() {
-    this.tableLoading = true;
-
-    const localDataVencimento = this.tableData.dataRows.length === 0 ? this.pre_form_amortizacao.preFA_data_vencimento.value : this.tableData.dataRows[this.getLastLine()]["indiceDataVencimento"];
-    const localValorDevedor = this.tableData.dataRows.length === 0 ? this.pre_form_amortizacao.preFa_saldo_devedor.value : this.tableData.dataRows[this.getLastLine()]["valorDevedorAtualizado"];
-
-    this.total_date_now = moment(localDataVencimento).format("DD/MM/YYYY");
-    this.total_data_calculo = moment(this.pre_form_riscos.pre_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate();
-    this.subtotal_data_calculo = this.total_date_now;
-    this.last_data_table = [];
-
-    const localTypeIndice = this.pre_form_riscos.pre_indice.value;
-    const localTypeValue = this.getIndiceDataBase(localTypeIndice, this.pre_form_amortizacao.preFA_data_base_atual.value);
-
-    const localLancamentos = this.pre_form_amortizacao.preFA_valor_lancamento.value;
-    const localTipoLancamento = this.pre_form_amortizacao.preFA_tipo_lancamento.value;
-    const localDataBaseAtual = this.pre_form_amortizacao.preFA_data_base_atual.value;
-
-    setTimeout(() => {
-      // this.payloadLancamento = ({
-      //   //dataVencimento: localDataVencimento,
-      //   indiceDB: localTypeIndice,
-      //   indiceDataBase: localTypeValue,
-      //   indiceBA: localTypeIndice,
-      //   indiceDataBaseAtual: localTypeValue,
-      //   //indiceDataCalcAmor: localDataBaseAtual,
-      //   valorNoVencimento: localValorDevedor,
-      //   encargosMonetarios: {
-      //     correcaoPeloIndice: null,
-      //     jurosAm: {
-      //       dias: null,
-      //       percentsJuros: null,
-      //       moneyValue: null,
-      //     },
-      //     multa: null,
-      //   },
-      //   lancamentos: localLancamentos,
-      //   tipoLancamento: localTipoLancamento,
-      //   valorDevedorAtualizado: null,
-      //   contractRef: this.pre_form.pre_contrato.value || 0,
-      //   ultimaAtualizacao: '',
-      // });
-      this.pre_form_amortizacao.preFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
-      this.tableLoading = false;
-    }, 0);
-    this.resetFields('preFormAmortizacao');
-
-    setTimeout(() => {
-      this.toggleUpdateLoading()
-      this.alertType = 'lancamento-incluido';
-      this.simularCalc(true)
-    }, 500)
-  }
-
   adicionarParcelas() {
     const nParcelas = this.pre_form_cadastro_parcelas.nparcelas.value;
     const parcelaInicial = this.pre_form_cadastro_parcelas.parcelaInicial.value;
@@ -302,7 +248,7 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   incluirParcelas() {
-    this.tableData.dataRows = [];
+    this.tableLoading = true;
     this.tableDataParcelas.dataRows.map((parcela, key) => {
       const indice = this.pre_form_riscos.pre_indice.value || null;
       const dataVencimento = parcela['dataVencimento'];
@@ -350,7 +296,8 @@ export class ParceladoPreComponent implements OnInit {
     })
 
     setTimeout(() => {
-      this.tableDataParcelas = this.tableData;
+      this.preFormCadastroParcelas.reset();
+      this.tableDataParcelas.dataRows = [];
       this.toggleUpdateLoading()
       this.alertType = 'lancamento-incluido';
       this.simularCalc(true)
@@ -376,13 +323,11 @@ export class ParceladoPreComponent implements OnInit {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
     this.tableDataParcelas.dataRows = [];
+    this.preFormRiscos.reset({pre_data_calculo: this.getCurrentDate('YYYY-MM-DD')});
+
     this.tableData.dataRows =  this.parceladoPre.getAll().filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(parcela => {
       parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios);
-      this.totalParcelasVencidas = JSON.parse(parcela.totalParcelasVencidas);
-      this.totalParcelasVincendas = JSON.parse(parcela.totalParcelasVincendas);
       this.ultima_atualizacao = moment(parcela.ultimaAtualizacao).format('YYYY-MM-DD');
-
-      this.tableDataParcelas.dataRows.push(parcela);
 
       return parcela;
     })
@@ -419,7 +364,6 @@ export class ParceladoPreComponent implements OnInit {
     const b = moment(secondDate, 'YYYY-MM-DD');
     return Math.abs(b.diff(a, 'days'));
   }
-
 
   changeDate(e, row, data, tipoIndice, tipoIndiceValue) {
     row[data] = moment(e.target.value).format("YYYY-MM-DD");
