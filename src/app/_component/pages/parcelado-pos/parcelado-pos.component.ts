@@ -198,7 +198,9 @@ export class ParceladoPosComponent implements OnInit {
       formMulta: this.pos_form.ce_multa.value,
       formJuros: this.pos_form.ce_juros_mora.value,
       formHonorarios: this.pos_form.ce_honorarios.value,
-      formMultaSobContrato: this.pos_form.ce_multa_sobre_constrato.value
+      formMultaSobContrato: this.pos_form.ce_multa_sobre_constrato.value,
+      formIndice: null,
+      formIndiceEncargos: null
     };
 
     setTimeout(() => {

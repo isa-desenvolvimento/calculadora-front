@@ -198,7 +198,9 @@ export class ParceladoPreComponent implements OnInit {
       formMulta: this.pre_form_riscos.ce_multa.value,
       formJuros: this.pre_form_riscos.ce_juros_mora.value,
       formHonorarios: this.pre_form_riscos.ce_honorarios.value,
-      formMultaSobContrato: this.pre_form_riscos.ce_multa_sobre_constrato.value
+      formMultaSobContrato: this.pre_form_riscos.ce_multa_sobre_constrato.value,
+      formIndice: null,
+      formIndiceEncargos: null
     };
 
     setTimeout(() => {
