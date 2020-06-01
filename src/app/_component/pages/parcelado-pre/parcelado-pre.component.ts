@@ -369,6 +369,10 @@ export class ParceladoPreComponent implements OnInit {
     }, 500)
   }
 
+  setCampoSemAlteracao(semFormat = false) {
+    return semFormat ? "---" : "NaN";
+  }
+
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
@@ -436,7 +440,6 @@ export class ParceladoPreComponent implements OnInit {
       let moneyValueTotal = 0,
       multaTotal = 0,
       subtotalTotal = 0,
-      valorPMTVincendaTotal = 0,
       amortizacaoTotal = 0,
       totalDevedorTotal = 0,
       correcaoPeloIndiceTotal = 0,
@@ -460,6 +463,9 @@ export class ParceladoPreComponent implements OnInit {
         if (!isInlineChange) {
           row['indiceDV'] = indiceDV = inputExternoIndice;
           row['indiceDCA'] = indiceDCA = inputExternoIndice;
+
+          row['indiceDataVencimento'] = this.getIndiceDataBase(indiceDV, row['dataVencimento']);
+          row['indiceDataCalcAmor'] = this.getIndiceDataBase( indiceDCA, row['dataCalcAmor']);
         }
 
         // Valores brutos
@@ -480,12 +486,12 @@ export class ParceladoPreComponent implements OnInit {
         const valor = (valorNoVencimento + correcaoPeloIndice) * porcentagem;
         const multa = (valorNoVencimento + correcaoPeloIndice + valor) * inputExternoMulta //verificar como foi salvo a multa do input;
         const subtotal = valorNoVencimento + correcaoPeloIndice + valor + multa;
-        let totalDevedor = subtotal + amortizacao;
+        const totalDevedor = subtotal + amortizacao;
         const desagio = vincenda ? Math.pow((inputExternoDesagio + 1), (qtdDias/30)) : (totalDevedor * -1);
         const valorPMTVincenda = vincenda ?  valorNoVencimento * desagio : 0;
-        totalDevedor = vincenda ? valorPMTVincenda : totalDevedor;
         const honorarios = totalDevedor * inputExternoHonorarios;
 
+   
         // Table Values
         row['encargosMonetarios']['correcaoPeloIndice'] = correcaoPeloIndice.toFixed(2);
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
@@ -493,7 +499,7 @@ export class ParceladoPreComponent implements OnInit {
         row['encargosMonetarios']['jurosAm']['moneyValue'] = valor.toFixed(2);
         row['encargosMonetarios']['multa'] = multa.toFixed(2);
         row['subtotal'] = subtotal.toFixed(2);
-        row['valorPMTVincenda'] = valorPMTVincenda.toFixed(2);
+        row['valorPMTVincenda'] = this.setCampoSemAlteracao();
         row['amortizacao'] = amortizacao.toFixed(2);
         row['totalDevedor'] = totalDevedor.toFixed(2);
         row['vincenda'] = vincenda;
@@ -501,11 +507,21 @@ export class ParceladoPreComponent implements OnInit {
         if (vincenda) {
           valorPMTVincendaTotalVincendas += valorPMTVincenda;
           totalDevedorTotalVincendas += totalDevedor;
+
+          row['encargosMonetarios']['correcaoPeloIndice'] = this.setCampoSemAlteracao();
+          row['encargosMonetarios']['jurosAm']['dias'] = this.setCampoSemAlteracao(true);;
+          row['encargosMonetarios']['jurosAm']['percentsJuros'] = this.setCampoSemAlteracao(true);
+          row['encargosMonetarios']['jurosAm']['moneyValue'] = this.setCampoSemAlteracao();
+          row['encargosMonetarios']['multa'] = this.setCampoSemAlteracao();
+          row['subtotal'] = this.setCampoSemAlteracao();
+          row['valorPMTVincenda'] = valorPMTVincenda.toFixed(2);
+          row['amortizacao'] =  this.setCampoSemAlteracao();
+          row['totalDevedor'] = valorPMTVincenda.toFixed(2);
+
         } else {
           moneyValueTotal += valor;
           multaTotal += multa;
           subtotalTotal += subtotal;
-          valorPMTVincendaTotal += valorPMTVincenda;
           amortizacaoTotal += amortizacao;
           totalDevedorTotal += totalDevedor;
           correcaoPeloIndiceTotal += correcaoPeloIndice;
@@ -541,7 +557,6 @@ export class ParceladoPreComponent implements OnInit {
         moneyValue: moneyValueTotal || 0,
         multa: multaTotal || 0,
         subtotal: subtotalTotal || 0,
-        valorPMTVincenda: valorPMTVincendaTotal || 0,
         amortizacao: amortizacaoTotal || 0,
         totalDevedor: totalDevedorTotal || 0,
         correcaoPeloIndice: correcaoPeloIndiceTotal || 0,

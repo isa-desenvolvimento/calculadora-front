@@ -278,7 +278,7 @@
 								<tr *ngFor="let row of tableData.dataRows" class="parcelado-font-size" align="center">
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.nparcelas}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<input type="date"[ngClass]="{'parcelas-vincendas': row.vincenda}"  class=" parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataCalcAmor" max="{{row.dataCalcAmor}}" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')"> </td>
+										<input type="date"[ngClass]="{'parcelas-vincendas': row.vincenda}"  class=" parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataCalcAmor" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')"> </td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<select [ngClass]="{'parcelas-vincendas': row.vincenda}" class="parcelado-font-size form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
@@ -315,7 +315,7 @@
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.moneyValue)}}</th>
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.multa)}}</th> 
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
-									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.valorPMTVincenda)}}</th>
+									<th class="footer-table" ></th>
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.amortizacao)}}</th>
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.totalDevedor)}}</th>
 									<th class="footer-table" ></th>
