@@ -306,23 +306,23 @@
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.status}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}" (click)="deleteRow(row)"><i style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i></td>
 								</tr>
-								<tr align="left" class="parcelado-font-size">
-									<th class="footer-table" colspan="7">TOTAL DE PARCELAS VENCIDAS</th>
+								<tr class="parcelado-font-size">
+									<th class="footer-table footer-title-table" colspan="7" >TOTAL DE PARCELAS VENCIDAS</th>
 									<th class="footer-table" width="100" colspan="1">{{formatCurrency(totalParcelasVencidas.valorNoVencimento)}}</th>
 									<th class="footer-table" width="100" colspan="1">{{formatCurrency(totalParcelasVencidas.correcaoPeloIndice)}}</th>
 									<th class="footer-table" ></th>
 									<th class="footer-table" ></th>
-									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.multa)}}</th>
+									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.moneyValue)}}</th>
+									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.multa)}}</th> 
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.valorPMTVincenda)}}</th>
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.amortizacao)}}</th>
-									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.moneyValue)}}</th>
 									<th class="footer-table" >{{formatCurrency(totalParcelasVencidas.totalDevedor)}}</th>
 									<th class="footer-table" ></th>
 									<th class="footer-table" ></th>
 								</tr>
 								<tr align="left" class="parcelado-font-size">
-									<th class="footer-table" colspan="7">TOTAL DE PARCELAS VINCENDAS</th>
+									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS VINCENDAS</th>
 									<th class="footer-table" width="100" colspan="1"></th>
 									<th class="footer-table" width="100" colspan="1"></th>
 									<th class="footer-table" colspan="1"></th>

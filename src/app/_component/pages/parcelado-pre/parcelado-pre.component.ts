@@ -351,6 +351,7 @@ export class ParceladoPreComponent implements OnInit {
     })
 
     setTimeout(() => {
+      this.tableDataParcelas = this.tableData;
       this.toggleUpdateLoading()
       this.alertType = 'lancamento-incluido';
       this.simularCalc(true)
@@ -454,17 +455,18 @@ export class ParceladoPreComponent implements OnInit {
         const inputExternoHonorarios = this.pre_form_riscos.pre_honorarios.value / 100;
         const inputExternoMultaSobContrato = this.pre_form_riscos.pre_multa_sobre_constrato.value / 100;
 
-
+        let indiceDV = row['indiceDV'];
+        let indiceDCA = row['indiceDCA'];
         if (!isInlineChange) {
-          row['indiceDV'] = inputExternoIndice;
-          row['indiceDCA'] = inputExternoIndice;
+          row['indiceDV'] = indiceDV = inputExternoIndice;
+          row['indiceDCA'] = indiceDCA = inputExternoIndice;
         }
 
         // Valores brutos
         const dataVencimento = moment(row["dataVencimento"]).format("YYYY-MM-DD");
         const dataCalcAmor = moment(row["dataCalcAmor"]).format("YYYY-MM-DD");
-        const indiceDataVencimento = this.getIndiceDataBase((inputExternoIndice || row['indiceDV']), row['dataVencimento']) / 100;
-        const indiceDataCalcAmor = this.getIndiceDataBase((inputExternoIndice || row['indiceDCA']), row['dataCalcAmor']) / 100;
+        const indiceDataVencimento = this.getIndiceDataBase(indiceDV, row['dataVencimento']) / 100;
+        const indiceDataCalcAmor = this.getIndiceDataBase( indiceDCA, row['dataCalcAmor']) / 100;
         const valorNoVencimento = parseFloat(row['valorNoVencimento']);
         const vincenda = dataVencimento > inputExternoDataCalculo;
         
@@ -487,7 +489,7 @@ export class ParceladoPreComponent implements OnInit {
         // Table Values
         row['encargosMonetarios']['correcaoPeloIndice'] = correcaoPeloIndice.toFixed(2);
         row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
-        row['encargosMonetarios']['jurosAm']['percentsJuros'] = porcentagem.toFixed(2) === "NaN" ? "---" : porcentagem.toFixed(2) || 0;
+        row['encargosMonetarios']['jurosAm']['percentsJuros'] = porcentagem ? porcentagem.toFixed(2) : 0;
         row['encargosMonetarios']['jurosAm']['moneyValue'] = valor.toFixed(2);
         row['encargosMonetarios']['multa'] = multa.toFixed(2);
         row['subtotal'] = subtotal.toFixed(2);
@@ -509,7 +511,6 @@ export class ParceladoPreComponent implements OnInit {
           correcaoPeloIndiceTotal += correcaoPeloIndice;
           valorNoVencimentoTotal += valorNoVencimento;
         }
-
         
         // Forms Total
         this.total_data_calculo = moment(inputExternoDataCalculo).format("DD/MM/YYYY") || this.getCurrentDate();
@@ -537,19 +538,19 @@ export class ParceladoPreComponent implements OnInit {
       });
       
       this.totalParcelasVencidas = {
-        moneyValue: moneyValueTotal,
-        multa: multaTotal,
-        subtotal: subtotalTotal,
-        valorPMTVincenda: valorPMTVincendaTotal,
-        amortizacao: amortizacaoTotal,
-        totalDevedor: totalDevedorTotal,
-        correcaoPeloIndice: correcaoPeloIndiceTotal,
-        valorNoVencimento: valorNoVencimentoTotal
+        moneyValue: moneyValueTotal || 0,
+        multa: multaTotal || 0,
+        subtotal: subtotalTotal || 0,
+        valorPMTVincenda: valorPMTVincendaTotal || 0,
+        amortizacao: amortizacaoTotal || 0,
+        totalDevedor: totalDevedorTotal || 0,
+        correcaoPeloIndice: correcaoPeloIndiceTotal || 0,
+        valorNoVencimento: valorNoVencimentoTotal || 0
       }
 
       this.totalParcelasVincendas = {
-        totalDevedor: totalDevedorTotal ,
-        valorPMTVincenda: valorPMTVincendaTotalVincendas
+        totalDevedor: totalDevedorTotalVincendas || 0,
+        valorPMTVincenda: valorPMTVincendaTotalVincendas || 0
       }
     }, 0);
     
@@ -620,14 +621,15 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   updateInlineIndice(value, row, innerDataIndice, indiceColumn ) {
-    console.log(value, row, innerDataIndice, indiceColumn);
-    
-    row[indiceColumn] = value;
-    row[innerDataIndice] = this.getIndiceDataBase(value, row[innerDataIndice]);
+    const index = this.tableData.dataRows.indexOf(row);
+    this.tableData.dataRows[index][indiceColumn] = value;
+    this.tableData.dataRows[index][innerDataIndice] = this.getIndiceDataBase(value, row[innerDataIndice]);
 
+    console.log(this.tableData);
+    
     setTimeout(() => {
      this.simularCalc(true);
-    }, 0);
+    }, 100);
   }
 
   // Mock formulário de riscos
