@@ -54,10 +54,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     formMulta: 0,
     formJuros: 0,
     formHonorarios: 0,
-    formMultaSobContrato: 0
+    formMultaSobContrato: 0,
+    formIndice: "---",
+    formIndiceEncargos: 6
   };
-
-  formIndice: String = "";
 
   constructor(
     private formBuilder: FormBuilder,
@@ -328,14 +328,18 @@ export class ChequeEmpresarialComponent implements OnInit {
         formMulta: this.ce_form_riscos.ce_multa.value || infoParaCalculo["formMulta"],
         formJuros: this.ce_form_riscos.ce_juros_mora.value || infoParaCalculo["formJuros"],
         formHonorarios: this.ce_form_riscos.ce_honorarios.value || infoParaCalculo["formHonorarios"],
-        formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"]
+        formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"],
+        formIndice: this.ce_form_riscos.ce_indice.value || infoParaCalculo["formIndice"],
+        formIndiceEncargos: this.ce_form_riscos.ce_encargos_contratuais.value || infoParaCalculo["formIndiceEncargos"]
       };
     } else {
       this.formDefaultValues = {
         formMulta: infoParaCalculo["formMulta"] || 0,
         formJuros: infoParaCalculo["formJuros"] || 0,
         formHonorarios: infoParaCalculo["formHonorarios"] || 0,
-        formMultaSobContrato: infoParaCalculo["formMultaSobContrato"] || 0
+        formMultaSobContrato: infoParaCalculo["formMultaSobContrato"] || 0,
+        formIndice: infoParaCalculo["formIndice"] || "---",
+        formIndiceEncargos: infoParaCalculo["formIndiceEncargos"] || 6
       };
     }
 
@@ -343,7 +347,6 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
-    !search && (this.formIndice = this.ce_form_riscos.ce_indice.value)
     this.changeFormValues(this.formDefaultValues, search);
     setTimeout(() => {
 

@@ -33,4 +33,6 @@ export interface InfoParaCalculo {
     formJuros: number;
     formHonorarios: number;
     formMultaSobContrato: number;
+    formIndice: string;
+    formIndiceEncargos: number;
 }
