@@ -115,7 +115,6 @@ export class ParceladoPreComponent implements OnInit {
     this.dtOptions = {
       paging: false,
       searching:false,
-
       // pagingType: 'full_numbers',
       language: {
         "decimal": "",
@@ -493,7 +492,7 @@ export class ParceladoPreComponent implements OnInit {
         const totalDevedor = subtotal - amortizacao;
         const desagio = Math.pow((inputExternoDesagio + 1), (-qtdDias/30));
         const valorPMTVincenda = valorNoVencimento * desagio;
-        const honorarios = totalDevedor * inputExternoHonorarios;
+        const honorarios = (subtotal + amortizacao) * inputExternoHonorarios;
 
         // Table Values
         if (vincenda) {
@@ -535,11 +534,7 @@ export class ParceladoPreComponent implements OnInit {
         // Forms Total
         //this.total_data_calculo = moment(inputExternoDataCalculo).format("DD/MM/YYYY") || this.getCurrentDate();
         this.total_honorarios = honorarios;
-        this.last_data_table = [...this.tableData.dataRows].pop();
-        let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataCalcAmor'] : moment(inputExternoDataCalculo).format("DD/MM/YYYY") || this.getCurrentDate();//this.total_data_calculo;
-        
-        this.total_data_calculo = this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
-        this.min_data = last_date;
+        this.total_data_calculo = this.subtotal_data_calculo = this.formatDate(inputExternoDataCalculo);
 
         this.tableLoading = false;
         if (origin === 'btn') {

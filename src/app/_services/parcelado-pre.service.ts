@@ -13,12 +13,12 @@ export class ParceladoPreService {
           id: 22,
           nparcelas: 3,
           parcelaInicial: 3,
-          dataVencimento: "2019-01-08",
+          dataVencimento: "2019-01-01",
           indiceDV: "INPC/IBGE",
           indiceDataVencimento: 69.876800,
           indiceDCA: 'INPC/IBGE',
           indiceDataCalcAmor: 71.590624,
-          dataCalcAmor: "2019-07-09",
+          dataCalcAmor: "2019-01-01",
           valorNoVencimento: 10222.38,
           encargosMonetarios: '{"correcaoPeloIndice":"1147.12","jurosAm":{"dias":1,"percentsJuros":"0.03","moneyValue":"38.62"},"multa":"2317.96"}',
           subtotal: 134,
@@ -26,7 +26,7 @@ export class ParceladoPreService {
           amortizacao: 0,
           totalDevedor: 114712.14,
           status: 'ABERTO',
-          contractRef: 1,
+          contractRef: 'SBA.132386/201614826170540 - MUTUO PRE RV',
           ultimaAtualizacao: '',
         },
         {
@@ -46,7 +46,7 @@ export class ParceladoPreService {
           amortizacao: 100,
           totalDevedor: 114712.14,
           status: 'ABERTO',
-          contractRef: 1,
+          contractRef: 'SBA.132386/201614826170540 - MUTUO PRE RV',
           ultimaAtualizacao: '',
         }]
     }
