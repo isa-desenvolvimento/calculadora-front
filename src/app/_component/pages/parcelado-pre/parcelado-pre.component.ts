@@ -237,47 +237,62 @@ export class ParceladoPreComponent implements OnInit {
     if (this.tableData.dataRows.length) {
       const preFATipo = this.pre_form_amortizacao.preFA_tipo.value;
       const preFASaldoDevedor = this.pre_form_amortizacao.preFA_saldo_devedor.value;
-      this.preFormAmortizacao.value['preFA_data_vencimento'] = this.tableData.dataRows[0]['dataCalcAmor'];
+
+      this.tableDataAmortizacao.dataRows.push(this.preFormAmortizacao.value);
 
       switch (preFATipo) {
         case 'Data do Cálculo':
+          this.preFormAmortizacao.value['preFA_data_vencimento'] = this.tableData.dataRows[0]['dataCalcAmor'];
           this.tableData.dataRows[0]['amortizacao'] = parseFloat(this.tableData.dataRows[0]['amortizacao']) +  preFASaldoDevedor;
           break;
         case 'Data Diferenciada':
-          this.tableDataAmortizacao.dataRows.map((amorti, key) => {
-            const row = this.tableData.dataRows[key];
-            if (key <= this.tableData.dataRows.length) {
-              if (row['valorNoVencimento'] > amorti['preFA_saldo_devedor']) {
-                const qtdDias = this.getQtdDias(row['dataCalcAmor'], amorti['preFA_data_vencimento']);
-                const newParcela =  {
-                  ...row, 
-                  nparcelas: `${row['nparcelas']}.1`,
-                  amortizacao: NaN,
-                  dataCalcAmor: amorti['preFA_data_vencimento'],
-                  dataVencimento: row['dataCalcAmor'] ,
-                  valorNoVencimento: row['valorNoVencimento'] - amorti['preFA_saldo_devedor'],
-                  encargosMonetarios: {...row['encargosMonetarios'], jurosAm: {...row['encargosMonetarios']['jurosAm'], dias: qtdDias}},
-                  amortizacaoDataDiferenciada: true
-                };
+          this.tableDataAmortizacao.dataRows.map((amorti) => {
+            this.tableData.dataRows.map((row, key) => {
 
-                this.tableData.dataRows.splice(key + 1 ,0, newParcela);
-                this.tableData.dataRows[key] = {
-                  ...row, 
-                  amortizacao: amorti['preFA_saldo_devedor'],
-                  //dataCalcAmor: row['dataVencimento']
-                }
+              if (row['amortizacaoDataDiferenciada'] || row['amortizacaoDataDiferenciadaIncluida']) {
+                amorti['amortizacaoDataDiferenciadaIncluida'] = true;
+                return;
               }
-            }
+
+              switch (!amorti['amortizacaoDataDiferenciadaIncluida']) {
+                case (row['valorNoVencimento'] > amorti['preFA_saldo_devedor']):
+                  const qtdDias = this.getQtdDias(row['dataCalcAmor'], amorti['preFA_data_vencimento']);
+                  const newParcela =  {
+                    ...row, 
+                    nparcelas: `${row['nparcelas']}.1`,
+                    amortizacao: "0.00",
+                    dataCalcAmor: amorti['preFA_data_vencimento'],
+                    dataVencimento: row['dataCalcAmor'] ,
+                    valorNoVencimento: row['valorNoVencimento'] - amorti['preFA_saldo_devedor'],
+                    encargosMonetarios: {...row['encargosMonetarios'], jurosAm: {...row['encargosMonetarios']['jurosAm'], dias: qtdDias}},
+                    amortizacaoDataDiferenciada: true
+                  };
+  
+                  this.tableData.dataRows.splice(key + 1 ,0, newParcela);
+                  row['amortizacao'] = amorti['preFA_saldo_devedor'];
+                  row['amortizacaoDataDiferenciadaIncluida'] = true;
+                  break;
+  
+                case (row['valorNoVencimento'] < amorti['preFA_saldo_devedor']):
+                  const diferenca = parseFloat(amorti['preFA_saldo_devedor']) - parseFloat(row['valorNoVencimento']);
+                  row['amortizacao'] = amorti['preFA_saldo_devedor'];
+                  if((key+1) < this.tableData.dataRows.length)  this.tableData.dataRows[key + 1]['amortizacao'] = diferenca;
+                  break;
+              
+                default:
+                  row['amortizacao'] = amorti['preFA_saldo_devedor'];
+                  break;
+              }
+            })
           });
           break;
         case 'Final':
+          this.preFormAmortizacao.value['preFA_data_vencimento'] = this.tableData.dataRows[0]['dataCalcAmor'];
           this.amortizacaoGeral += preFASaldoDevedor;
           break;
         default:
           break;
       }
-
-    this.tableDataAmortizacao.dataRows.push(this.preFormAmortizacao.value);
 
       setTimeout(() => {
         this.preFormAmortizacao.reset();
