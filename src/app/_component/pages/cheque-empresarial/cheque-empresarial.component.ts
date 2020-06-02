@@ -369,7 +369,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.ce_form_riscos.ce_indice.value && (row['indiceDB'] = this.ce_form_riscos.ce_indice.value);
           this.ce_form_riscos.ce_indice.value && (row['indiceBA'] = this.ce_form_riscos.ce_indice.value);
 
-          this.ce_form_riscos.ce_indice.value && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value, row['dataBaseAtual']));
+          this.ce_form_riscos.ce_indice.value && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value, row['indiceDataBase']));
           this.ce_form_riscos.ce_indice.value && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value, row['dataBaseAtual']));
 
           this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" && this.ce_form_riscos.ce_encargos_contratuais && (row['indiceDataBaseAtual'] = this.ce_form_riscos.ce_encargos_contratuais.value);
@@ -481,9 +481,9 @@ export class ChequeEmpresarialComponent implements OnInit {
     }
   }
 
-  updateInlineIndice(e, row, innerIndice, indiceToChangeInline) {
+  updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
     row[innerIndice] = e.target.value;
-    row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value, row["dataBaseAtual"]);
+    row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value, row[columnData]);
 
     setTimeout(() => {
       this.simularCalc(true);

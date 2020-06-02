@@ -578,6 +578,9 @@ export class ParceladoPreComponent implements OnInit {
     return parseFloat(this.indipre_field.filter(ind => ind.type === indice).map(ind => {
       let date = moment(indiceDataCalcAmor).format("DD/MM/YYYY");
 
+      console.log(date, this.datasINPC[date]);
+      
+
       switch (ind.type) {
         case "INPC/IBGE":
           return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;

@@ -326,7 +326,7 @@
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px" class="form-control custom-select"
                                             name="ce_indiceDB" id="ce_indiceDB"
-                                            (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase')">
+                                            (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase', 'dataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="indice.type === row.indiceDB">
                                                 {{indice.type}}</option>
@@ -344,7 +344,7 @@
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px" class="form-control custom-select"
                                             name="ce_indice" id="ce_indice"
-                                            (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual')">
+                                            (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual', 'dataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="indice.type === row.indiceBA">
                                                 {{indice.type}}</option>
