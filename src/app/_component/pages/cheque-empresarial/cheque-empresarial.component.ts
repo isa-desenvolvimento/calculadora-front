@@ -99,6 +99,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     this.dtOptions = {
       paging: false,
+      searching:false,
       // pagingType: 'full_numbers',
       language: {
         "decimal": "",
