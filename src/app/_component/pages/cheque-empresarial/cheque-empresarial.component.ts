@@ -379,10 +379,10 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" || row["indiceDataBaseAtual"] === 6) {
+        if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %"  || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %" ) {
           row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
         } else {
-          row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : (((valorDevedor / row['indiceDataBase']) * (row['indiceDataBaseAtual'] / 100)) * qtdDias).toFixed(2);
+          row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor / (row['indiceDataBase']/100) * (row['indiceDataBaseAtual'] / 100)) - valorDevedor).toFixed(2);
         }
 
         // -- dias
