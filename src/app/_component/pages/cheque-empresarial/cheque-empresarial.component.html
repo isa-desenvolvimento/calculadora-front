@@ -35,7 +35,7 @@
                             <div class="col-sm-3">
                                 <label for="ce_pasta" class="col-form-label">Pasta</label>
                                 <select class="form-control custom-select col-md-12 col-sm-12" name="ce_pasta"
-                                    id="ce_pasta" formControlName="ce_pasta">
+                                    id="ce_pasta" formControlName="ce_pasta"  (change)="setContrato()">
                                     <option *ngFor="let folder of folderData_field" [value]="folder">
                                         {{folder}}</option>
                                 </select>
@@ -43,9 +43,9 @@
                             <div class="col-sm-3">
                                 <label for="ce_contrato" class="col-form-label">Contrato</label>
                                 <select class="form-control custom-select col-md-12 col-sm-12" name="ce_contrato"
-                                    id="ce_contrato" formControlName="ce_contrato" required>
-                                    <option *ngFor="let contract of contractList_field" [value]="contract.id">
-                                        {{contract.title}}</option>
+                                    id="ce_contrato" formControlName="ce_contrato" required (change)="setTypeContract()">
+                                    <option *ngFor="let contract of contractList_field" [value]="contract">
+                                        {{contract}}</option>
                                 </select>
                             </div>
                             <div class="col-sm-3">

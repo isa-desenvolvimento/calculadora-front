@@ -4,6 +4,7 @@ import { Lancamento, InfoParaCalculo } from '../../../_models/ChequeEmpresarial'
 import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
 
 import { IndicesService } from '../../../_services/indices.service';
+import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
@@ -63,6 +64,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
     private indicesService: IndicesService,
+    private pastasContratosService : PastasContratosService
   ) {
   }
 
@@ -70,9 +72,9 @@ export class ChequeEmpresarialComponent implements OnInit {
     // this.pesquisarContratos();
 
     this.ceForm = this.formBuilder.group({
-      ce_pasta: [],
+      ce_pasta: ['', Validators.required],
       ce_contrato: ['', Validators.required],
-      ce_tipo_contrato: []
+      ce_tipo_contrato: ['', Validators.required]
     });
     this.ceFormRiscos = this.formBuilder.group({
       ce_indice: [],
@@ -205,6 +207,8 @@ export class ChequeEmpresarialComponent implements OnInit {
   incluirLancamentos() {
     this.tableLoading = true;
 
+    const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value +  this.ce_form.ce_tipo_contrato.value;
+
     const localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[this.getLastLine()]["dataBaseAtual"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[this.getLastLine()]["valorDevedorAtualizado"];
 
@@ -250,7 +254,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         lancamentos: localLancamentos,
         tipoLancamento: localTipoLancamento,
         valorDevedorAtualizado: null,
-        contractRef: this.ce_form.ce_contrato.value || 0,
+        contractRef: contractRef,
         ultimaAtualizacao: '',
         infoParaCalculo: { ...localInfoParaCalculo }
       });
@@ -273,8 +277,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ultima_atualizacao = '';
     this.ceFormRiscos.reset({ce_data_calculo: this.getCurrentDate('YYYY-MM-DD')});
 
+    const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value +  this.ce_form.ce_tipo_contrato.value;
+
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
-      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
+      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === contractRef).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
         cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
 
@@ -492,35 +498,43 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   // Mock formulário de riscos
-  // Consulta 
+  folderData_field = this.agruparPasta();
 
-  folderData_field = [1, 2, 3, 5, 6, 7, 8, 9, 10];
+  agruparPasta() {
+    let pastasFiltros = [];
 
-  contractList_field = [{
-    title: "AA",
-    id: "0",
-    fodlerRef: "1",
-  }, {
-    title: "BB",
-    id: "1",
-    fodlerRef: "1",
-  }, {
-    title: "CC",
-    id: "2",
-    fodlerRef: "2",
-  },
-  {
-    title: "DD",
-    id: "3",
-    fodlerRef: "3",
-  },
-  {
-    title: "EE",
-    id: "4",
-    fodlerRef: "1",
-  }];
+    this.pastas['data'].map(pasta => pastasFiltros.push(pasta.PASTA));
+    const setUnico = new Set(pastasFiltros);
 
-  typeContractList_field = ["Cheque empresarial", "Parcelado", "Pós"];
+    return [...setUnico];
+  }
+
+  contractList_field = [];
+  setContrato() {
+    this.pastas['data'].map(pasta=> {
+      if (pasta.PASTA === this.ce_form.ce_pasta.value) {
+        this.contractList_field.push(pasta.CONTRATO);
+      }
+    });
+
+    const setUnico = new Set(this.contractList_field);
+    this.contractList_field = [...setUnico];
+  }
+  
+  typeContractList_field = [];
+  setTypeContract() {
+    this.pastas['data'].map(pasta=> {
+      if (pasta.PASTA === this.ce_form.ce_pasta.value && pasta.CONTRATO === this.ce_form.ce_contrato.value) {
+        this.typeContractList_field.push(pasta.DESCRICAO);
+      }
+    });
+
+    console.log(this.typeContractList_field);
+    
+
+    const setUnico = new Set(this.typeContractList_field);
+    this.typeContractList_field = [...setUnico];
+  }
 
   indice_field = [{
     type: "---",
@@ -552,5 +566,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   get datasINPC() {
     return this.indicesService.getINPC();
   };
-
+  get pastas() {
+    return this.pastasContratosService.getPastas();
+  }
 }

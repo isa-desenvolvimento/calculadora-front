@@ -4,10 +4,12 @@ import { Lancamento } from '../../../_models/ChequeEmpresarial';
 import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 
 import { IndicesService } from '../../../_services/indices.service';
+import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
 import { timeout } from 'rxjs/operators';
+import { logging } from 'protractor';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -63,16 +65,15 @@ export class ParceladoPreComponent implements OnInit {
     private formBuilder: FormBuilder,
     private parceladoPre: ParceladoPreService,
     private indicesService: IndicesService,
+    private pastasContratosService : PastasContratosService
   ) {
   }
 
   ngOnInit() {
-    // this.pesquisarContratos();
-
     this.preForm = this.formBuilder.group({
-      pre_pasta: [],
+      pre_pasta: ['', Validators.required],
       pre_contrato: ['', Validators.required],
-      pre_tipo_contrato: []
+      pre_tipo_contrato: ['', Validators.required],
     });
     this.preFormRiscos = this.formBuilder.group({
       pre_indice: [],
@@ -287,7 +288,6 @@ export class ParceladoPreComponent implements OnInit {
           });
           break;
         case 'Final':
-          this.preFormAmortizacao.value['preFA_data_vencimento'] = this.tableData.dataRows[0]['dataCalcAmor'];
           this.amortizacaoGeral += preFASaldoDevedor;
           break;
         default:
@@ -379,9 +379,12 @@ export class ParceladoPreComponent implements OnInit {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
     this.tableDataParcelas.dataRows = [];
+
     this.preFormRiscos.reset({pre_data_calculo: this.getCurrentDate('YYYY-MM-DD')});
 
-    this.tableData.dataRows =  this.parceladoPre.getAll().filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(parcela => {
+    const contractRef = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value +  this.pre_form.pre_tipo_contrato.value;
+
+    this.tableData.dataRows =  this.parceladoPre.getAll().filter((row) => row["contractRef"] === contractRef).map(parcela => {
       parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios);
       this.ultima_atualizacao = moment(parcela.ultimaAtualizacao).format('YYYY-MM-DD');
 
@@ -578,9 +581,6 @@ export class ParceladoPreComponent implements OnInit {
     return parseFloat(this.indipre_field.filter(ind => ind.type === indice).map(ind => {
       let date = moment(indiceDataCalcAmor).format("DD/MM/YYYY");
 
-      console.log(date, this.datasINPC[date]);
-      
-
       switch (ind.type) {
         case "INPC/IBGE":
           return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
@@ -672,35 +672,43 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   // Mock formulário de riscos
-  // Consulta 
+  folderData_field = this.agruparPasta();
 
-  folderData_field = [1, 2, 3, 5, 6, 7, 8, 9, 10];
+  agruparPasta() {
+    let pastasFiltros = [];
+
+    this.pastas['data'].map(pasta => pastasFiltros.push(pasta.PASTA));
+    const setUnico = new Set(pastasFiltros);
+
+    return [...setUnico];
+  }
+
+  contractList_field = [];
+  setContrato() {
+    this.pastas['data'].map(pasta=> {
+      if (pasta.PASTA === this.pre_form.pre_pasta.value) {
+        this.contractList_field.push(pasta.CONTRATO);
+      }
+    });
+
+    const setUnico = new Set(this.contractList_field);
+    this.contractList_field = [...setUnico];
+  }
   
-  contractList_field = [{
-    title: "AA",
-    id: "0",
-    fodlerRef: "1",
-  }, {
-    title: "BB",
-    id: "1",
-    fodlerRef: "1",
-  }, {
-    title: "CC",
-    id: "2",
-    fodlerRef: "2",
-  },
-  {
-    title: "DD",
-    id: "3",
-    fodlerRef: "3",
-  },
-  {
-    title: "EE",
-    id: "4",
-    fodlerRef: "1",
-  }];
+  typeContractList_field = [];
+  setTypeContract() {
+    this.pastas['data'].map(pasta=> {
+      if (pasta.PASTA === this.pre_form.pre_pasta.value && pasta.CONTRATO === this.pre_form.pre_contrato.value) {
+        this.typeContractList_field.push(pasta.DESCRICAO);
+      }
+    });
 
-  typeContractList_field = ["Cheque empresarial", "Parcelado", "Pós"];
+    console.log(this.typeContractList_field);
+    
+
+    const setUnico = new Set(this.typeContractList_field);
+    this.typeContractList_field = [...setUnico];
+  }
 
   indipre_field = [{
     type: "---",
@@ -755,5 +763,7 @@ export class ParceladoPreComponent implements OnInit {
   get datasINPC() {
     return this.indicesService.getINPC();
   };
-
+  get pastas() {
+    return this.pastasContratosService.getPastas();
+  }
 }
