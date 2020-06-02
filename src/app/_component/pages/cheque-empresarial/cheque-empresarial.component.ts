@@ -270,6 +270,8 @@ export class ChequeEmpresarialComponent implements OnInit {
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
+    this.ceFormRiscos.reset({ce_data_calculo: this.getCurrentDate('YYYY-MM-DD')});
+
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === parseInt(this.ce_form.ce_contrato.value || 0)).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
