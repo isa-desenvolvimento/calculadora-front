@@ -685,6 +685,9 @@ export class ParceladoPreComponent implements OnInit {
 
   contractList_field = [];
   setContrato() {
+    this.contractList_field = [];
+    this.typeContractList_field = [];
+
     this.pastas['data'].map(pasta=> {
       if (pasta.PASTA === this.pre_form.pre_pasta.value) {
         this.contractList_field.push(pasta.CONTRATO);

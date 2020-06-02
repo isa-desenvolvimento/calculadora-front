@@ -531,9 +531,6 @@ export class ChequeEmpresarialComponent implements OnInit {
       }
     });
 
-    console.log(this.typeContractList_field);
-    
-
     const setUnico = new Set(this.typeContractList_field);
     this.typeContractList_field = [...setUnico];
   }
