@@ -233,26 +233,19 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   adicionarAmortizacao() {
-    this.tableDataAmortizacao.dataRows.push(this.preFormAmortizacao.value);
 
     if (this.tableData.dataRows.length) {
-      this.amortizacaoGeral = 0;
-      this.tableDataAmortizacao.dataRows.map((amorti, key) => {
-        const row = this.tableData.dataRows[key];
-       
-        switch (this.pre_form_amortizacao.preFA_tipo.value) {
-          case 'Data Atual':
-            amorti['preFA_data_vencimento'] = row['dataCalcAmor'];
+      const preFATipo = this.pre_form_amortizacao.preFA_tipo.value;
+      const preFASaldoDevedor = this.pre_form_amortizacao.preFA_saldo_devedor.value;
+      this.preFormAmortizacao.value['preFA_data_vencimento'] = this.tableData.dataRows[0]['dataCalcAmor'];
 
-            if (key <= this.tableData.dataRows.length) {
-              this.tableData.dataRows[key] = {
-                ...this.tableData.dataRows[key], 
-                amortizacao: amorti['preFA_saldo_devedor'],
-                dataCalcAmor:amorti['preFA_data_vencimento']
-              }
-            }
-            break;
-          case 'Data Diferenciada':
+      switch (preFATipo) {
+        case 'Data do Cálculo':
+          this.tableData.dataRows[0]['amortizacao'] = parseFloat(this.tableData.dataRows[0]['amortizacao']) +  preFASaldoDevedor;
+          break;
+        case 'Data Diferenciada':
+          this.tableDataAmortizacao.dataRows.map((amorti, key) => {
+            const row = this.tableData.dataRows[key];
             if (key <= this.tableData.dataRows.length) {
               if (row['valorNoVencimento'] > amorti['preFA_saldo_devedor']) {
                 const qtdDias = this.getQtdDias(row['dataCalcAmor'], amorti['preFA_data_vencimento']);
@@ -275,15 +268,16 @@ export class ParceladoPreComponent implements OnInit {
                 }
               }
             }
-            break;
-          case 'Final':
-            amorti['preFA_data_vencimento'] = row['dataCalcAmor'];
-            this.amortizacaoGeral += amorti['preFA_saldo_devedor'];
-            break;
-          default:
-            break;
-        }
-      });
+          });
+          break;
+        case 'Final':
+          this.amortizacaoGeral += preFASaldoDevedor;
+          break;
+        default:
+          break;
+      }
+
+    this.tableDataAmortizacao.dataRows.push(this.preFormAmortizacao.value);
 
       setTimeout(() => {
         this.preFormAmortizacao.reset();
@@ -478,7 +472,7 @@ export class ParceladoPreComponent implements OnInit {
         const valor = (valorNoVencimento + correcaoPeloIndice) * porcentagem;
         const multa = row['amortizacaoDataDiferenciada'] ? 0 : (valorNoVencimento + correcaoPeloIndice + valor) * inputExternoMulta;
         const subtotal = valorNoVencimento + correcaoPeloIndice + valor + multa;
-        const totalDevedor = subtotal + amortizacao;
+        const totalDevedor = subtotal - amortizacao;
         const desagio = Math.pow((inputExternoDesagio + 1), (-qtdDias/30));
         const valorPMTVincenda = valorNoVencimento * desagio;
         const honorarios = totalDevedor * inputExternoHonorarios;
@@ -496,7 +490,7 @@ export class ParceladoPreComponent implements OnInit {
           row['totalDevedor'] = valorPMTVincenda.toFixed(2);
 
           valorPMTVincendaTotalVincendas += valorPMTVincenda;
-          totalDevedorTotalVincendas += totalDevedor;
+          totalDevedorTotalVincendas += valorPMTVincenda;
 
         } else {
           row['encargosMonetarios']['correcaoPeloIndice'] = correcaoPeloIndice.toFixed(2);
@@ -536,11 +530,10 @@ export class ParceladoPreComponent implements OnInit {
         }
 
         if (this.tableData.dataRows.length > 0) {
-          this.total_subtotal = this.last_data_table['totalDevedor'];
-          const valorDevedorAtualizado = parseFloat(this.last_data_table['totalDevedor']);
+          this.total_subtotal = totalDevedorTotalVincendas + totalDevedorTotal;
 
-          this.pre_form_riscos.pre_multa_sobre_constrato && (this.total_multa_sob_contrato = (valorDevedorAtualizado + honorarios) * inputExternoMultaSobContrato) || 0;
-          this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizado - this.amortizacaoGeral;
+          this.pre_form_riscos.pre_multa_sobre_constrato && (this.total_multa_sob_contrato = ( this.total_subtotal + honorarios) * inputExternoMultaSobContrato) || 0;
+          this.total_grandtotal = this.total_multa_sob_contrato + honorarios +  this.total_subtotal - this.amortizacaoGeral;
         }
         
         return parseFloat(row['totalDevedor']);
@@ -624,7 +617,7 @@ export class ParceladoPreComponent implements OnInit {
     const index = this.tableDataAmortizacao.dataRows.indexOf(row);
 
     switch (row['preFA_tipo']) {
-      case 'Data Atual':
+      case 'Data do Cálculo':
         this.tableData.dataRows[index]['amortizacao'] = 0;
         console.log(this.tableData.dataRows[index]);
         
@@ -721,7 +714,7 @@ export class ParceladoPreComponent implements OnInit {
   }]
 
   amortizacao_field = [{
-    type: "Data Atual",
+    type: "Data do Cálculo",
     value: "1"
   },
   {

@@ -225,7 +225,7 @@
 						<table [dtOptions]="dtOptions" datatable class="table table-hover" >
 							<thead>
 								<tr align="center">
-									<th>Data Vencimento</th>
+									<th>Data de Laçamento</th>
 									<th>Valor</th>
 									<th>Tipo</th>
 									<th>Ações</th>
@@ -358,11 +358,11 @@
 					<div class="card-footer" *ngIf="tableData.dataRows.length > 0 && !tableLoading">
 						<div class="row">
 							<div class="col-md-10">
-								<p>Subtotal apurado em {{ subtotal_data_calculo || "---------"}}</p>
+								<p>Subtotal Devedor em {{ subtotal_data_calculo || "---------"}}</p>
 								<p>Amortização</p>
 								<p>Honorários {{pre_form_riscos.pre_honorarios.value || 0}}%</p>
 								<p>Multa sob contrato {{pre_form_riscos.pre_multa_sobre_constrato.value || 0}}%</p>
-								<p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
+								<p>TOTAL SALDO DEVEDOR EM {{total_data_calculo || "---------"}}</p>
 							</div>
 							<div class="col-md-2">
 								<p>{{formatCurrency(total_subtotal || 0)}}</p>
