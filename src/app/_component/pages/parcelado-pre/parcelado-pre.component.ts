@@ -425,7 +425,7 @@ export class ParceladoPreComponent implements OnInit {
     row[data] = moment(e.target.value).format("YYYY-MM-DD");
     const indice = this.pre_form_riscos.pre_indice.value || row[tipoIndiceValue];
 
-    this.updateInlineIndice(indice, row, tipoIndice, tipoIndiceValue);
+    this.updateInlineIndice(indice, row, tipoIndice, tipoIndiceValue, data);
   }
 
   formatDate(date) {
@@ -658,10 +658,11 @@ export class ParceladoPreComponent implements OnInit {
     }, 0)
   }
 
-  updateInlineIndice(value, row, innerDataIndice, indiceColumn ) {
+  updateInlineIndice(value, row, innerDataIndice, indiceColumn, columnData ) {
     const index = this.tableData.dataRows.indexOf(row);
+
     this.tableData.dataRows[index][indiceColumn] = value;
-    this.tableData.dataRows[index][innerDataIndice] = this.getIndiceDataBase(value, row[innerDataIndice]);
+    this.tableData.dataRows[index][innerDataIndice] = this.getIndiceDataBase(value, row[columnData]);
 
     console.log(this.tableData);
     

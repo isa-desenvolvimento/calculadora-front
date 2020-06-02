@@ -293,7 +293,7 @@
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<input type="date"[ngClass]="{'parcelas-vincendas': row.vincenda}"  class=" parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataVencimento" id="pre_dataCalcAmor" [value]="row.dataVencimento" (change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')"> </td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<select [ngClass]="{'parcelas-vincendas': row.vincenda}" class="parcelado-font-size form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV')">
+										<select [ngClass]="{'parcelas-vincendas': row.vincenda}" class="parcelado-font-size form-control custom-select" name="pre_indiceDV" id="pre_indiceDV" (change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV', 'dataVencimento')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
 										</select>
 									</td>
@@ -301,7 +301,7 @@
 									<td width="120" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<input [ngClass]="{'parcelas-vincendas': row.vincenda}" type="date" class="parcelado-font-size form-control col-md-11 col-sm-12" name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31" [value]="row.dataCalcAmor" (change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')"> </td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<select [ngClass]="{'parcelas-vincendas': row.vincenda}" class="parcelado-font-size form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA')">
+										<select [ngClass]="{'parcelas-vincendas': row.vincenda}" class="parcelado-font-size form-control custom-select" name="pre_indice" id="pre_indice" (change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA', 'dataCalcAmor')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type" [selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
 										</select>
 									</td>
