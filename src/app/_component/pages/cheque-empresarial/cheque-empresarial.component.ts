@@ -511,6 +511,8 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   contractList_field = [];
   setContrato() {
+    this.contractList_field = [];
+    this.typeContractList_field = [];
     this.pastas['data'].map(pasta=> {
       if (pasta.PASTA === this.ce_form.ce_pasta.value) {
         this.contractList_field.push(pasta.CONTRATO);
