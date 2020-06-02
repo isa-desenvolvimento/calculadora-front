@@ -140,7 +140,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       lancamentoLocal['infoParaCalculo'] = JSON.stringify(this.formDefaultValues);
       lancamentoLocal['valorDevedor'] = parseFloat(lancamentoLocal['valorDevedor']);
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
-      lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
+      lancamentoLocal['contractRef'] = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value +  this.ce_form.ce_tipo_contrato.value;
       lancamentoLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
 
       if (lancamentoLocal["id"]) {
