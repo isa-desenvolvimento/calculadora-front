@@ -488,6 +488,7 @@ export class ParceladoPreComponent implements OnInit {
           row['valorPMTVincenda'] = valorPMTVincenda.toFixed(2);
           row['amortizacao'] =  amortizacao.toFixed(2);
           row['totalDevedor'] = valorPMTVincenda.toFixed(2);
+          row['vincenda'] = true;
 
           valorPMTVincendaTotalVincendas += valorPMTVincenda;
           totalDevedorTotalVincendas += valorPMTVincenda;
@@ -502,7 +503,6 @@ export class ParceladoPreComponent implements OnInit {
           row['valorPMTVincenda'] = this.setCampoSemAlteracao();
           row['amortizacao'] = amortizacao.toFixed(2);
           row['totalDevedor'] = totalDevedor.toFixed(2);
-          row['vincenda'] = vincenda;
           row['desagio'] = desagio;
 
           moneyValueTotal += valor;
