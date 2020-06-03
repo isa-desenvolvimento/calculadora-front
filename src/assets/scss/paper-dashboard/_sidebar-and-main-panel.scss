@@ -11,28 +11,28 @@
 
 .sidebar-minimizar {
     width: 85px;
+    transition: 0.5s;
 
     .sidebar-title {
-        display: none;
-    }
-    .sidebar-icon {
-        padding-bottom: 30px;
-    }
-    .sidebar-username {
         color: white;
+        transition: 0.5s;
+        white-space: nowrap;
     }
 }
 
 .main-maximizar {
     width: calc(100% - 85px) !important;
+    transition: 0.5s;
 }
 
 .main-minimizar {
     width: calc(100% - 250px) !important;
+    
 }
 
 .sidebar-maximizar{
     width: 250px;
+    transition: 0.5s;
 
     .sidebar-title {
         display: block;
