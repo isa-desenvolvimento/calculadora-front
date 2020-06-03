@@ -10,28 +10,29 @@
 }
 
 .sidebar-minimizar {
-    width: 85px;
+    width: $sidebar-mini-width;
     transition: 0.5s;
 
     .sidebar-title {
         color: white;
         transition: 0.5s;
         white-space: nowrap;
+        font-size: 12px;
     }
 }
 
 .main-maximizar {
-    width: calc(100% - 85px) !important;
+    width: $main-painel-max;
     transition: 0.5s;
 }
 
 .main-minimizar {
-    width: calc(100% - 250px) !important;
+    width: $main-painel;
     
 }
 
 .sidebar-maximizar{
-    width: 250px;
+    width: $sidebar-width;
     transition: 0.5s;
 
     .sidebar-title {
@@ -40,6 +41,19 @@
 
     .sidebar-icon {
         padding-bottom: 0px;
+    }
+}
+
+@media only screen and (max-width: 990px) {
+    .sidebar-minimizar {
+        width: $sidebar-mini-width;
+        transition: 0.5s;
+    
+        .sidebar-title {
+            transition: 0.5s;
+            color: #66615B;
+            font-size: 0.4rem;
+        }
     }
 }
 
@@ -329,7 +343,6 @@
 .main-panel{
     position: relative;
     float: right;
-    width: $sidebar-width;
     background-color: #f4f3ef;;
 
 
