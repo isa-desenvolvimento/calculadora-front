@@ -284,6 +284,13 @@ export class ChequeEmpresarialComponent implements OnInit {
     const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value +  this.ce_form.ce_tipo_contrato.value;
 
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
+      if (!chequeEmpresarialList.length) {
+          this.toggleUpdateLoading();
+          this.tableLoading = false;
+          this.alertType = 'sem-registros'
+          return;
+      }
+      
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === contractRef).map(cheque => {
         if (Object.values(cheque).length) {
           cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
