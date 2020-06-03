@@ -248,6 +248,7 @@ export class ParceladoPreComponent implements OnInit {
           const row = this.tableData.dataRows[0];
           const index = this.tableDataAmortizacao.dataRows.length -1;
           const amorti = this.tableDataAmortizacao.dataRows[index];
+          this.preFormAmortizacao.value['preFA_data_vencimento'] = row['dataCalcAmor'];
           
           if (row['totalDevedor'] == preFASaldoDevedor) {
 
@@ -262,7 +263,6 @@ export class ParceladoPreComponent implements OnInit {
             this.tableData.dataRows.splice(0, 1);
 
           } else {
-            this.preFormAmortizacao.value['preFA_data_vencimento'] = row['dataCalcAmor'];
             row['amortizacao'] = parseFloat(row['amortizacao']) +  preFASaldoDevedor;
           }
           break;
@@ -665,8 +665,8 @@ export class ParceladoPreComponent implements OnInit {
       tableData.splice(rowtableData['index'] ,0, rowtableData);
       index = rowtableData['index'];
       tableData[index]['status'] = "Aberto";
-      //tableData[index]['amortizacao'] -= amortizacao['preFA_saldo_devedor']; 
-      tableData[index]['amortizacao'] = 0;
+      tableData[index]['amortizacao'] = tableData[index]['totalDevedor'] - amortizacao['preFA_saldo_devedor']; 
+      //tableData[index]['amortizacao'] = 0;
       this.pagas.splice(amortizacao['pagoIndex'], 1);
 
     } else {
