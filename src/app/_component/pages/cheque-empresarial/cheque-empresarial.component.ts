@@ -166,7 +166,11 @@ export class ChequeEmpresarialComponent implements OnInit {
           }
           lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
         }, err => {
-          this.errorMessage = "Falha ao atualizar risco.";
+          this.tableLoading = false;
+          this.alertType = 'registro-nao-incluido';
+          this.toggleUpdateLoading()
+
+          this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
         });
 
       }
@@ -281,24 +285,33 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === contractRef).map(cheque => {
-        cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
-        cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
-
-        if (chequeEmpresarialList.length) {
-          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
-          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        if (Object.values(cheque).length) {
+          cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+          cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
+  
+          if (chequeEmpresarialList.length) {
+            const ultimaAtualizacao = [...chequeEmpresarialList].pop();
+            this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+          }
+  
+          setTimeout(() => {
+  
+            this.changeFormValues(cheque.infoParaCalculo, true);
+            this.simularCalc(true, null, true);
+          }, 1000);
+  
+          return cheque;
+        } else {
+          this.toggleUpdateLoading()
+          this.alertType = 'sem-registros';
         }
-
-        setTimeout(() => {
-
-          this.changeFormValues(cheque.infoParaCalculo, true);
-          this.simularCalc(true, null, true);
-        }, 1000);
-
-        return cheque;
       });
       this.tableLoading = false;
     }, err => {
+
+      this.tableLoading = false;
+      this.alertType = 'sem-registros';
+      this.toggleUpdateLoading()
       this.errorMessage = err.error.message;
     });
 
