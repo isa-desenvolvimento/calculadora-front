@@ -30,4 +30,17 @@ export class AdminLayoutComponent implements OnInit {
 	logout(){
 		this.authService.logout();
   }
+
+
+  toggleSidebar() {
+	document.getElementById("sidebar-wrapper").classList.toggle('sidebar-maximizar');
+	document.getElementById("sidebar-wrapper").classList.toggle('sidebar-minimizar');
+
+	document.getElementById("main-panel").classList.toggle('main-minimizar');
+	document.getElementById("main-panel").classList.toggle('main-maximizar');
+
+	document.querySelectorAll(".sidebar-title").forEach(element => element.classList.toggle('sidebar-maximizar'));
+	document.querySelectorAll(".sidebar-title").forEach(element => element.classList.toggle('sidebar-minimizar'));
+
+  }
 }

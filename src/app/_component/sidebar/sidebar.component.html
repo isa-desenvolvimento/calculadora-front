@@ -1,20 +1,20 @@
 
-<div class="sidebar-wrapper">
+<div class="sidebar-wrapper " >
   <div class="logo">
     <a href="#" class="simple-text logo-mini">
       <div class="logo-image-small">
         <img src="assets/img/angular2-logo.png">
       </div>
     </a>
-    <a href="#" class="simple-text logo-normal">
-      {{username}}
+    <a href="#" class="simple-text logo-normal" >
+      <span class="sidebar-username">{{username}}</span>
     </a>
   </div>
     <ul class="nav">
-        <li *ngFor="let menuItem of menuItems" routerLinkActive="active" class="{{menuItem.class}}">
+        <li *ngFor="let menuItem of menuItems" routerLinkActive="active" class="{{menuItem.class}}  sidebar-icon">
             <a [routerLink]="[menuItem.path]">
                 <i class="nc-icon {{menuItem.icon}}"></i>
-                <p>{{menuItem.title}}</p>
+                <p class="sidebar-title">{{menuItem.title}}</p>
             </a>
         </li>
     </ul>

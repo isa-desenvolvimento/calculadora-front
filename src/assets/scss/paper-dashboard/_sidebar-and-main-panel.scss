@@ -9,22 +9,57 @@
     }
 }
 
+.sidebar-minimizar {
+    width: 85px;
+
+    .sidebar-title {
+        display: none;
+    }
+    .sidebar-icon {
+        padding-bottom: 30px;
+    }
+    .sidebar-username {
+        color: white;
+    }
+}
+
+.main-maximizar {
+    width: calc(100% - 85px) !important;
+}
+
+.main-minimizar {
+    width: calc(100% - 250px) !important;
+}
+
+.sidebar-maximizar{
+    width: 250px;
+
+    .sidebar-title {
+        display: block;
+    }
+
+    .sidebar-icon {
+        padding-bottom: 0px;
+    }
+}
+
 .sidebar,
 .off-canvas-sidebar{
     position: fixed;
     top: 0;
     height: 100%;
     bottom: 0;
-    width: 160px;
     left: 0;
     z-index: 1030;
     border-right: 1px solid #ddd;
+
+
 
     .sidebar-wrapper{
         position: relative;
         height: calc(100vh - 75px);
         overflow: auto;
-        width: 160px;
+        width:100%;
         z-index: 4;
         padding-bottom: 100px;
 
