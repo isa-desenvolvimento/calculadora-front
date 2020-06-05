@@ -64,7 +64,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
     private indicesService: IndicesService,
-    private pastasContratosService : PastasContratosService
+    private pastasContratosService: PastasContratosService
   ) {
   }
 
@@ -101,7 +101,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     this.dtOptions = {
       paging: false,
-      searching:false,
+      searching: false,
       // pagingType: 'full_numbers',
       language: {
         "decimal": "",
@@ -132,7 +132,8 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   atualizarRisco() {
     this.controleLancamentos = 0;
-    this.tableData.dataRows.forEach(lancamento => {
+
+    const payload = this.tableData.dataRows.map(lancamento => {
 
       this.updateLoadingBtn = true;
       let lancamentoLocal = { ...lancamento };
@@ -140,41 +141,45 @@ export class ChequeEmpresarialComponent implements OnInit {
       lancamentoLocal['infoParaCalculo'] = JSON.stringify(this.formDefaultValues);
       lancamentoLocal['valorDevedor'] = parseFloat(lancamentoLocal['valorDevedor']);
       lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
-      lancamentoLocal['contractRef'] = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value +  this.ce_form.ce_tipo_contrato.value;
+      lancamentoLocal['contractRef'] = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value + this.ce_form.ce_tipo_contrato.value;
       lancamentoLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
 
-      if (lancamentoLocal["id"]) {
-        this.chequeEmpresarialService.updateLancamento(lancamentoLocal).subscribe(chequeEmpresarialList => {
-          this.updateLoadingBtn = false;
-          this.controleLancamentos = this.controleLancamentos + 1;
-          if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-            this.toggleUpdateLoading()
-            this.alertType = 'risco-atualizado';
-          }
-        }, err => {
-          this.errorMessage = "Falha ao atualizar risco.";
-        });
-      } else {
-        this.chequeEmpresarialService.addLancamento(lancamentoLocal).subscribe(chequeEmpresarialListUpdated => {
-          this.updateLoadingBtn = false;
-          this.controleLancamentos = this.controleLancamentos + 1;
-          if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-            this.toggleUpdateLoading()
-            this.alertType = 'risco-atualizado';
-          }
-          lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
-        }, err => {
-          this.tableLoading = false;
-          this.alertType = 'registro-nao-incluido';
-          this.toggleUpdateLoading()
+      return lancamentoLocal;
+    });
 
-          this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
-        });
+    const payloadPut = [...payload].filter((lancamento => lancamento['id']));
 
+    payloadPut.length > 0 && this.chequeEmpresarialService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
+      this.updateLoadingBtn = false;
+      this.controleLancamentos = this.controleLancamentos + 1;
+      if (this.tableData.dataRows.length === this.controleLancamentos) {
+        this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
+        this.toggleUpdateLoading()
+        this.alertType = 'risco-atualizado';
       }
-    })
+    }, err => {
+      this.errorMessage = "Falha ao atualizar risco.";
+    });
+
+    const payloadPost = [...payload].filter((lancamento => !lancamento['id']));
+
+    payloadPost.length > 0 && this.chequeEmpresarialService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
+      this.updateLoadingBtn = false;
+      this.controleLancamentos = this.controleLancamentos + 1;
+      if (this.tableData.dataRows.length === this.controleLancamentos) {
+        this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
+        this.toggleUpdateLoading()
+        this.alertType = 'risco-atualizado';
+      }
+      // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
+    }, err => {
+      this.tableLoading = false;
+      this.alertType = 'registro-nao-incluido';
+      this.toggleUpdateLoading()
+
+      this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+    });
+
     setTimeout(() => {
       this.updateLoading = false;
     }, 3000);
@@ -211,7 +216,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   incluirLancamentos() {
     this.tableLoading = true;
 
-    const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value +  this.ce_form.ce_tipo_contrato.value;
+    const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value + this.ce_form.ce_tipo_contrato.value;
 
     const localDataBase = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFA_data_vencimento.value : this.tableData.dataRows[this.getLastLine()]["dataBaseAtual"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? this.ce_form_amortizacao.ceFa_saldo_devedor.value : this.tableData.dataRows[this.getLastLine()]["valorDevedorAtualizado"];
@@ -279,34 +284,34 @@ export class ChequeEmpresarialComponent implements OnInit {
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
-    this.ceFormRiscos.reset({ce_data_calculo: this.getCurrentDate('YYYY-MM-DD')});
+    this.ceFormRiscos.reset({ ce_data_calculo: this.getCurrentDate('YYYY-MM-DD') });
 
-    const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value +  this.ce_form.ce_tipo_contrato.value;
+    const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value + this.ce_form.ce_tipo_contrato.value;
 
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
       if (!chequeEmpresarialList.length) {
-          this.toggleUpdateLoading();
-          this.tableLoading = false;
-          this.alertType = 'sem-registros'
-          return;
+        this.toggleUpdateLoading();
+        this.tableLoading = false;
+        this.alertType = 'sem-registros'
+        return;
       }
-      
+
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === contractRef).map(cheque => {
         if (Object.values(cheque).length) {
           cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
           cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
-  
+
           if (chequeEmpresarialList.length) {
             const ultimaAtualizacao = [...chequeEmpresarialList].pop();
             this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
           }
-  
+
           setTimeout(() => {
-  
+
             this.changeFormValues(cheque.infoParaCalculo, true);
             this.simularCalc(true, null, true);
           }, 1000);
-  
+
           return cheque;
         } else {
           this.toggleUpdateLoading()
@@ -406,10 +411,10 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-        if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %"  || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %" ) {
+        if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
           row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
         } else {
-          row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor / (row['indiceDataBase']/100) * (row['indiceDataBaseAtual'] / 100)) - valorDevedor).toFixed(2);
+          row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor / (row['indiceDataBase'] / 100) * (row['indiceDataBaseAtual'] / 100)) - valorDevedor).toFixed(2);
         }
 
         // -- dias
@@ -533,7 +538,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   setContrato() {
     this.contractList_field = [];
     this.typeContractList_field = [];
-    this.pastas['data'].map(pasta=> {
+    this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.ce_form.ce_pasta.value) {
         this.contractList_field.push(pasta.CONTRATO);
       }
@@ -542,10 +547,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     const setUnico = new Set(this.contractList_field);
     this.contractList_field = [...setUnico];
   }
-  
+
   typeContractList_field = [];
   setTypeContract() {
-    this.pastas['data'].map(pasta=> {
+    this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.ce_form.ce_pasta.value && pasta.CONTRATO === this.ce_form.ce_contrato.value) {
         this.typeContractList_field.push(pasta.DESCRICAO);
       }

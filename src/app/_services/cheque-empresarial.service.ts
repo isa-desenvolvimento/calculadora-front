@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
 import { environment } from '../../environments/environment';
-import { Lancamento} from '../_models/ChequeEmpresarial';
+import { Lancamento } from '../_models/ChequeEmpresarial';
 
 @Injectable({ providedIn: 'root' })
 export class ChequeEmpresarialService {
@@ -16,12 +16,12 @@ export class ChequeEmpresarialService {
         return this.http.get<Lancamento[]>(`${environment.API_PATH}/cheque-empresarial/${id}`);
     }
 
-    addLancamento(payload: any) {
-        return this.http.post(`${environment.API_PATH}/cheque-empresarial`, payload);
+    addLancamento(lancamentoList: any) {
+        return this.http.post(`${environment.API_PATH}/cheque-empresarial`, lancamentoList);
     }
 
-    updateLancamento(payload: any) {
-        return this.http.put(`${environment.API_PATH}/cheque-empresarial/${payload.id}`, payload);
+    updateLancamento(lancamentoList: any) {
+        return this.http.put(`${environment.API_PATH}/cheque-empresarial`, lancamentoList);
     }
 
     removeLancamento(id: number) {
