@@ -289,35 +289,31 @@ export class ChequeEmpresarialComponent implements OnInit {
     const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value + this.ce_form.ce_tipo_contrato.value;
 
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
-      if (!chequeEmpresarialList.length) {
+      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === contractRef).map(cheque => {
+        cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
+        cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
+
+        if (chequeEmpresarialList.length) {
+          const ultimaAtualizacao = [...chequeEmpresarialList].pop();
+          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        }
+
+        setTimeout(() => {
+
+          this.changeFormValues(cheque.infoParaCalculo, true);
+          this.simularCalc(true, null, true);
+        }, 1000);
+
+        return cheque;
+      });
+
+      if (!this.tableData.dataRows.length) {
         this.toggleUpdateLoading();
         this.tableLoading = false;
         this.alertType = 'sem-registros'
         return;
       }
 
-      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === contractRef).map(cheque => {
-        if (Object.values(cheque).length) {
-          cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
-          cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
-
-          if (chequeEmpresarialList.length) {
-            const ultimaAtualizacao = [...chequeEmpresarialList].pop();
-            this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
-          }
-
-          setTimeout(() => {
-
-            this.changeFormValues(cheque.infoParaCalculo, true);
-            this.simularCalc(true, null, true);
-          }, 1000);
-
-          return cheque;
-        } else {
-          this.toggleUpdateLoading()
-          this.alertType = 'sem-registros';
-        }
-      });
       this.tableLoading = false;
     }, err => {
 
@@ -550,7 +546,8 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   typeContractList_field = [];
   setTypeContract() {
-    this.pastas['data'].map(pasta => {
+    this.typeContractList_field = [];
+    this.pastas['data'].map(pasta=> {
       if (pasta.PASTA === this.ce_form.ce_pasta.value && pasta.CONTRATO === this.ce_form.ce_contrato.value) {
         this.typeContractList_field.push(pasta.DESCRICAO);
       }

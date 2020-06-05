@@ -739,15 +739,12 @@ export class ParceladoPreComponent implements OnInit {
   
   typeContractList_field = [];
   setTypeContract() {
+    this.typeContractList_field = [];
     this.pastas['data'].map(pasta=> {
       if (pasta.PASTA === this.pre_form.pre_pasta.value && pasta.CONTRATO === this.pre_form.pre_contrato.value) {
         this.typeContractList_field.push(pasta.DESCRICAO);
       }
     });
-
-    console.log(this.typeContractList_field);
-    
-
     const setUnico = new Set(this.typeContractList_field);
     this.typeContractList_field = [...setUnico];
   }
