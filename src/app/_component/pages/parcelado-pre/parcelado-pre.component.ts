@@ -68,7 +68,8 @@ export class ParceladoPreComponent implements OnInit {
     formHonorarios: 0,
     formMultaSobContrato: 0,
     formIndice: "---",
-    formIndiceEncargos: 6
+    formIndiceEncargos: 6,
+    formIndiceDesagio: 6
   };
 
   constructor(
@@ -177,7 +178,7 @@ export class ParceladoPreComponent implements OnInit {
   
       const payloadPut = [...payload].filter((parcela => parcela['id']));
   
-      payloadPut.length > 0 && this.parceladoPreService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
+      payloadPut.length > 0 && this.parceladoPreService.updateLancamento(payloadPut).subscribe(parceladoPreList => {
         this.updateLoadingBtn = false;
         this.controleLancamentos = this.controleLancamentos + 1;
         if (this.tableData.dataRows.length === this.controleLancamentos) {
@@ -413,12 +414,6 @@ export class ParceladoPreComponent implements OnInit {
   changeCadastroParcelas(e, row, col) {
     const index = this.tableDataParcelas.dataRows.indexOf(row);
     this.tableDataParcelas.dataRows[index][col] = col === 'valorNoVencimento' ? e.target.value.slice(2) : e.target.value;
-    
-    setTimeout(() => {
-      this.toggleUpdateLoading()
-      this.alertType = 'lancamento-incluido';
-      this.simularCalc(false)
-    }, 500)
   }
 
   setCampoSemAlteracao(semFormat = false) {
@@ -428,42 +423,44 @@ export class ParceladoPreComponent implements OnInit {
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
-    this.tableDataParcelas.dataRows = [];
+    this.preFormRiscos.reset({ pre_data_calculo: this.getCurrentDate('YYYY-MM-DD') });
 
-    this.preFormRiscos.reset({pre_data_calculo: this.getCurrentDate('YYYY-MM-DD')});
+    const contractRef = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value + this.pre_form.pre_tipo_contrato.value;
 
-    const contractRef = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value +  this.pre_form.pre_tipo_contrato.value;
+    this.parceladoPreService.getAll().subscribe(parceladoPreList => {
+      this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === contractRef).map(parcela => {
+        parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
+        parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
 
-    this.tableData.dataRows =  this.parceladoPreService.getAll().filter((row) => row["contractRef"] === contractRef).map(parcela => {
-      parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios);
-      parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
+        if (parceladoPreList.length) {
+          const ultimaAtualizacao = [...parceladoPreList].pop();
+          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        }
 
-      this.ultima_atualizacao = moment(parcela.ultimaAtualizacao).format('YYYY-MM-DD');
+        setTimeout(() => {
 
-      this.changeFormValues(parcela.infoParaCalculo, true);
-      return parcela;
-    })
+          this.changeFormValues(parcela.infoParaCalculo, true);
+          this.simularCalc(true, null, true);
+        }, 1000);
 
-     this.simularCalc(false, null, true);
-    // this.parceladoPre.getAll().subscribe(parceladopreList => {
-    //   this.tableData.dataRows = parceladopreList.filter((row) => row["contractRef"] === parseInt(this.pre_form.pre_contrato.value || 0)).map(parcela => {
-    //     parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
+        return parcela;
+      });
 
-    //     if (parceladopreList.length) {
-    //       const ultimaAtualizacao = [...parceladopreList].pop();
-    //       this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
-    //     }
+      if (!this.tableData.dataRows.length) {
+        this.toggleUpdateLoading();
+        this.tableLoading = false;
+        this.alertType = 'sem-registros'
+        return;
+      }
 
-    //     setTimeout(() => {
-    //       this.simularCalc(true, null, true);
-    //     }, 1000);
+      this.tableLoading = false;
+    }, err => {
 
-    //     return parcela;
-    //   });
-    //   this.tableLoading = false;
-    // }, err => {
-    //   this.errorMessage = err.error.message;
-    // });
+      this.tableLoading = false;
+      this.alertType = 'sem-registros';
+      this.toggleUpdateLoading()
+      this.errorMessage = err.error.message;
+    });
 
   }
 
@@ -496,7 +493,8 @@ export class ParceladoPreComponent implements OnInit {
         formHonorarios: this.pre_form_riscos.pre_honorarios.value || infoParaCalculo["formHonorarios"],
         formMultaSobContrato: this.pre_form_riscos.pre_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"],
         formIndice: this.pre_form_riscos.pre_indice.value || infoParaCalculo["formIndice"],
-        formIndiceEncargos: this.pre_form_riscos.pre_encargos_contratuais.value || infoParaCalculo["formIndiceEncargos"]
+        formIndiceEncargos: this.pre_form_riscos.pre_encargos_contratuais.value || infoParaCalculo["formIndiceEncargos"],
+        formIndiceDesagio: this.pre_form_riscos.pre_desagio.value || infoParaCalculo["formIndiceDesagio"]
       };
     } else {
       this.formDefaultValues = {
@@ -505,7 +503,9 @@ export class ParceladoPreComponent implements OnInit {
         formHonorarios: infoParaCalculo["formHonorarios"] || 0,
         formMultaSobContrato: infoParaCalculo["formMultaSobContrato"] || 0,
         formIndice: infoParaCalculo["formIndice"] || "---",
-        formIndiceEncargos: infoParaCalculo["formIndiceEncargos"] || 6
+        formIndiceEncargos: infoParaCalculo["formIndiceEncargos"] || 6,
+        formIndiceDesagio: infoParaCalculo["formIndiceDesagio"] || 0
+
       };
     }
 
@@ -683,7 +683,7 @@ export class ParceladoPreComponent implements OnInit {
         this.alertType = 'registro-excluido'
       }, 0)
     } else {
-      this.parceladoPre.removeLancamento(row.id).subscribe(() => {
+      this.parceladoPreService.removeLancamento(row.id).subscribe(() => {
         this.tableData.dataRows.splice(index, 1);
         setTimeout(() => {
           this.simularCalc(false);

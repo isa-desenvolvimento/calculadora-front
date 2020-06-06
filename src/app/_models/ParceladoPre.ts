@@ -17,6 +17,7 @@ export interface Parcela {
     status: string;
     contractRef: number;
     ultimaAtualizacao: string;
+    infoParaCalculo: any;
 }
 
 export interface EncargosMonetarios {
@@ -38,4 +39,5 @@ export interface InfoParaCalculo {
     formMultaSobContrato: number;
     formIndice: string;
     formIndiceEncargos: number;
+    formIndiceDesagio: number;
 }
