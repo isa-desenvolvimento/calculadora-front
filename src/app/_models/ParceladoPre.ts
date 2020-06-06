@@ -30,3 +30,12 @@ export interface JurosAm {
     percentsJuros: number;
     moneyValue: number;
 }
+
+export interface InfoParaCalculo {
+    formMulta: number;
+    formJuros: number;
+    formHonorarios: number;
+    formMultaSobContrato: number;
+    formIndice: string;
+    formIndiceEncargos: number;
+}

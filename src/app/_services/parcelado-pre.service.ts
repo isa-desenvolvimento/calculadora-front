@@ -28,6 +28,7 @@ export class ParceladoPreService {
           status: 'ABERTO',
           contractRef: 'SBA.132386/201614826170540 - MUTUO PRE RV',
           ultimaAtualizacao: '',
+          infoParaCalculo: '{ "formMulta" : "2", "formJuros" : "2", "formHonorarios" : "2", "formMultaSobContrato" : "2", "formIndice" : "INPC/IBGE", "formIndiceEncargos" : "2"}'
         },
         {
           id: 22,
@@ -48,6 +49,7 @@ export class ParceladoPreService {
           status: 'ABERTO',
           contractRef: 'SBA.132386/201614826170540 - MUTUO PRE RV',
           ultimaAtualizacao: '',
+          infoParaCalculo: '{ "formMulta" : "2", "formJuros" : "2", "formHonorarios" : "2", "formMultaSobContrato" : "2", "formIndice" : "INPC/IBGE", "formIndiceEncargos" : "2"}'
         }]
     }
 

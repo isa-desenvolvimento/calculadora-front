@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 
-import { Lancamento } from '../../../_models/ChequeEmpresarial';
+import { Parcela, InfoParaCalculo } from '../../../_models/ParceladoPre';
 import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 
 import { IndicesService } from '../../../_services/indices.service';
@@ -31,7 +31,7 @@ export class ParceladoPreComponent implements OnInit {
   submitted = false;
   returnUrl: string;
   errorMessage = '';
-  payloadLancamento: Lancamento;
+  payloadLancamento: Parcela;
 
   tableLoading = false;
   updateLoading = false;
@@ -62,9 +62,18 @@ export class ParceladoPreComponent implements OnInit {
   min_data: string;
   ultima_atualizacao: String;
 
+  formDefaultValues: InfoParaCalculo = {
+    formMulta: 0,
+    formJuros: 0,
+    formHonorarios: 0,
+    formMultaSobContrato: 0,
+    formIndice: "---",
+    formIndiceEncargos: 6
+  };
+
   constructor(
     private formBuilder: FormBuilder,
-    private parceladoPre: ParceladoPreService,
+    private parceladoPreService: ParceladoPreService,
     private indicesService: IndicesService,
     private pastasContratosService : PastasContratosService
   ) {
@@ -147,48 +156,61 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   atualizarRisco() {
-    this.controleLancamentos = 0;
-    this.tableData.dataRows.forEach(lancamento => {
+      this.controleLancamentos = 0;
+  
+      const payload = this.tableData.dataRows.map(parcela => {
+  
+        this.updateLoadingBtn = true;
+        let parcelaLocal = { ...parcela };
+        parcelaLocal['encargosMonetarios'] = JSON.stringify(parcelaLocal['encargosMonetarios']);
+        parcelaLocal['infoParaCalculo'] = JSON.stringify(this.formDefaultValues);
 
-      this.updateLoadingBtn = true;
-      let lancamentoLocal = { ...lancamento };
-      lancamentoLocal['encargosMonetarios'] = JSON.stringify(lancamentoLocal['encargosMonetarios']);
-      lancamentoLocal['valorNoVencimento'] = parseFloat(lancamentoLocal['valorNoVencimento']);
-      lancamentoLocal['valorDevedorAtualizado'] = parseFloat(lancamentoLocal['valorDevedorAtualizado']);
-      lancamentoLocal['contractRef'] = parseFloat(lancamentoLocal['contractRef']);
-      lancamentoLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
-
-      if (lancamentoLocal["id"]) {
-        this.parceladoPre.updateLancamento(lancamentoLocal).subscribe(parceladopreList => {
-          this.updateLoadingBtn = false;
-          this.controleLancamentos = this.controleLancamentos + 1;
-          if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-            this.toggleUpdateLoading()
-            this.alertType = 'risco-atualizado';
-          }
-        }, err => {
-          this.errorMessage = "Falha ao atualizar risco.";
-        });
-      } else {
-        this.parceladoPre.addLancamento(lancamentoLocal).subscribe(parceladopreListUpdated => {
-          this.updateLoadingBtn = false;
-          this.controleLancamentos = this.controleLancamentos + 1;
-          if (this.tableData.dataRows.length === this.controleLancamentos) {
-            this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-            this.toggleUpdateLoading()
-            this.alertType = 'risco-atualizado';
-          }
-          lancamento["id"] = lancamentoLocal["id"] = parceladopreListUpdated["id"];
-        }, err => {
-          this.errorMessage = "Falha ao atualizar risco.";
-        });
-
-      }
-    })
-    setTimeout(() => {
-      this.updateLoading = false;
-    }, 3000);
+        parcelaLocal['valorPMTVincenda'] = parseFloat(parcelaLocal['valorPMTVincenda']);
+        parcelaLocal['amortizacao'] = parseFloat(parcelaLocal['amortizacao']);
+        parcelaLocal['totalDevedor'] = parseFloat(parcelaLocal['totalDevedor']);
+        parcelaLocal['subtotal'] = parseFloat(parcelaLocal['subtotal']);
+        parcelaLocal['contractRef'] = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value + this.pre_form.pre_tipo_contrato.value;
+        parcelaLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
+  
+        return parcelaLocal;
+      });
+  
+      const payloadPut = [...payload].filter((parcela => parcela['id']));
+  
+      payloadPut.length > 0 && this.parceladoPreService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
+        this.updateLoadingBtn = false;
+        this.controleLancamentos = this.controleLancamentos + 1;
+        if (this.tableData.dataRows.length === this.controleLancamentos) {
+          this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
+          this.toggleUpdateLoading()
+          this.alertType = 'risco-atualizado';
+        }
+      }, err => {
+        this.errorMessage = "Falha ao atualizar risco.";
+      });
+  
+      const payloadPost = [...payload].filter((parcela => !parcela['id']));
+  
+      payloadPost.length > 0 && this.parceladoPreService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
+        this.updateLoadingBtn = false;
+        this.controleLancamentos = this.controleLancamentos + 1;
+        if (this.tableData.dataRows.length === this.controleLancamentos) {
+          this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
+          this.toggleUpdateLoading()
+          this.alertType = 'risco-atualizado';
+        }
+        // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
+      }, err => {
+        this.tableLoading = false;
+        this.alertType = 'registro-nao-incluido';
+        this.toggleUpdateLoading()
+  
+        this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+      });
+  
+      setTimeout(() => {
+        this.updateLoading = false;
+      }, 3000);
   }
 
   toggleUpdateLoading() {
@@ -412,10 +434,13 @@ export class ParceladoPreComponent implements OnInit {
 
     const contractRef = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value +  this.pre_form.pre_tipo_contrato.value;
 
-    this.tableData.dataRows =  this.parceladoPre.getAll().filter((row) => row["contractRef"] === contractRef).map(parcela => {
+    this.tableData.dataRows =  this.parceladoPreService.getAll().filter((row) => row["contractRef"] === contractRef).map(parcela => {
       parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios);
+      parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
+
       this.ultima_atualizacao = moment(parcela.ultimaAtualizacao).format('YYYY-MM-DD');
 
+      this.changeFormValues(parcela.infoParaCalculo, true);
       return parcela;
     })
 
@@ -463,8 +488,32 @@ export class ParceladoPreComponent implements OnInit {
     return moment(date).format("DD/MM/YYYY");
   }
 
+  changeFormValues(infoParaCalculo, search = false) {
+    if (!search) {
+      this.formDefaultValues = {
+        formMulta: this.pre_form_riscos.pre_multa.value || infoParaCalculo["formMulta"],
+        formJuros: this.pre_form_riscos.pre_juros_mora.value || infoParaCalculo["formJuros"],
+        formHonorarios: this.pre_form_riscos.pre_honorarios.value || infoParaCalculo["formHonorarios"],
+        formMultaSobContrato: this.pre_form_riscos.pre_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"],
+        formIndice: this.pre_form_riscos.pre_indice.value || infoParaCalculo["formIndice"],
+        formIndiceEncargos: this.pre_form_riscos.pre_encargos_contratuais.value || infoParaCalculo["formIndiceEncargos"]
+      };
+    } else {
+      this.formDefaultValues = {
+        formMulta: infoParaCalculo["formMulta"] || 0,
+        formJuros: infoParaCalculo["formJuros"] || 0,
+        formHonorarios: infoParaCalculo["formHonorarios"] || 0,
+        formMultaSobContrato: infoParaCalculo["formMultaSobContrato"] || 0,
+        formIndice: infoParaCalculo["formIndice"] || "---",
+        formIndiceEncargos: infoParaCalculo["formIndiceEncargos"] || 6
+      };
+    }
+
+  }
+
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
+    this.changeFormValues(this.formDefaultValues, search);
 
     setTimeout(() => {
       let moneyValueTotal = 0,

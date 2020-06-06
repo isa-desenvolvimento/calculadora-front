@@ -264,15 +264,15 @@
 								<tr align="center">
 									<th class="align-title-top" rowspan="2">Nº Parcela</th>
 									<th class="align-title-top" rowspan="2">Data Vencimento</th>
-									<th class="align-title-top" rowspan="2">Índice <b>{{pre_form_riscos.pre_indice.value}}</b> </th>
+									<th class="align-title-top" rowspan="2">Índice <b>{{formDefaultValues.formIndice}}</b> </th>
 									<th width="80" class="align-title-top" rowspan="2">Índice Data Vencimento</th>
 									<th class="align-title-top" rowspan="2">Data Cálculo / Amort.</th>
-									<th class="align-title-top" rowspan="2">Índice <b>{{pre_form_riscos.pre_indice.value}}</b> </th>
+									<th class="align-title-top" rowspan="2">Índice <b>{{formDefaultValues.formIndice}}</b> </th>
 									<th width="80" class="align-title-top" rowspan="2">Índice Data Cálculo / Amort.</th>
 									<th class="align-title-top" rowspan="2">Valor no Vencimento R$</th>
 									<th width="100" rowspan="2">Correção pelo Índice</th>
-									<th colspan="3">Juros a.m. {{( pre_form_riscos.pre_juros_mora.value || 0 ) + "%"}} </th>
-									<th width="100" rowspan="2">Multa <b>{{( pre_form_riscos.pre_multa.value || 0 ) + "%"}}</b> </th>
+									<th colspan="3">Juros a.m. {{(formDefaultValues.formJuros ||  0 ) + "%"}} </th>
+									<th width="100" rowspan="2">Multa <b>{{(formDefaultValues.formMulta || 0 ) + "%"}}</b> </th>
 									<th class="align-title-top" rowspan="2">Subtotal</th>
 									<th width="80" class="align-title-top" rowspan="2">Valor da PMT Vincenda em <b>{{tableData.dataRows.length ? formatDate(tableData.dataRows[0]['dataCalcAmor']) : ''}}</b></th>
 									<th width="80" class="align-title-top" rowspan="2">Amortização</th>
