@@ -81,55 +81,44 @@ export class IndicesComponent implements OnInit {
     value.target.value = Math.abs(value.target.value);
   }
 
-  adicionaIndice() {
-    const indice = {
-      indice : this.indice_form.indice.value,
-      data : this.indice_form.data.value,
-      valor : this.indice_form.valor.value
-    }
-
-    this.tableData.dataRows.push(indice);
-    this.indicesForm.reset();
+  toggleUpdateLoading() {
+    this.updateLoading = true;
+    setTimeout(() => {
+      this.updateLoading = false;
+    }, 3000);
   }
 
-  tranformJSON(indice, json) {
-    const indicesFormated = [];
+  adicionaIndice() {
+    this.tableLoading = true;
 
-    Object.entries(json).forEach(([key, value]) => {
-      indicesFormated.push({
-        indice,
-        data: this.formatDate(key, "YYYY-DD-MM"),
-        valor: value
-      })
-    })
+    const indice = {
+      indice: this.indice_form.indice.value,
+      data: this.indice_form.data.value,
+      valor: this.indice_form.valor.value
+    }
 
-    return indicesFormated;
+    this.indicesService.addIndice(indice).subscribe(resp => {
+      this.tableData.dataRows.push(resp);
+      this.indicesForm.reset();
+      this.alertType = 'indice-incluido';
+      this.toggleUpdateLoading()
+
+    }, err => {
+      this.alertType = 'registro-nao-incluido';
+      //this.toggleUpdateLoading()
+      //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+    });
+
+    this.tableLoading = false;
   }
 
   changeIndices() {
-    const INDICEINPUT = this.indice_form.indice.value;
-    const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
-
-    let table = [];
     this.tableData.dataRows = [];
     this.tableLoading = true;
-
-    switch (INDICEINPUT) {
-      case "INPC/IBGE":
-        if (!this.listaINPC.length) this.listaINPC = this.tranformJSON(INDICEINPUT, this.datasINPC);
-        table = DATAINPUT ? this.listaINPC.filter(indice => indice.data === DATAINPUT) : this.listaINPC
-        break;
-      case "CDI":
-        if (!this.listaCDI.length) this.listaCDI = this.tranformJSON(INDICEINPUT, this.datasCDI);
-        table = DATAINPUT ? this.listaCDI.filter(indice => indice.data === DATAINPUT) : this.listaCDI;
-        break
-      case "IGPM":
-        if (!this.listaIGPM.length) this.listaIGPM = this.tranformJSON(INDICEINPUT, this.datasIGPM);
-        table = DATAINPUT ? this.listaIGPM.filter(indice => indice.data === DATAINPUT) : this.listaIGPM;
-        break
-      default:
-        break;
-    }
+    let table = this.getIndice;
+    
+    const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
+    //if (DATAINPUT) table = table.filter(indice => indice.data === DATAINPUT)
 
     setTimeout(() => {
       this.tableLoading = false;
@@ -143,10 +132,26 @@ export class IndicesComponent implements OnInit {
     const index = this.tableData.dataRows.indexOf(row);
     this.tableData.dataRows[index][column] = value;
 
-    //fazer requisicao para alterar no banco
+    this.indicesService.updateIndice(row.id, this.tableData.dataRows[index]).subscribe(resp => {
+      this.alertType = 'indice-incluido';
+      this.toggleUpdateLoading()
+    }, err => {
+      this.alertType = 'registro-nao-incluido';
+      //this.toggleUpdateLoading()
+      //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+    });
   }
 
-  deleteRow(row) { }
+  deleteRow(row) {
+    // this.indicesService.removeIndice(row.id).subscribe(resp => {
+    //   this.alertType = 'registro-excluido';
+    //   this.toggleUpdateLoading()
+    // }, err => {
+    //   this.alertType = 'registro-nao-incluido';
+    //   //this.toggleUpdateLoading()
+    //   //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+    // });
+   }
 
   formatCurrency(value) {
     return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
@@ -160,6 +165,9 @@ export class IndicesComponent implements OnInit {
 
   get indice_form() { return this.indicesForm.controls; }
 
+  get getIndice() {
+    return this.indicesService.getIndice(this.indice_form.indice.value);
+  }
   get datasCDI() {
     return this.indicesService.getCDI();
   };
