@@ -529,12 +529,6 @@ export class ParceladoPreComponent implements OnInit {
       // Valores inputs
       const inputExternoDataCalculo = this.pre_form_riscos.pre_data_calculo.value;
       const inputExternoIndice = this.pre_form_riscos.pre_indice.value;
-      const inputExternoEncargosContratuais = this.pre_form_riscos.pre_encargos_contratuais.value;
-      const inputExternoPorcentagem = this.pre_form_riscos.pre_juros_mora.value / 100;
-      const inputExternoMulta = this.pre_form_riscos.pre_multa.value / 100;
-      const inputExternoDesagio = this.pre_form_riscos.pre_desagio.value / 100;
-      const inputExternoHonorarios = this.pre_form_riscos.pre_honorarios.value / 100;
-      const inputExternoMultaSobContrato = this.pre_form_riscos.pre_multa_sobre_constrato.value / 100;
 
       this.tableData.dataRows.map((row) => {
         let indiceDV = row['indiceDV'];
@@ -558,17 +552,17 @@ export class ParceladoPreComponent implements OnInit {
         const vincenda = dataVencimento > inputExternoDataCalculo;
 
         const amortizacao = parseFloat(row['amortizacao']);
-        let porcentagem = inputExternoPorcentagem || parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']);
+        let porcentagem = (this.formDefaultValues.formJuros || parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) / 100);
 
         // Calculos 
         const correcaoPeloIndice = (valorNoVencimento / indiceDataVencimento * indiceDataCalcAmor) - valorNoVencimento;
         const qtdDias = this.getQtdDias(dataVencimento, dataCalcAmor);
         porcentagem = porcentagem / 30 * qtdDias;
         const valor = (valorNoVencimento + correcaoPeloIndice) * porcentagem;
-        const multa = row['amortizacaoDataDiferenciada'] ? 0 : (valorNoVencimento + correcaoPeloIndice + valor) * inputExternoMulta;
+        const multa = row['amortizacaoDataDiferenciada'] ? 0 : (valorNoVencimento + correcaoPeloIndice + valor) * (this.formDefaultValues.formMulta / 100);
         const subtotal = valorNoVencimento + correcaoPeloIndice + valor + multa;
         const totalDevedor = subtotal - amortizacao;
-        const desagio = Math.pow((inputExternoDesagio + 1), (-qtdDias / 30));
+        const desagio = Math.pow(((this.formDefaultValues.formIndiceDesagio / 100) + 1), (-qtdDias / 30));
         const valorPMTVincenda = valorNoVencimento * desagio;
 
         // Table Values
@@ -628,10 +622,10 @@ export class ParceladoPreComponent implements OnInit {
 
       // Forms Total rodapé
       if (this.tableData.dataRows.length > 0) {
-        const honorarios = this.total_honorarios = (subtotalTotal + amortizacaoTotal) * inputExternoHonorarios;
+        const honorarios = this.total_honorarios = (subtotalTotal + amortizacaoTotal) * (this.formDefaultValues.formHonorarios / 100);
         this.total_data_calculo = this.subtotal_data_calculo = this.formatDate(inputExternoDataCalculo);
         this.total_subtotal = totalDevedorTotalVincendas + totalDevedorTotal;
-        this.pre_form_riscos.pre_multa_sobre_constrato && (this.total_multa_sob_contrato = (this.total_subtotal + honorarios + this.amortizacaoGeral) * inputExternoMultaSobContrato) || 0;
+        this.pre_form_riscos.pre_multa_sobre_constrato && (this.total_multa_sob_contrato = (this.total_subtotal + honorarios + this.amortizacaoGeral) * (this.formDefaultValues.formMultaSobContrato / 100)) || 0;
         this.total_grandtotal = this.total_multa_sob_contrato + honorarios + this.total_subtotal - this.amortizacaoGeral;
       }
 
