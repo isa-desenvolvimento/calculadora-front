@@ -64,7 +64,7 @@ export class ParceladoPreService {
     }
 
     updateLancamento(payload: any) {
-        return this.http.put(`${environment.API_PATH}/parcelado-pre/${payload.id}`, payload);
+        return this.http.put(`${environment.API_PATH}/parcelado-pre`, payload);
     }
 
     removeLancamento(id: number) {
