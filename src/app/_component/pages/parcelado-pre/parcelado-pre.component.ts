@@ -128,7 +128,8 @@ export class ParceladoPreComponent implements OnInit {
     this.dtOptions = {
       paging: false,
       searching:false,
-      // pagingType: 'full_numbers',
+      scrollY:        "300px",
+      scrollCollapse: true,
       language: {
         "decimal": "",
         "emptyTable": "Sem dados para exibir",

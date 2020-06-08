@@ -22,3 +22,7 @@
 .parcelas-vincendas {
     background-color: #f4f3ef !important;
 }
+
+.dataTables_wrapper.no-footer .dataTables_scrollBody {
+    border-bottom: none;
+}
