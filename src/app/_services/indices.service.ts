@@ -47,17 +47,19 @@ export class IndicesService {
   }
 
   getIndice(indices: string) {
-    switch (indices) {
-      case "INPC/IBGE":
-        return this.tranformJSON(indices, this.getINPC());
-      case "CDI":
-        return this.tranformJSON(indices, this.getCDI());
-      case "IGPM":
-        return this.tranformJSON(indices, this.getIGPM());
-      default:
-        break;
-    }
-    // return this.http.get<Indices[]>(`${environment.API_PATH}/indices/${indices}`);
+    // switch (indices) {
+    //   case "INPC/IBGE":
+    //     return this.tranformJSON(indices, this.getINPC());
+    //   case "CDI":
+    //     return this.tranformJSON(indices, this.getCDI());
+    //   case "IGPM":
+    //     return this.tranformJSON(indices, this.getIGPM());
+    //   default:
+    //     break;
+    // }
+    console.log(indices);
+    
+    return this.http.get<Indices[]>(`${environment.API_PATH}/indices/${indices}`);
   }
 
   addIndice(indice: any) {
