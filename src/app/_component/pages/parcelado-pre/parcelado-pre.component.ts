@@ -4,6 +4,7 @@ import { Parcela, InfoParaCalculo } from '../../../_models/ParceladoPre';
 import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 
 import { IndicesService } from '../../../_services/indices.service';
+import { LogService } from '../../../_services/log.service';
 import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -76,7 +77,8 @@ export class ParceladoPreComponent implements OnInit {
     private formBuilder: FormBuilder,
     private parceladoPreService: ParceladoPreService,
     private indicesService: IndicesService,
-    private pastasContratosService : PastasContratosService
+    private pastasContratosService : PastasContratosService,
+    private logService: LogService,
   ) {
   }
 
@@ -645,6 +647,22 @@ export class ParceladoPreComponent implements OnInit {
         totalDevedor: totalDevedorTotalVincendas || 0,
         valorPMTVincenda: valorPMTVincendaTotalVincendas || 0
       }
+
+      this.logService.addLog({
+        data:  this.getCurrentDate(),
+        usuario: '',
+        pasta: this.pre_form.pre_pasta.value,
+        contrato: this.pre_form.pre_contrato.value,
+        dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
+        indice: this.formDefaultValues.formIndice, 
+        desagio: "---",
+        honorios: this.formDefaultValues.formHonorarios,
+        multa: this.formDefaultValues.formMulta,
+        jurosMora: this.formDefaultValues.formJuros,
+        dataAmortizacao: "---",
+        valorAmortizacao: "---"
+      });
+
     }, 0);
     
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);

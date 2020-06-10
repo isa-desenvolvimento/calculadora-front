@@ -4,6 +4,7 @@ import { Lancamento, InfoParaCalculo } from '../../../_models/ChequeEmpresarial'
 import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
 
 import { IndicesService } from '../../../_services/indices.service';
+import { LogService } from '../../../_services/log.service';
 import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -64,6 +65,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
     private indicesService: IndicesService,
+    private logService: LogService,
     private pastasContratosService: PastasContratosService
   ) {
   }
@@ -459,7 +461,21 @@ export class ChequeEmpresarialComponent implements OnInit {
         return parseFloat(row['valorDevedorAtualizado']);
       });
 
-
+      this.logService.addLog({
+        data:  this.getCurrentDate(),
+        usuario: '',
+        pasta: this.ce_form.ce_pasta.value,
+        contrato: this.ce_form.ce_contrato.value,
+        dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
+        indice: this.formDefaultValues.formIndice,
+        desagio: "---",
+        honorios: this.formDefaultValues.formHonorarios,
+        multa: this.formDefaultValues.formMulta,
+        jurosMora: this.formDefaultValues.formJuros,
+        dataAmortizacao: "---",
+        valorAmortizacao: "---"
+      });
+      
     }, 0);
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);
     !isInlineChange && this.toggleUpdateLoading();
