@@ -648,20 +648,26 @@ export class ParceladoPreComponent implements OnInit {
         valorPMTVincenda: valorPMTVincendaTotalVincendas || 0
       }
 
-      this.logService.addLog({
-        data:  this.getCurrentDate(),
-        usuario: '',
-        pasta: this.pre_form.pre_pasta.value,
-        contrato: this.pre_form.pre_contrato.value,
-        dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
-        indice: this.formDefaultValues.formIndice, 
-        desagio: "---",
-        honorios: this.formDefaultValues.formHonorarios,
-        multa: this.formDefaultValues.formMulta,
-        jurosMora: this.formDefaultValues.formJuros,
-        dataAmortizacao: "---",
-        valorAmortizacao: "---"
-      });
+      if (origin === 'btn') {
+        this.logService.addLog({
+          data:  this.getCurrentDate(),
+          usuario: '',
+          pasta: this.pre_form.pre_pasta.value,
+          contrato: this.pre_form.pre_contrato.value,
+          dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
+          indice: this.formDefaultValues.formIndice, 
+          desagio: "---",
+          honorarios: this.formDefaultValues.formHonorarios,
+          multa: this.formDefaultValues.formMulta,
+          jurosMora: this.formDefaultValues.formJuros,
+          dataAmortizacao: "---",
+          valorAmortizacao: "---"
+        });
+        this.tableLoading = false;
+        this.toggleUpdateLoading()
+        this.alertType = 'calculo-simulado';
+      }
+
 
     }, 0);
     

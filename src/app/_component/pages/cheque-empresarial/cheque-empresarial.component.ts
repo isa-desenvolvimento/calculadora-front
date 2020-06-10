@@ -444,12 +444,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
-        this.tableLoading = false;
-        if (origin === 'btn') {
-          this.toggleUpdateLoading()
-          this.alertType = 'calculo-simulado';
-        }
-
         if (this.tableData.dataRows.length > 0) {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
@@ -461,20 +455,25 @@ export class ChequeEmpresarialComponent implements OnInit {
         return parseFloat(row['valorDevedorAtualizado']);
       });
 
-      this.logService.addLog({
-        data:  this.getCurrentDate(),
-        usuario: '',
-        pasta: this.ce_form.ce_pasta.value,
-        contrato: this.ce_form.ce_contrato.value,
-        dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
-        indice: this.formDefaultValues.formIndice,
-        desagio: "---",
-        honorios: this.formDefaultValues.formHonorarios,
-        multa: this.formDefaultValues.formMulta,
-        jurosMora: this.formDefaultValues.formJuros,
-        dataAmortizacao: "---",
-        valorAmortizacao: "---"
-      });
+      if (origin === 'btn') {
+        this.logService.addLog({
+          data:  this.getCurrentDate(),
+          usuario: '',
+          pasta: this.ce_form.ce_pasta.value,
+          contrato: this.ce_form.ce_contrato.value,
+          dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
+          indice: this.formDefaultValues.formIndice,
+          desagio: "---",
+          honorarios: this.formDefaultValues.formHonorarios,
+          multa: this.formDefaultValues.formMulta,
+          jurosMora: this.formDefaultValues.formJuros,
+          dataAmortizacao: "---",
+          valorAmortizacao: "---"
+        });
+        this.tableLoading = false;
+        this.toggleUpdateLoading()
+        this.alertType = 'calculo-simulado';
+      }
       
     }, 0);
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);

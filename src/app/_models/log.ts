@@ -8,7 +8,7 @@ export interface Log {
     indice: string;
     indiceOutros: string;
     desagio: string;
-    honorios: string;
+    honorarios: string;
     multa: string;
     jurosMora: string;
     dataAmortizacao: string;
