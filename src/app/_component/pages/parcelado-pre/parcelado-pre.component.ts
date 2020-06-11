@@ -4,6 +4,7 @@ import { Parcela, InfoParaCalculo } from '../../../_models/ParceladoPre';
 import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 
 import { IndicesService } from '../../../_services/indices.service';
+import { LogService } from '../../../_services/log.service';
 import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -76,7 +77,8 @@ export class ParceladoPreComponent implements OnInit {
     private formBuilder: FormBuilder,
     private parceladoPreService: ParceladoPreService,
     private indicesService: IndicesService,
-    private pastasContratosService: PastasContratosService
+    private pastasContratosService : PastasContratosService,
+    private logService: LogService,
   ) {
   }
 
@@ -620,20 +622,26 @@ export class ParceladoPreComponent implements OnInit {
         valorPMTVincenda: valorPMTVincendaTotalVincendas || 0
       }
 
-      // Forms Total rodapé
-      if (this.tableData.dataRows.length > 0) {
-        const honorarios = this.total_honorarios = (subtotalTotal + amortizacaoTotal) * (this.formDefaultValues.formHonorarios / 100);
-        this.total_data_calculo = this.subtotal_data_calculo = this.formatDate(inputExternoDataCalculo);
-        this.total_subtotal = totalDevedorTotalVincendas + totalDevedorTotal;
-        this.pre_form_riscos.pre_multa_sobre_constrato && (this.total_multa_sob_contrato = (this.total_subtotal + honorarios + this.amortizacaoGeral) * (this.formDefaultValues.formMultaSobContrato / 100)) || 0;
-        this.total_grandtotal = this.total_multa_sob_contrato + honorarios + this.total_subtotal - this.amortizacaoGeral;
-      }
-
-      this.tableLoading = false;
       if (origin === 'btn') {
+        this.logService.addLog({
+          data:  this.getCurrentDate(),
+          usuario: '',
+          pasta: this.pre_form.pre_pasta.value,
+          contrato: this.pre_form.pre_contrato.value,
+          dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
+          indice: this.formDefaultValues.formIndice, 
+          desagio: "---",
+          honorarios: this.formDefaultValues.formHonorarios,
+          multa: this.formDefaultValues.formMulta,
+          jurosMora: this.formDefaultValues.formJuros,
+          dataAmortizacao: "---",
+          valorAmortizacao: "---"
+        });
+        this.tableLoading = false;
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';
       }
+
 
     }, 0);
 

@@ -12,7 +12,9 @@ export const ROUTES: RouteInfo[] = [
     { path: '/admin/cheque-empresarial',     title: 'Cheque Empresarial',         icon:'nc-bank',       class: '' },
     { path: '/admin/parcelado-pre',     title: 'Parcelado Pré',         icon:'nc-credit-card',       class: '' },
     //{ path: '/admin/parcelado-pos',     title: 'Parcelado Pós',         icon:'nc-credit-card',       class: '' },
-    { path: '/admin/user',          title: 'Usuário',      icon:'nc-single-02',  class: '' }
+    { path: '/admin/indices',          title: 'Índices',      icon:'nc-sound-wave',  class: '' },
+    { path: '/admin/user',          title: 'Usuário',      icon:'nc-single-02',  class: '' },
+    { path: '/admin/log',          title: 'Log',      icon:'nc-paper',  class: '' }
 ];
 
 @Component({

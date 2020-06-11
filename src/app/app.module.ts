@@ -20,7 +20,8 @@ import { NavbarModule} from './_component/navbar/navbar.module';
 import { ToastrModule } from "ngx-toastr";
 
 import { DataTablesModule } from 'angular-datatables';
-
+import { IndicesComponent } from './_component/pages/indices/indices.component';
+import { LogComponent } from './_component/pages/log/log.component';
 
 @NgModule({
   declarations: [
@@ -32,7 +33,9 @@ import { DataTablesModule } from 'angular-datatables';
     AdminLayoutComponent,
     ChequeEmpresarialComponent,
     ParceladoPosComponent,
-    ParceladoPreComponent
+    ParceladoPreComponent,
+    IndicesComponent,
+    LogComponent
   ],
   imports: [
     BrowserModule,
