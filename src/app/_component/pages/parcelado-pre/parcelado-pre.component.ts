@@ -552,7 +552,7 @@ export class ParceladoPreComponent implements OnInit {
         const vincenda = dataVencimento > inputExternoDataCalculo;
 
         const amortizacao = parseFloat(row['amortizacao']);
-        let porcentagem = (this.formDefaultValues.formJuros || parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) / 100);
+        let porcentagem = (this.formDefaultValues.formJuros/100) || (parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) / 100);
 
         // Calculos 
         const correcaoPeloIndice = (valorNoVencimento / indiceDataVencimento * indiceDataCalcAmor) - valorNoVencimento;
