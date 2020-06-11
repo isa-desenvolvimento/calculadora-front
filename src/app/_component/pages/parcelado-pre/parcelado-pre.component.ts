@@ -637,12 +637,10 @@ export class ParceladoPreComponent implements OnInit {
           dataAmortizacao: "---",
           valorAmortizacao: "---"
         });
-        this.tableLoading = false;
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';
       }
-
-
+      this.tableLoading = false;
     }, 0);
 
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);
