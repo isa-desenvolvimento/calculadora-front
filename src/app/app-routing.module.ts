@@ -9,6 +9,7 @@ import { ChequeEmpresarialComponent } from './_component/pages/cheque-empresaria
 import { ParceladoPosComponent } from './_component/pages/parcelado-pos/parcelado-pos.component';
 import { ParceladoPreComponent } from './_component/pages/parcelado-pre/parcelado-pre.component';
 import { IndicesComponent } from './_component/pages/indices/indices.component';
+import { LogComponent } from './_component/pages/log/log.component';
 
 const routes: Routes = [
 	{
@@ -40,6 +41,10 @@ const routes: Routes = [
 			{
 				path: 'indices',
 				component: IndicesComponent
+			},
+			{
+				path: 'log',
+				component: LogComponent
 			}
 		]
 	},

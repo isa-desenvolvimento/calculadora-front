@@ -4,6 +4,7 @@ import { Lancamento, InfoParaCalculo } from '../../../_models/ChequeEmpresarial'
 import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
 
 import { IndicesService } from '../../../_services/indices.service';
+import { LogService } from '../../../_services/log.service';
 import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -64,6 +65,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
     private indicesService: IndicesService,
+    private logService: LogService,
     private pastasContratosService: PastasContratosService
   ) {
   }
@@ -442,12 +444,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 
-        this.tableLoading = false;
-        if (origin === 'btn') {
-          this.toggleUpdateLoading()
-          this.alertType = 'calculo-simulado';
-        }
-
         if (this.tableData.dataRows.length > 0) {
           this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
           const valorDevedorAtualizado = parseFloat(this.last_data_table['valorDevedorAtualizado']);
@@ -459,7 +455,26 @@ export class ChequeEmpresarialComponent implements OnInit {
         return parseFloat(row['valorDevedorAtualizado']);
       });
 
-
+      if (origin === 'btn') {
+        this.logService.addLog({
+          data:  this.getCurrentDate(),
+          usuario: '',
+          pasta: this.ce_form.ce_pasta.value,
+          contrato: this.ce_form.ce_contrato.value,
+          dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
+          indice: this.formDefaultValues.formIndice,
+          desagio: "---",
+          honorarios: this.formDefaultValues.formHonorarios,
+          multa: this.formDefaultValues.formMulta,
+          jurosMora: this.formDefaultValues.formJuros,
+          dataAmortizacao: "---",
+          valorAmortizacao: "---"
+        });
+        this.tableLoading = false;
+        this.toggleUpdateLoading()
+        this.alertType = 'calculo-simulado';
+      }
+      
     }, 0);
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);
     !isInlineChange && this.toggleUpdateLoading();

@@ -115,16 +115,20 @@ export class IndicesComponent implements OnInit {
   changeIndices() {
     this.tableData.dataRows = [];
     this.tableLoading = true;
-    let table = this.getIndice;
-    
     const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
+
+    this.indicesService.getIndice(this.indice_form.indice.value).subscribe(indices => {
+      console.log(indices);
+      
+      this.tableData.dataRows = indices;
+      setTimeout(() => {
+        this.tableLoading = false;
+        return;
+      }, 100);
+    })
+    
     //if (DATAINPUT) table = table.filter(indice => indice.data === DATAINPUT)
 
-    setTimeout(() => {
-      this.tableLoading = false;
-      this.tableData.dataRows = table;
-      return;
-    }, 100);
   }
 
   changeIndiceTable(e, row, column) {
