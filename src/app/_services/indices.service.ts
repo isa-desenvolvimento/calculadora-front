@@ -58,13 +58,12 @@ export class IndicesService {
     //   default:
     //     break;
     // }
-    console.log(indice);
     
-    return this.http.get<Indices[]>(`${environment.API_PATH}/indices/${indice}`);
+    return this.http.get<Indices[]>(`${environment.API_PATH}/indices?indice=${indice}`);
   }
 
-  addIndice(indice: any) {
-    return this.http.post(`${environment.API_PATH}/indices`, indice);
+  addIndice(indiceList: any) {
+    return this.http.post(`${environment.API_PATH}/indices`, indiceList);
   }
 
   updateIndice(id: number, indice: any) {

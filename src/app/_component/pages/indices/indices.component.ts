@@ -88,17 +88,21 @@ export class IndicesComponent implements OnInit {
     }, 3000);
   }
 
+  popularBanco
+
   adicionaIndice() {
     this.tableLoading = true;
 
-    const indice = {
+    const indiceList = [{
       indice: this.indice_form.indice.value,
       data: this.indice_form.data.value,
       valor: this.indice_form.valor.value
-    }
+    }];
 
-    this.indicesService.addIndice(indice).subscribe(resp => {
-      this.tableData.dataRows.push(resp);
+    this.indicesService.addIndice(indiceList).subscribe(resp => {
+      indiceList.forEach(indice => {
+        this.tableData.dataRows.push(indice);
+      })
       this.indicesForm.reset();
       this.alertType = 'indice-incluido';
       this.toggleUpdateLoading()
@@ -119,14 +123,14 @@ export class IndicesComponent implements OnInit {
 
     this.indicesService.getIndice(this.indice_form.indice.value).subscribe(indices => {
       console.log(indices);
-      
+
       this.tableData.dataRows = indices;
       setTimeout(() => {
         this.tableLoading = false;
         return;
       }, 100);
     })
-    
+
     //if (DATAINPUT) table = table.filter(indice => indice.data === DATAINPUT)
 
   }
@@ -147,15 +151,19 @@ export class IndicesComponent implements OnInit {
   }
 
   deleteRow(row) {
-    // this.indicesService.removeIndice(row.id).subscribe(resp => {
-    //   this.alertType = 'registro-excluido';
-    //   this.toggleUpdateLoading()
-    // }, err => {
-    //   this.alertType = 'registro-nao-incluido';
-    //   //this.toggleUpdateLoading()
-    //   //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
-    // });
-   }
+    this.indicesService.removeIndice(row.id).subscribe(resp => {
+
+      const index = this.tableData.dataRows.indexOf(row);
+      this.tableData.dataRows.splice(index, 1);
+
+      this.alertType = 'registro-excluido';
+      this.toggleUpdateLoading()
+    }, err => {
+      this.alertType = 'registro-nao-incluido';
+      //this.toggleUpdateLoading()
+      //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+    });
+  }
 
   formatCurrency(value) {
     return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
