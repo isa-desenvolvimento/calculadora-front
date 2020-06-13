@@ -437,10 +437,14 @@ export class ChequeEmpresarialComponent implements OnInit {
         (this.formDefaultValues.formHonorarios || this.ce_form_riscos.ce_honorarios.value) && (this.total_honorarios = honorarios);
 
         this.last_data_table = [...this.tableData.dataRows].pop();
-        let last_date = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+        let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+        let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
 
-        this.subtotal_data_calculo = moment(last_date).format("DD/MM/YYYY");
-        this.min_data = last_date;
+        this.subtotal_data_calculo = moment(last_date_base).format("DD/MM/YYYY");
+        this.total_data_calculo = moment(last_date_base_atual).format("DD/MM/YYYY");
+        this.total_data_calculo
+
+        this.min_data = last_date_base_atual;
         // this.total_subtotal = 1000;
         // this.total_grandtotal = this.total_grandtotal + row['valorDevedorAtualizado'];
 

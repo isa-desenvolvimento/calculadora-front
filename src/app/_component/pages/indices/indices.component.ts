@@ -103,7 +103,7 @@ export class IndicesComponent implements OnInit {
       indiceList.forEach(indice => {
         this.tableData.dataRows.push(indice);
       })
-      this.indicesForm.reset();
+      this.indicesForm.reset({indice: this.indice_form.indice.value});
       this.alertType = 'indice-incluido';
       this.toggleUpdateLoading()
 

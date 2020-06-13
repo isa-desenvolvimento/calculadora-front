@@ -389,6 +389,18 @@
                                     <td (click)="deleteRow(row)"><i style="color: red; cursor: pointer;"
                                             class="nc-icon nc-simple-remove"></i></td>
                                 </tr>
+
+								<tr class="parcelado-font-size">
+									<th class="footer-table footer-title-table" colspan="7" >  SUBTOTAL APURADO EM {{subtotal_data_calculo || "---------"}}</th>
+									<th class="footer-table" width="100" colspan="1"></th>
+									<th class="footer-table" width="100" colspan="1"></th>
+									<th class="footer-table" ></th>
+									<th class="footer-table" ></th>
+									<th class="footer-table" ></th>
+									<th class="footer-table" ></th> 
+									<th class="footer-table" ></th>
+									<th class="footer-table" >{{formatCurrency(total_subtotal || 0)}}</th>
+								</tr>
                             </tbody>
                         </table>
                         <div class="d-flex justify-content-center" *ngIf="tableLoading" style="padding: 200px">
@@ -400,13 +412,13 @@
                     <div class="card-footer" *ngIf="tableData.dataRows.length > 0 && !tableLoading">
                         <div class="row">
                             <div class="col-md-10">
-                                <p>Subtotal apurado em {{ subtotal_data_calculo || "---------"}}</p>
+                                <!-- <p>Subtotal apurado em {{ subtotal_data_calculo || "---------"}}</p> -->
                                 <p>Honorários {{formDefaultValues.formHonorarios || 0}}%</p>
                                 <p>Multa sob contrato {{formDefaultValues.formMultaSobContrato || 0}}%</p>
                                 <p>TOTAL APURADO EM {{total_data_calculo || "---------"}}</p>
                             </div>
                             <div class="col-md-2">
-                                <p>{{formatCurrency(total_subtotal || 0)}}</p>
+                                <!-- <p>{{formatCurrency(total_subtotal || 0)}}</p> -->
                                 <p>{{formatCurrency(total_honorarios || 0)}}</p>
                                 <p>{{formatCurrency(total_multa_sob_contrato || 0)}}</p>
                                 <p>{{formatCurrency(total_grandtotal || 0)}}</p>
