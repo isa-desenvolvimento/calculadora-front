@@ -69,7 +69,7 @@
                                     <td>
                                         <input type="date" class="form-control col-md-11 col-sm-12"
                                             (change)="changeIndiceTable($event, row, 'data')"
-                                            [value]="row.data">
+                                            [value]="formatDate(row.data, 'YYYY-MM-DD')">
                                     </td>
                                     <td>
                                         <input class="form-control col-md-11 col-sm-12"
