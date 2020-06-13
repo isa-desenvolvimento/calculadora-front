@@ -4,6 +4,7 @@ export interface Log {
     usuario: string;
     pasta: string;
     contrato: string;
+    tipoContrato: string;
     dataSimulacao: string;
     indice: string;
     indiceOutros: string;
