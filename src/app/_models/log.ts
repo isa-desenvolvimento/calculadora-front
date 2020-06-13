@@ -13,4 +13,5 @@ export interface Log {
     jurosMora: string;
     dataAmortizacao: string;
     valorAmortizacao: string;
+    infoTabela: any;
 }
