@@ -77,7 +77,7 @@ export class ParceladoPreComponent implements OnInit {
     private formBuilder: FormBuilder,
     private parceladoPreService: ParceladoPreService,
     private indicesService: IndicesService,
-    private pastasContratosService : PastasContratosService,
+    private pastasContratosService: PastasContratosService,
     private logService: LogService,
   ) {
   }
@@ -159,7 +159,7 @@ export class ParceladoPreComponent implements OnInit {
     };
   }
 
-  formartTable() {
+  formartTable(acao) {
     const inter = setInterval(() => {
       const table = document.getElementById('tablePre');
       if (table) {
@@ -171,11 +171,22 @@ export class ParceladoPreComponent implements OnInit {
         )
 
         clearInterval(inter)
-        return table.innerHTML
+        this.logService.addLog([{
+          data: this.getCurrentDate(),
+          usuario: '',
+          pasta: this.pre_form.pre_pasta.value,
+          contrato: this.pre_form.pre_contrato.value,
+          tipoContrato: this.pre_form.pre_tipo_contrato.value,
+          dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
+          acao: acao,
+          infoTabela: table.innerHTML
+        }]).subscribe(log => {
+          console.log(log);
+        })
       }
     }, 500);
   }
-  
+
   atualizarRisco() {
     this.controleLancamentos = 0;
 
@@ -231,18 +242,7 @@ export class ParceladoPreComponent implements OnInit {
 
     setTimeout(() => {
       this.updateLoading = false;
-
-      this.logService.addLog({
-        data: this.getCurrentDate(),
-        usuario: '',
-        pasta: this.pre_form.pre_pasta.value,
-        contrato: this.pre_form.pre_contrato.value,
-        tipoContrato: this.pre_form.pre_tipo_contrato.value,
-        dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
-        acao: 'Atualização de Risco',
-        infoTabela: this.formartTable(),
-      });
-
+      this.formartTable('Atualização de Risco');
     }, 3000);
   }
 
@@ -583,7 +583,7 @@ export class ParceladoPreComponent implements OnInit {
         const vincenda = dataVencimento > inputExternoDataCalculo;
 
         const amortizacao = parseFloat(row['amortizacao']);
-        let porcentagem = (this.formDefaultValues.formJuros/100) || (parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) / 100);
+        let porcentagem = (this.formDefaultValues.formJuros / 100) || (parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) / 100);
 
         // Calculos 
         const correcaoPeloIndice = (valorNoVencimento / indiceDataVencimento * indiceDataCalcAmor) - valorNoVencimento;
@@ -652,19 +652,9 @@ export class ParceladoPreComponent implements OnInit {
       }
 
       if (origin === 'btn') {
-        this.logService.addLog({
-          data: this.getCurrentDate(),
-          usuario: '',
-          pasta: this.pre_form.pre_pasta.value,
-          contrato: this.pre_form.pre_contrato.value,
-          tipoContrato: this.pre_form.pre_tipo_contrato.value,
-          dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
-          acao: 'Simulação',
-          infoTabela: this.formartTable(),
-        });
-
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';
+        this.formartTable('Simulação')
       }
       this.tableLoading = false;
     }, 0);

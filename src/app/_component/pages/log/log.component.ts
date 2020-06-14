@@ -118,11 +118,20 @@ export class LogComponent implements OnInit {
 
     const pasta = this.log_form.log_pasta.value;
     const contrato = this.log_form.log_contrato.value;
-    const tipoContrato = this.log_form.log_tipoContrato.value;
+    const tipoContrato = this.log_form.log_tipo_contrato.value;
+    this.tableData.dataRows = [];
 
     this.logService.getLog(pasta, contrato, tipoContrato).subscribe(logs => {
+      if (!logs.length) {
+        this.alertType = 'sem-registros';
+        this.tableLoading = false;
+        this.toggleUpdateLoading()
+        return;
+      }
+
       this.tableData.dataRows = logs;
       this.tableLoading = false;
+
     }, err => {
       this.tableLoading = false;
       this.alertType = 'sem-registros';

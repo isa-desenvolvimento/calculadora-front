@@ -199,16 +199,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     setTimeout(() => {
       this.updateLoading = false;
-      this.logService.addLog({
-        data: this.getCurrentDate(),
-        usuario: '',
-        pasta: this.ce_form.ce_pasta.value,
-        contrato: this.ce_form.ce_contrato.value,
-        tipoContrato: this.ce_form.ce_tipo_contrato.value,
-        dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
-        acao: 'Atualização de Risco',
-        infoTabela: this.formartTable()
-      })
+      this.formartTable('Atualização de Risco');
     }, 3000);
   }
 
@@ -240,7 +231,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     return this.tableData.dataRows.length === 0 ? this.tableData.dataRows.length : this.tableData.dataRows.length - 1;
   }
 
-  formartTable() {
+  formartTable(acao) {
     const inter = setInterval(() => {
       const table = document.getElementById('tableCheque');
       if (table) {
@@ -252,7 +243,18 @@ export class ChequeEmpresarialComponent implements OnInit {
         )
 
         clearInterval(inter)
-        return table.innerHTML
+        this.logService.addLog([{
+          data: this.getCurrentDate(),
+          usuario: '',
+          pasta: this.ce_form.ce_pasta.value,
+          contrato: this.ce_form.ce_contrato.value,
+          tipoContrato: this.ce_form.ce_tipo_contrato.value,
+          dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
+          acao: acao,
+          infoTabela: table.innerHTML
+        }]).subscribe(log => {
+          console.log(log);
+        })
       }
     }, 500);
   }
@@ -509,20 +511,11 @@ export class ChequeEmpresarialComponent implements OnInit {
       });
 
       if (origin === 'btn') {
-        this.logService.addLog({
-          data: this.getCurrentDate(),
-          usuario: '',
-          pasta: this.ce_form.ce_pasta.value,
-          contrato: this.ce_form.ce_contrato.value,
-          tipoContrato: this.ce_form.ce_tipo_contrato.value,
-          dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
-          acao: 'Simulação',
-          infoTabela: this.formartTable(),
-        });
+        this.formartTable('Simulação');
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';
       }
-      
+
       this.tableLoading = false;
     }, 0);
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);
