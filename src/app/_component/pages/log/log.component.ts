@@ -3,6 +3,7 @@ import { LogService } from '../../../_services/log.service';
 import * as moment from 'moment';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PastasContratosService } from '../../../_services/pastas-contratos.service';
+import { DataTableDirective } from 'angular-datatables';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -20,6 +21,8 @@ export class LogComponent implements OnInit {
   tableData: TableData;
   dtOptions: DataTables.Settings = {};
 
+  @ViewChild(DataTableDirective)
+  datatableElement: DataTableDirective;
 
   logForm: FormGroup;
 
@@ -66,23 +69,73 @@ export class LogComponent implements OnInit {
           "sortAscending": ": Ordernar para cima",
           "sortDescending": ": Ordernar para baixo"
         }
+      },
+
+      rowCallback: (row: Node, data: any[] | Object, index: number) => {
+        // Unbind first in order to avoid any duplicate handler
+        // (see https://github.com/l-lin/angular-datatables/issues/87)
+        $('.details-control', row).unbind('click');
+        $('.details-control', row).bind('click', (el) => {
+          this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
+            let selectedRow = dtInstance.row($(row));
+
+            el.currentTarget.children[0].classList.toggle('nc-simple-add')
+            el.currentTarget.children[0].style.color = el.currentTarget.children[0].style.color === 'red' ? 'green' : 'red';
+            el.currentTarget.children[0].classList.toggle('nc-simple-remove')
+
+            if (selectedRow.child.isShown()) {
+              selectedRow.child.hide();
+            } else {
+              selectedRow.child(this.detailsRow(this.item)).show();
+            }
+          });
+        });
+        return row;
       }
     };
   }
 
+  detailsRow(item: any) {
+    // e.currentTarget.children[0].classList.toggle('nc-simple-add')
+    // e.currentTarget.children[0].style.color = rowCurrent.open ? 'green' : 'red';
+    // e.currentTarget.children[0].classList.toggle('nc-simple-remove')
 
-  infoTable(e, rowCurrent) {
-    e.currentTarget.children[0].classList.toggle('nc-simple-add')
-    e.currentTarget.children[0].style.color = rowCurrent.open ? 'green' : 'red';
-    e.currentTarget.children[0].classList.toggle('nc-simple-remove')
-    
-    rowCurrent.open  = !!rowCurrent.open;
+    // rowCurrent.open  = !!rowCurrent.open;
 
+    return '<table id="example" class="display" style="width:100%">' + 
+    "      <thead>                     " +                     
+    "          <tr>                    " +                      
+    "              <th></th>           " +                               
+    "              <th>First name</th> " +                                         
+    "              <th>Last name</th>  " +                                        
+    "              <th>Position</th>   " +                                       
+    "              <th>Office</th>     " +                                     
+    "          </tr>                   " +                       
+    "      </thead>                    " +                      
+    "      <tfoot>                     " +                     
+    "          <tr>                    " +                      
+    "              <th></th>           " +                               
+    "              <th>First name</th> " +                                         
+    "              <th>Last name</th>  " +                                        
+    "              <th>Position</th>   " +                                       
+    "              <th>Office</th>     " +                                     
+    "          </tr>                   " +                       
+    "      </tfoot>                    " +                      
+    "  </table>'                       " ;                 
   }
 
   pesquisarContratos() {
     this.tableLoading = true;
     this.tableData.dataRows = [
+      {
+        "data": "2020-06-13",
+        "usuario": "Dessa",
+        "pasta": "123",
+        "contrato": "123",
+        "tipoContrato": "123",
+        "dataSimulacao": "2020-06-13",
+        "open": false
+      },
       {
         "data": "2020-06-13",
         "usuario": "Dessa",

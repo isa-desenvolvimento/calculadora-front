@@ -63,7 +63,7 @@
             <div class="card-body ">
                 <div class="row">
                     <div class="col-md-12">
-                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%" id="tableLog" >
+                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%" id="tableLog"[dtTrigger]="dtTrigger" >
                             <thead>
                                 <tr align="center">
                                     <th></th>
@@ -77,7 +77,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" align="center">
-                                    <td (click)="infoTable($event, row)" ><i style="color: green; cursor: pointer;"
+                                    <td class="details-control" (click)="toggleDetails()"><i style="color: green; cursor: pointer;"
                                             class="nc-icon nc-simple-add "></i></td>
                                     <td>{{formatDate(row.data)}}</td>
                                     <td>{{row.usuario}}</td>
