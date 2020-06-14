@@ -159,6 +159,23 @@ export class ParceladoPreComponent implements OnInit {
     };
   }
 
+  formartTable() {
+    const inter = setInterval(() => {
+      const table = document.getElementById('tablePre');
+      if (table) {
+        table.querySelectorAll('.log-hidden').forEach(el =>
+          el['style'].display = 'none'
+        )
+        table.querySelectorAll('.log-visible').forEach(el =>
+          el['style'].display = 'block'
+        )
+
+        clearInterval(inter)
+        return table.innerHTML
+      }
+    }, 500);
+  }
+  
   atualizarRisco() {
     this.controleLancamentos = 0;
 
@@ -214,6 +231,18 @@ export class ParceladoPreComponent implements OnInit {
 
     setTimeout(() => {
       this.updateLoading = false;
+
+      this.logService.addLog({
+        data: this.getCurrentDate(),
+        usuario: '',
+        pasta: this.pre_form.pre_pasta.value,
+        contrato: this.pre_form.pre_contrato.value,
+        tipoContrato: this.pre_form.pre_tipo_contrato.value,
+        dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
+        acao: 'Atualização de Risco',
+        infoTabela: this.formartTable(),
+      });
+
     }, 3000);
   }
 
@@ -624,12 +653,14 @@ export class ParceladoPreComponent implements OnInit {
 
       if (origin === 'btn') {
         this.logService.addLog({
-          data:  this.getCurrentDate(),
+          data: this.getCurrentDate(),
           usuario: '',
           pasta: this.pre_form.pre_pasta.value,
           contrato: this.pre_form.pre_contrato.value,
+          tipoContrato: this.pre_form.pre_tipo_contrato.value,
           dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
-          infoTabela: JSON.stringify(this.tableData.dataRows)
+          acao: 'Simulação',
+          infoTabela: this.formartTable(),
         });
 
         this.toggleUpdateLoading()

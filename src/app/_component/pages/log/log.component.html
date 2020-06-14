@@ -1,9 +1,10 @@
 <div class="row ">
 
-    <div *ngIf="updateLoading && alertType === 'sem-registros'" class="col-lg-3  mt-3" style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-		<div class="alert alert-warning" role="alert"> Nenhuma registro encontrado! </div>
+    <div *ngIf="updateLoading && alertType === 'sem-registros'" class="col-lg-3  mt-3"
+        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
+        <div class="alert alert-warning" role="alert"> Nenhuma registro encontrado! </div>
     </div>
-    
+
     <div class="col-md-12">
         <div class="card ">
             <div class="card-header ">
@@ -68,7 +69,8 @@
             <div class="card-body ">
                 <div class="row">
                     <div class="col-md-12">
-                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%" id="tableLog">
+                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%"
+                            id="tableLog">
                             <thead>
                                 <tr align="center">
                                     <th></th>
@@ -83,8 +85,9 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" align="center">
-                                    <td class="details-control" (click)="toggleDetails(row)"><i style="color: green; cursor: pointer;"
-                                            class="nc-icon nc-simple-add "></i></td>
+                                    <td class="details-control" (click)="toggleDetails(row)"><i
+                                            style="color: green; cursor: pointer;" class="nc-icon nc-simple-add "></i>
+                                    </td>
                                     <td>{{formatDate(row.data)}}</td>
                                     <td>{{row.usuario}}</td>
                                     <td>{{row.pasta}}</td>
