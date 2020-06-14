@@ -103,8 +103,18 @@ export class ChequeEmpresarialComponent implements OnInit {
     });
 
     this.tableHeader = [
-      
+      'Data Base',
+      'Índice',
+      'Índice Data Base',
+      'Data Base Atual',
+      'Índice',
+      'Valor Devedor',
+      'Correção pelo Índice',
+      'Encargos Monetários',
+      'Lançamento',
+      'Valor Devedor Atualizado'
     ]
+
     this.dtOptions = {
       paging: false,
       searching: false,
@@ -472,18 +482,30 @@ export class ChequeEmpresarialComponent implements OnInit {
 
       if (origin === 'btn') {
         this.logService.addLog({
-          data:  this.getCurrentDate(),
+          data: this.getCurrentDate(),
           usuario: '',
           pasta: this.ce_form.ce_pasta.value,
           contrato: this.ce_form.ce_contrato.value,
           tipoContrato: this.ce_form.ce_tipo_contrato.value,
           dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
-          infoTabela: JSON.stringify(this.tableData.dataRows)
+          infoTabela: JSON.stringify(this.tableData.dataRows),
+          infoHeader: JSON.stringify(this.tableHeader)
         });
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';
       }
       this.tableLoading = false;
+
+      const inter = setInterval(() => {
+        const table = document.getElementById('tableCheque');
+         
+        if (table) {
+           localStorage.setItem('tableCheque', table.innerHTML);
+          clearInterval(inter)
+        }
+      }, 1000);
+
+
     }, 0);
     this.tableData.dataRows.length === 0 && (this.tableLoading = false);
     !isInlineChange && this.toggleUpdateLoading();
@@ -571,7 +593,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   typeContractList_field = [];
   setTypeContract() {
     this.typeContractList_field = [];
-    this.pastas['data'].map(pasta=> {
+    this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.ce_form.ce_pasta.value && pasta.CONTRATO === this.ce_form.ce_contrato.value) {
         this.typeContractList_field.push(pasta.DESCRICAO);
       }

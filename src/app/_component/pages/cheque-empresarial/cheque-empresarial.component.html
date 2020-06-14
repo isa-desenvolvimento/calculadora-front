@@ -282,7 +282,7 @@
                         <h4 class="card-title">MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO</h4>
                     </div>
                     <div class="card-body" style="max-height: 100vh;overflow: scroll;">
-                        <table [dtOptions]="dtOptions" datatable class="table table-hover"
+                        <table [dtOptions]="dtOptions" datatable class="table table-hover" id="tableCheque"
                             *ngIf="tableData && tableData.dataRows && !tableLoading" style="width:100%">
                             <thead>
                                 <tr align="center">

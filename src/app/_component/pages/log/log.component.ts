@@ -43,8 +43,7 @@ export class LogComponent implements OnInit {
       dataRows: []
     }
     this.dtOptions = {
-      paging: false,
-      scrollY: "300px",
+      paging: true,
       scrollCollapse: true,
       language: {
         "decimal": "",
@@ -102,26 +101,30 @@ export class LogComponent implements OnInit {
 
     // rowCurrent.open  = !!rowCurrent.open;
 
-    return '<table id="example" class="display" style="width:100%">' + 
-    "      <thead>                     " +                     
-    "          <tr>                    " +                      
-    "              <th></th>           " +                               
-    "              <th>First name</th> " +                                         
-    "              <th>Last name</th>  " +                                        
-    "              <th>Position</th>   " +                                       
-    "              <th>Office</th>     " +                                     
-    "          </tr>                   " +                       
-    "      </thead>                    " +                      
-    "      <tfoot>                     " +                     
-    "          <tr>                    " +                      
-    "              <th></th>           " +                               
-    "              <th>First name</th> " +                                         
-    "              <th>Last name</th>  " +                                        
-    "              <th>Position</th>   " +                                       
-    "              <th>Office</th>     " +                                     
-    "          </tr>                   " +                       
-    "      </tfoot>                    " +                      
-    "  </table>'                       " ;                 
+    let tableHeader = [
+      'Data Base',
+      'Índice',
+      'Índice Data Base',
+      'Data Base Atual',
+      'Índice',
+      'Valor Devedor',
+      'Correção pelo Índice',
+      'Encargos Monetários',
+      'Lançamento',
+      'Valor Devedor Atualizado'
+    ]
+
+    let header = [];
+    tableHeader.map(nome => {
+      return header.push(`<th> ${nome} </th>`);
+    })
+
+   console.log(window.localStorage.getItem('tableCheque'));
+   
+
+    const tableCheque = window.localStorage.getItem('tableCheque')
+
+    return tableCheque;
   }
 
   pesquisarContratos() {
