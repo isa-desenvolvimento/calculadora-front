@@ -161,7 +161,7 @@ export class ParceladoPreComponent implements OnInit {
 
   formartTable(acao) {
     const inter = setInterval(() => {
-      const table = document.getElementById('tablePre');
+      const table = {...document.getElementById('tablePre')};
       if (table) {
         table.querySelectorAll('.log-hidden').forEach(el =>
           el['style'].display = 'none'

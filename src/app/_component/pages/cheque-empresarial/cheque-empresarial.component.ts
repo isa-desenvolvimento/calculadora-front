@@ -234,7 +234,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   formartTable(acao) {
     const inter = setInterval(() => {
-      const table = document.getElementById('tableCheque');
+      const table = {...document.getElementById('tableCheque')};
       if (table) {
         table.querySelectorAll('.log-hidden').forEach(el =>
           el['style'].display = 'none'
