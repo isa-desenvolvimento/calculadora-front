@@ -161,7 +161,7 @@ export class ParceladoPreComponent implements OnInit {
 
   formartTable(acao) {
     const inter = setInterval(() => {
-      const table = {...document.getElementById('tablePre')};
+      const table = document.getElementById('tablePre');
       if (table) {
         table.querySelectorAll('.log-hidden').forEach(el =>
           el['style'].display = 'none'
@@ -181,7 +181,12 @@ export class ParceladoPreComponent implements OnInit {
           acao: acao,
           infoTabela: table.innerHTML
         }]).subscribe(log => {
-          console.log(log);
+          table.querySelectorAll('.log-hidden').forEach(el =>
+            el['style'].display = 'block'
+          )
+          table.querySelectorAll('.log-visible').forEach(el =>
+            el['style'].display = 'none'
+          )   
         })
       }
     }, 500);
@@ -212,10 +217,11 @@ export class ParceladoPreComponent implements OnInit {
     payloadPut.length > 0 && this.parceladoPreService.updateLancamento(payloadPut).subscribe(parceladoPreList => {
       this.updateLoadingBtn = false;
       this.controleLancamentos = this.controleLancamentos + 1;
+      this.formartTable('Atualização de Risco');
+
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
-        this.formartTable('Atualização de Risco');
         this.alertType = 'risco-atualizado';
       }
     }, err => {
@@ -227,11 +233,12 @@ export class ParceladoPreComponent implements OnInit {
     payloadPost.length > 0 && this.parceladoPreService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
       this.updateLoadingBtn = false;
       this.controleLancamentos = this.controleLancamentos + 1;
+      this.formartTable('Atualização de Risco');
+
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
         this.alertType = 'risco-atualizado';
-        this.formartTable('Atualização de Risco');
       }
       // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
     }, err => {

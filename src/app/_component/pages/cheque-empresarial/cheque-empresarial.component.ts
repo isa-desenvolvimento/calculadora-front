@@ -169,10 +169,11 @@ export class ChequeEmpresarialComponent implements OnInit {
     payloadPut.length > 0 && this.chequeEmpresarialService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
       this.updateLoadingBtn = false;
       this.controleLancamentos = this.controleLancamentos + 1;
+      this.formartTable('Atualização de Risco');
+
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
-        this.formartTable('Atualização de Risco');
         this.alertType = 'risco-atualizado';
       }
     }, err => {
@@ -184,11 +185,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     payloadPost.length > 0 && this.chequeEmpresarialService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
       this.updateLoadingBtn = false;
       this.controleLancamentos = this.controleLancamentos + 1;
+      this.formartTable('Atualização de Risco');
+
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
         this.alertType = 'risco-atualizado';
-        this.formartTable('Atualização de Risco');
       }
       // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
     }, err => {
@@ -234,7 +236,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   formartTable(acao) {
     const inter = setInterval(() => {
-      const table = {...document.getElementById('tableCheque')};
+      const table = document.getElementById('tableCheque');
       if (table) {
         table.querySelectorAll('.log-hidden').forEach(el =>
           el['style'].display = 'none'
@@ -254,10 +256,16 @@ export class ChequeEmpresarialComponent implements OnInit {
           acao: acao,
           infoTabela: table.innerHTML
         }]).subscribe(log => {
-          console.log(log);
+          table.querySelectorAll('.log-hidden').forEach(el =>
+            el['style'].display = 'block'
+          )
+          table.querySelectorAll('.log-visible').forEach(el =>
+            el['style'].display = 'none'
+          )
         })
       }
-    }, 500);
+
+    }, 0);
   }
 
   incluirLancamentos() {

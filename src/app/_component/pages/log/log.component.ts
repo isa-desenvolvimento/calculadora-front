@@ -81,9 +81,9 @@ export class LogComponent implements OnInit {
           this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
             let selectedRow = dtInstance.row($(row));
 
-            el.currentTarget.children[0].classList.toggle('nc-simple-add')
+            el.currentTarget.children[0].classList.toggle('nc-minimal-right')
             el.currentTarget.children[0]['style'].color = el.currentTarget.children[0]['style'].color === 'red' ? 'green' : 'red';
-            el.currentTarget.children[0].classList.toggle('nc-simple-remove')
+            el.currentTarget.children[0].classList.toggle('nc-minimal-down')
 
             if (selectedRow.child.isShown()) {
               selectedRow.child.hide();
