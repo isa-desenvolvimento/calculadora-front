@@ -118,8 +118,6 @@ export class IndicesComponent implements OnInit {
     const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
 
     this.indicesService.getIndice(this.indice_form.indice.value).subscribe(indices => {
-      console.log(indices);
-
       this.tableData.dataRows = indices;
       setTimeout(() => {
         this.tableLoading = false;

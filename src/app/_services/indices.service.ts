@@ -59,7 +59,7 @@ export class IndicesService {
   }
 
   updateIndice(id: number, indice: any) {
-    return this.http.put(`${environment.API_PATH}/indices/${id}`, indice);
+    return this.http.put(`${environment.API_PATH}/indices/${id}`, [indice]);
   }
 
   removeIndice(id: number) {

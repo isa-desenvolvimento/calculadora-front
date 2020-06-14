@@ -12,6 +12,9 @@ import * as moment from 'moment'; // add this 1 of 4
 import { timeout } from 'rxjs/operators';
 import { element } from 'protractor';
 
+import 'datatables.net';
+import 'datatables.net-buttons';
+
 declare interface TableData {
   dataRows: Array<Object>;
 }
@@ -119,6 +122,8 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.dtOptions = {
       paging: false,
       searching: false,
+      dom: 'Bfrtip',
+      buttons: ['excel', 'pdf'],
       // pagingType: 'full_numbers',
       language: {
         "decimal": "",
@@ -354,7 +359,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         }
 
         setTimeout(() => {
-
           this.changeFormValues(cheque.infoParaCalculo, true);
           this.simularCalc(true, null, true);
         }, 1000);

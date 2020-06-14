@@ -11,6 +11,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
 import { timeout } from 'rxjs/operators';
 import { logging } from 'protractor';
+import 'datatables.net';
+import 'datatables.net-buttons';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -128,10 +130,11 @@ export class ParceladoPreComponent implements OnInit {
     })
 
     this.dtOptions = {
-      paging: false,
-      searching: false,
-      scrollY: "300px",
+      paging: true,
+      searching: true,
       scrollCollapse: true,
+      dom: 'Bfrtip',
+      buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
       language: {
         "decimal": "",
         "emptyTable": "Sem dados para exibir",
@@ -156,7 +159,7 @@ export class ParceladoPreComponent implements OnInit {
           "sortDescending": ": Ordernar para baixo"
         }
       }
-    };
+    }
   }
 
   formartTable(acao) {
@@ -186,7 +189,7 @@ export class ParceladoPreComponent implements OnInit {
           )
           table.querySelectorAll('.log-visible').forEach(el =>
             el['style'].display = 'none'
-          )   
+          )
         })
       }
     }, 500);

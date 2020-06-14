@@ -4,6 +4,8 @@ import * as moment from 'moment';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 import { DataTableDirective } from 'angular-datatables';
+import 'datatables.net';
+import 'datatables.net-buttons';
 
 declare interface TableData {
   dataRows: Array<Object>;
