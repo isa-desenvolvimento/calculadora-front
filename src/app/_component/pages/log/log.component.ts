@@ -73,7 +73,10 @@ export class LogComponent implements OnInit {
 
   infoTable(e, rowCurrent) {
     e.currentTarget.children[0].classList.toggle('nc-simple-add')
+    e.currentTarget.children[0].style.color = rowCurrent.open ? 'green' : 'red';
     e.currentTarget.children[0].classList.toggle('nc-simple-remove')
+    
+    rowCurrent.open  = !!rowCurrent.open;
 
   }
 
