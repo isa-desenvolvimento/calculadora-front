@@ -329,7 +329,7 @@
                                     <td>
                                         <input type="text" style="width: 120px; font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden" name="ce_data_calculo"
-                                            id="ce_data_calculo" max="3000-12-31" min="1000-01-01"
+                                             max="3000-12-31" min="1000-01-01"
                                             [value]="formatDate(row)" disabled>
                                         <span class="log-visible">{{formatDate(row)}}</span>
                                     </td>
@@ -349,7 +349,7 @@
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden" name="ce_data_calculo"
-                                            id="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}"
+                                             max="3000-12-31" min="{{row.dataBase}}"
                                             [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
                                         <span class="log-visible">{{formatDate(row.dataBaseAtual)}}</span>
 

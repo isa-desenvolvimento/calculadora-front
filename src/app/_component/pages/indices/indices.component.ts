@@ -48,8 +48,6 @@ export class IndicesComponent implements OnInit {
 
     this.dtOptions = {
       paging: true,
-      pagingType: 'full_numbers',
-      stateSave: true,
       language: {
         "decimal": "",
         "emptyTable": "Sem dados para exibir",
@@ -73,8 +71,8 @@ export class IndicesComponent implements OnInit {
           "sortAscending": ": Ordernar para cima",
           "sortDescending": ": Ordernar para baixo"
         }
-      },
-    };
+      }
+    }
   }
 
   verifyNumber(value) {
@@ -87,8 +85,6 @@ export class IndicesComponent implements OnInit {
       this.updateLoading = false;
     }, 3000);
   }
-
-  popularBanco
 
   adicionaIndice() {
     this.tableLoading = true;
