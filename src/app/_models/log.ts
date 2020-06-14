@@ -6,13 +6,5 @@ export interface Log {
     contrato: string;
     tipoContrato: string;
     dataSimulacao: string;
-    indice: string;
-    indiceOutros: string;
-    desagio: string;
-    honorarios: string;
-    multa: string;
-    jurosMora: string;
-    dataAmortizacao: string;
-    valorAmortizacao: string;
     infoTabela: any;
 }

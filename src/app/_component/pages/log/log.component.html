@@ -11,7 +11,7 @@
                             <div class="col-sm-3">
                                 <label for="log_pasta" class="col-form-label">Pasta</label>
                                 <select class="form-control custom-select col-md-12 col-sm-12" name="log_pasta"
-                                    id="log_pasta" formControlName="log_pasta"  (change)="setContrato()">
+                                    id="log_pasta" formControlName="log_pasta" (change)="setContrato()">
                                     <option *ngFor="let folder of folderData_field" [value]="folder">
                                         {{folder}}</option>
                                 </select>
@@ -19,7 +19,8 @@
                             <div class="col-sm-3">
                                 <label for="log_contrato" class="col-form-label">Contrato</label>
                                 <select class="form-control custom-select col-md-12 col-sm-12" name="log_contrato"
-                                    id="log_contrato" formControlName="log_contrato" required (change)="setTypeContract()">
+                                    id="log_contrato" formControlName="log_contrato" required
+                                    (change)="setTypeContract()">
                                     <option *ngFor="let contract of contractList_field" [value]="contract">
                                         {{contract}}</option>
                                 </select>
@@ -61,38 +62,29 @@
             </div>
             <div class="card-body ">
                 <div class="row">
-                    <div class="col-md-12" >
-                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%">
+                    <div class="col-md-12">
+                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%" id="tableLog" >
                             <thead>
                                 <tr align="center">
+                                    <th></th>
                                     <th>Data</th>
                                     <th>Usuário</th>
                                     <th>Pasta</th>
                                     <th>Contrato</th>
+                                    <th>Tipo deContrato</th>
                                     <th>Data Simulação</th>
-                                    <th>Índice</th>
-                                    <th>Deágio</th>
-                                    <th>Honorários</th>
-                                    <th>Multa</th>
-                                    <th>Juros Mora</th>
-                                    <th>Data Amortização</th>
-                                    <th>Valor Amortização</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" align="center">
-                                    <td>{{formatDate(row.valorNoVencimento)}}</td>
-                                    <td>{{row.usuario}</td>
-                                    <td>{{row.pasta}</td>
-                                    <td>{{row.contrato}</td>
+                                    <td (click)="infoTable($event, row)" ><i style="color: green; cursor: pointer;"
+                                            class="nc-icon nc-simple-add "></i></td>
+                                    <td>{{formatDate(row.data)}}</td>
+                                    <td>{{row.usuario}}</td>
+                                    <td>{{row.pasta}}</td>
+                                    <td>{{row.contrato}}</td>
+                                    <td>{{row.tipoContrato}}</td>
                                     <td>{{formatDate(row.dataSimulacao)}}</td>
-                                    <td>{{row.indice}</td>
-                                    <td>{{formatCurrency(row.desagio)}}</td>
-                                    <td>{{formatCurrency(row.honorarios)}}</td>
-                                    <td>{{formatCurrency(row.multa)}}</td>
-                                    <td>{{formatCurrency(row.jurosMora)}}</td>
-                                    <td>{{formatDate(row.dataAmortizacao)}}</td>
-                                    <td>{{formatCurrency(row.valorAmortizacao)}}</td>
                                 </tr>
                             </tbody>
                         </table>

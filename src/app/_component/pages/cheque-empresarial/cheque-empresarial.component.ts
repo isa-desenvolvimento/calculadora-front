@@ -37,6 +37,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   alertType = '';
   updateLoadingBtn = false;
   controleLancamentos = 0;
+  tableHeader = [];
 
   // total
   total_date_now: any;
@@ -101,6 +102,9 @@ export class ChequeEmpresarialComponent implements OnInit {
       // ceFA_tipo_amortizacao: []
     });
 
+    this.tableHeader = [
+      
+    ]
     this.dtOptions = {
       paging: false,
       searching: false,
@@ -472,14 +476,9 @@ export class ChequeEmpresarialComponent implements OnInit {
           usuario: '',
           pasta: this.ce_form.ce_pasta.value,
           contrato: this.ce_form.ce_contrato.value,
+          tipoContrato: this.ce_form.ce_tipo_contrato.value,
           dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
-          indice: this.formDefaultValues.formIndice,
-          desagio: "---",
-          honorarios: this.formDefaultValues.formHonorarios,
-          multa: this.formDefaultValues.formMulta,
-          jurosMora: this.formDefaultValues.formJuros,
-          dataAmortizacao: "---",
-          valorAmortizacao: "---"
+          infoTabela: JSON.stringify(this.tableData.dataRows)
         });
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';

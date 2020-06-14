@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { LogService } from '../../../_services/log.service';
 import * as moment from 'moment';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -14,12 +14,14 @@ declare interface TableData {
   styleUrls: ['./log.component.css']
 })
 export class LogComponent implements OnInit {
+
   tableLoading = false;
+
   tableData: TableData;
   dtOptions: DataTables.Settings = {};
 
-  logForm: FormGroup;
 
+  logForm: FormGroup;
 
   constructor(
     private logService: LogService,
@@ -39,7 +41,6 @@ export class LogComponent implements OnInit {
     }
     this.dtOptions = {
       paging: false,
-      searching: false,
       scrollY: "300px",
       scrollCollapse: true,
       language: {
@@ -69,13 +70,34 @@ export class LogComponent implements OnInit {
     };
   }
 
+
+  infoTable(e, rowCurrent) {
+    e.currentTarget.children[0].classList.toggle('nc-simple-add')
+    e.currentTarget.children[0].classList.toggle('nc-simple-remove')
+
+  }
+
   pesquisarContratos() {
     this.tableLoading = true;
+    this.tableData.dataRows = [
+      {
+        "data": "2020-06-13",
+        "usuario": "Dessa",
+        "pasta": "123",
+        "contrato": "123",
+        "tipoContrato": "123",
+        "dataSimulacao": "2020-06-13",
+        "open": false
+      }
+    ]
+    this.tableLoading = false;
 
-    this.logService.getLog().subscribe(log => {
-      this.tableData.dataRows = log;
-      this.tableLoading = false;
-    })
+    // this.logService.getLog().subscribe(log => {
+    //   log.infoTabela = JSON.parse(log.infoTabela)
+
+    //   this.tableData.dataRows = log.infoTabela;
+    //   this.tableLoading = false;
+    // })
   }
 
   formatCurrency(value) {
