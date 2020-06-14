@@ -17,6 +17,9 @@ declare interface TableData {
 export class LogComponent implements OnInit {
 
   tableLoading = false;
+  updateLoading = false;
+  alertType = '';
+  row: {};
 
   tableData: TableData;
   dtOptions: DataTables.Settings = {};
@@ -85,7 +88,7 @@ export class LogComponent implements OnInit {
             if (selectedRow.child.isShown()) {
               selectedRow.child.hide();
             } else {
-              selectedRow.child(this.detailsRow({})).show();
+              selectedRow.child(this.detailsRow(this.row)).show();
             }
           });
         });
@@ -94,60 +97,37 @@ export class LogComponent implements OnInit {
     };
   }
 
-  toggleDetails(){}
+  toggleDetails(row) {
+    this.row = row.infoTabela
+  }
+
   detailsRow(item: any) {
-    // let tableHeader = [
-    //   'Data Base',
-    //   'Índice',
-    //   'Índice Data Base',
-    //   'Data Base Atual',
-    //   'Índice',
-    //   'Valor Devedor',
-    //   'Correção pelo Índice',
-    //   'Encargos Monetários',
-    //   'Lançamento',
-    //   'Valor Devedor Atualizado'
-    // ]
-
-    // let header = [];
-    // tableHeader.map(nome => {
-    //   return header.push(`<th> ${nome} </th>`);
-    // })
-
-    const tableCheque = window.localStorage.getItem('tableCheque')
+    const tableCheque = item
     return tableCheque;
+  }
+
+  toggleUpdateLoading() {
+    this.updateLoading = true;
+    setTimeout(() => {
+      this.updateLoading = false;
+    }, 3000);
   }
 
   pesquisarContratos() {
     this.tableLoading = true;
-    this.tableData.dataRows = [
-      {
-        "data": "2020-06-13",
-        "usuario": "Dessa",
-        "pasta": "123",
-        "contrato": "123",
-        "tipoContrato": "123",
-        "dataSimulacao": "2020-06-13",
-        "open": false
-      },
-      {
-        "data": "2020-06-13",
-        "usuario": "Dessa",
-        "pasta": "123",
-        "contrato": "123",
-        "tipoContrato": "123",
-        "dataSimulacao": "2020-06-13",
-        "open": false
-      }
-    ]
-    this.tableLoading = false;
 
-    // this.logService.getLog().subscribe(log => {
-    //   log.infoTabela = JSON.parse(log.infoTabela)
+    const pasta = this.log_form.log_pasta.value;
+    const contrato = this.log_form.log_contrato.value;
+    const tipoContrato = this.log_form.log_tipoContrato.value;
 
-    //   this.tableData.dataRows = log.infoTabela;
-    //   this.tableLoading = false;
-    // })
+    this.logService.getLog(pasta, contrato, tipoContrato).subscribe(logs => {
+      this.tableData.dataRows = logs;
+      this.tableLoading = false;
+    }, err => {
+      this.tableLoading = false;
+      this.alertType = 'sem-registros';
+      this.toggleUpdateLoading()
+    });
   }
 
   formatCurrency(value) {
@@ -157,7 +137,6 @@ export class LogComponent implements OnInit {
   formatDate(date, format = "DD/MM/YYYY") {
     return moment(date).format(format);
   }
-
 
   folderData_field = this.agruparPasta();
 

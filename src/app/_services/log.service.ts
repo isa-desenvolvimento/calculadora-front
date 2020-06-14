@@ -14,7 +14,7 @@ export class LogService {
     return this.http.post(`${environment.API_PATH}/log`, log);
   }
 
-  getLog() {   
-    return this.http.get<Log[]>(`${environment.API_PATH}/log`);
+  getLog(pasta: string, contrato: string, tipoContrato: string) {   
+    return this.http.get<Log[]>(`${environment.API_PATH}/log?pasta=${pasta}&contrato=${contrato}&tipoContrato=${tipoContrato}`);
   }
 }
