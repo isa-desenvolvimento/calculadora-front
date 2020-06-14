@@ -172,6 +172,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
+        this.formartTable('Atualização de Risco');
         this.alertType = 'risco-atualizado';
       }
     }, err => {
@@ -187,6 +188,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
         this.alertType = 'risco-atualizado';
+        this.formartTable('Atualização de Risco');
       }
       // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
     }, err => {
@@ -199,7 +201,6 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     setTimeout(() => {
       this.updateLoading = false;
-      this.formartTable('Atualização de Risco');
     }, 3000);
   }
 
@@ -245,7 +246,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         clearInterval(inter)
         this.logService.addLog([{
           data: this.getCurrentDate(),
-          usuario: '',
+          usuario: window.localStorage.getItem('username').toUpperCase(),
           pasta: this.ce_form.ce_pasta.value,
           contrato: this.ce_form.ce_contrato.value,
           tipoContrato: this.ce_form.ce_tipo_contrato.value,

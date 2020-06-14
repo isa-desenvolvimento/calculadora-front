@@ -173,7 +173,7 @@ export class ParceladoPreComponent implements OnInit {
         clearInterval(inter)
         this.logService.addLog([{
           data: this.getCurrentDate(),
-          usuario: '',
+          usuario: window.localStorage.getItem('username').toUpperCase(),
           pasta: this.pre_form.pre_pasta.value,
           contrato: this.pre_form.pre_contrato.value,
           tipoContrato: this.pre_form.pre_tipo_contrato.value,
@@ -215,6 +215,7 @@ export class ParceladoPreComponent implements OnInit {
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
+        this.formartTable('Atualização de Risco');
         this.alertType = 'risco-atualizado';
       }
     }, err => {
@@ -230,6 +231,7 @@ export class ParceladoPreComponent implements OnInit {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
         this.toggleUpdateLoading()
         this.alertType = 'risco-atualizado';
+        this.formartTable('Atualização de Risco');
       }
       // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
     }, err => {
@@ -242,7 +244,6 @@ export class ParceladoPreComponent implements OnInit {
 
     setTimeout(() => {
       this.updateLoading = false;
-      this.formartTable('Atualização de Risco');
     }, 3000);
   }
 
