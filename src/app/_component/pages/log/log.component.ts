@@ -79,13 +79,13 @@ export class LogComponent implements OnInit {
             let selectedRow = dtInstance.row($(row));
 
             el.currentTarget.children[0].classList.toggle('nc-simple-add')
-            el.currentTarget.children[0].style.color = el.currentTarget.children[0].style.color === 'red' ? 'green' : 'red';
+            el.currentTarget.children[0]['style'].color = el.currentTarget.children[0]['style'].color === 'red' ? 'green' : 'red';
             el.currentTarget.children[0].classList.toggle('nc-simple-remove')
 
             if (selectedRow.child.isShown()) {
               selectedRow.child.hide();
             } else {
-              selectedRow.child(this.detailsRow(this.item)).show();
+              selectedRow.child(this.detailsRow({})).show();
             }
           });
         });
@@ -94,36 +94,27 @@ export class LogComponent implements OnInit {
     };
   }
 
+  toggleDetails(){}
   detailsRow(item: any) {
-    // e.currentTarget.children[0].classList.toggle('nc-simple-add')
-    // e.currentTarget.children[0].style.color = rowCurrent.open ? 'green' : 'red';
-    // e.currentTarget.children[0].classList.toggle('nc-simple-remove')
+    // let tableHeader = [
+    //   'Data Base',
+    //   'Índice',
+    //   'Índice Data Base',
+    //   'Data Base Atual',
+    //   'Índice',
+    //   'Valor Devedor',
+    //   'Correção pelo Índice',
+    //   'Encargos Monetários',
+    //   'Lançamento',
+    //   'Valor Devedor Atualizado'
+    // ]
 
-    // rowCurrent.open  = !!rowCurrent.open;
-
-    let tableHeader = [
-      'Data Base',
-      'Índice',
-      'Índice Data Base',
-      'Data Base Atual',
-      'Índice',
-      'Valor Devedor',
-      'Correção pelo Índice',
-      'Encargos Monetários',
-      'Lançamento',
-      'Valor Devedor Atualizado'
-    ]
-
-    let header = [];
-    tableHeader.map(nome => {
-      return header.push(`<th> ${nome} </th>`);
-    })
-
-   console.log(window.localStorage.getItem('tableCheque'));
-   
+    // let header = [];
+    // tableHeader.map(nome => {
+    //   return header.push(`<th> ${nome} </th>`);
+    // })
 
     const tableCheque = window.localStorage.getItem('tableCheque')
-
     return tableCheque;
   }
 

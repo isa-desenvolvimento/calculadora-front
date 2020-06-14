@@ -63,7 +63,7 @@
             <div class="card-body ">
                 <div class="row">
                     <div class="col-md-12">
-                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%" id="tableLog"[dtTrigger]="dtTrigger" >
+                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%" id="tableLog">
                             <thead>
                                 <tr align="center">
                                     <th></th>
@@ -71,7 +71,8 @@
                                     <th>Usuário</th>
                                     <th>Pasta</th>
                                     <th>Contrato</th>
-                                    <th>Tipo deContrato</th>
+                                    <th>Tipo de Contrato</th>
+                                    <th>Tipo de Ação</th>
                                     <th>Data Simulação</th>
                                 </tr>
                             </thead>
@@ -84,6 +85,7 @@
                                     <td>{{row.pasta}}</td>
                                     <td>{{row.contrato}}</td>
                                     <td>{{row.tipoContrato}}</td>
+                                    <td>{{row.acao}}</td>
                                     <td>{{formatDate(row.dataSimulacao)}}</td>
                                 </tr>
                             </tbody>

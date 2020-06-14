@@ -10,6 +10,7 @@ import { PastasContratosService } from '../../../_services/pastas-contratos.serv
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
 import { timeout } from 'rxjs/operators';
+import { element } from 'protractor';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -198,6 +199,16 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     setTimeout(() => {
       this.updateLoading = false;
+      this.logService.addLog({
+        data: this.getCurrentDate(),
+        usuario: '',
+        pasta: this.ce_form.ce_pasta.value,
+        contrato: this.ce_form.ce_contrato.value,
+        tipoContrato: this.ce_form.ce_tipo_contrato.value,
+        dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
+        acao: 'Atualização de Risco',
+        infoTabela: this.formartTable()
+      })
     }, 3000);
   }
 
@@ -227,6 +238,23 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   getLastLine() {
     return this.tableData.dataRows.length === 0 ? this.tableData.dataRows.length : this.tableData.dataRows.length - 1;
+  }
+
+  formartTable() {
+    const inter = setInterval(() => {
+      const table = document.getElementById('tableCheque');
+      if (table) {
+        table.querySelectorAll('.log-hidden').forEach(el =>
+          el['style'].display = 'none'
+        )
+        table.querySelectorAll('.log-visible').forEach(el =>
+          el['style'].display = 'block'
+        )
+
+        clearInterval(inter)
+        return table.innerHTML
+      }
+    }, 500);
   }
 
   incluirLancamentos() {
@@ -488,22 +516,14 @@ export class ChequeEmpresarialComponent implements OnInit {
           contrato: this.ce_form.ce_contrato.value,
           tipoContrato: this.ce_form.ce_tipo_contrato.value,
           dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
-          infoTabela: JSON.stringify(this.tableData.dataRows),
-          infoHeader: JSON.stringify(this.tableHeader)
+          acao: 'Simulação',
+          infoTabela: this.formartTable(),
         });
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';
       }
       this.tableLoading = false;
 
-      const inter = setInterval(() => {
-        const table = document.getElementById('tableCheque');
-         
-        if (table) {
-           localStorage.setItem('tableCheque', table.innerHTML);
-          clearInterval(inter)
-        }
-      }, 1000);
 
 
     }, 0);

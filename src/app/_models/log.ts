@@ -6,5 +6,6 @@ export interface Log {
     contrato: string;
     tipoContrato: string;
     dataSimulacao: string;
+    acao: string;
     infoTabela: any;
 }

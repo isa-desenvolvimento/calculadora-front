@@ -50,6 +50,11 @@ table.dataTable thead .sorting_desc {
     font-weight: bold;
 }
 
+.log-visible {
+    display: none;
+}
+
+
 /* width */
 ::-webkit-scrollbar {
     width: 6px;
