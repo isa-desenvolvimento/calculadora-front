@@ -50,8 +50,16 @@ table.dataTable thead .sorting_desc {
     font-weight: bold;
 }
 
-.log-visible {
+.log-visible-false{
     display: none;
+}
+
+.log-visible-true {
+    display: block;
+}
+
+.log-hidden-true {
+    display: none !important;
 }
 
 .dt-button {

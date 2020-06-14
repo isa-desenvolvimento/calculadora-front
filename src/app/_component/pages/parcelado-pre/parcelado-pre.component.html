@@ -352,7 +352,7 @@
 									<th width="80" class="align-title-top" rowspan="2">Amortização</th>
 									<th width="80" class="align-title-top" rowspan="2">Total Devedor</th>
 									<th width="80" class="align-title-top" rowspan="2">Status</th>
-									<th width="80" class="align-title-top log-hidden" rowspan="2">Ação</th>
+									<th width="80" class="align-title-top log-hidden-false" rowspan="2">Ação</th>
 								</tr>
 								<tr align="center">
 									<th>Dias</th>
@@ -365,20 +365,20 @@
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.nparcelas}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<input type="date" [ngClass]="{'parcelas-vincendas': row.vincenda} "
-											class=" parcelado-font-size form-control col-md-11 col-sm-12 log-hidden"
+											class=" parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataVencimento" id="pre_dataCalcAmor" [value]="row.dataVencimento"
 											(change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')">
-										<span class="log-visible">{{formatDate(row.dataVencimento)}}</span>
+										<span class="log-visible-false">{{formatDate(row.dataVencimento)}}</span>
 									</td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<select [ngClass]="{'parcelas-vincendas': row.vincenda}"
-											class="parcelado-font-size form-control custom-select log-hidden" name="pre_indiceDV"
+											class="parcelado-font-size form-control custom-select log-hidden-false" name="pre_indiceDV"
 											id="pre_indiceDV"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV', 'dataVencimento')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type"
 												[selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
 										</select>
-										<span class="log-visible">{{row.indiceDV}}</span>
+										<span class="log-visible-false">{{row.indiceDV}}</span>
 
 									</td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
@@ -386,22 +386,22 @@
 									</td>
 									<td width="120" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<input [ngClass]="{'parcelas-vincendas': row.vincenda}" type="date"
-											class="parcelado-font-size form-control col-md-11 col-sm-12 log-hidden"
+											class="parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31"
 											[value]="row.dataCalcAmor"
 											(change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')">
-										<span class="log-visible">{{formatDate(row.dataCalcAmor)}}</span>
+										<span class="log-visible-false">{{formatDate(row.dataCalcAmor)}}</span>
 
 									</td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<select [ngClass]="{'parcelas-vincendas': row.vincenda}"
-											class="parcelado-font-size form-control custom-select log-hidden" name="pre_indice"
+											class="parcelado-font-size form-control custom-select log-hidden-false" name="pre_indice"
 											id="pre_indice"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA', 'dataCalcAmor')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type"
 												[selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
 										</select>
-										<span class="log-visible">{{row.indiceDCA}}</span>
+										<span class="log-visible-false">{{row.indiceDCA}}</span>
 
 									</td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
@@ -428,7 +428,7 @@
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										{{formatCurrency(row.totalDevedor)}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.status}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}" class="log-hidden" (click)="deleteRow(row)"><i
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}" class="log-hidden-false" (click)="deleteRow(row)"><i
 											style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i>
 									</td>
 								</tr>
@@ -448,7 +448,7 @@
 									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.amortizacao)}}</th>
 									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.totalDevedor)}}</th>
 									<th class="footer-table"></th>
-									<th class="footer-table log-hidden"></th>
+									<th class="footer-table log-hidden-false"></th>
 								</tr>
 								<tr align="left" class="parcelado-font-size">
 									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS VINCENDAS
@@ -466,7 +466,7 @@
 									<th class="footer-table">{{formatCurrency(totalParcelasVincendas.totalDevedor)}}
 									</th>
 									<th class="footer-table"></th>
-									<th class="footer-table log-hidden"></th>
+									<th class="footer-table log-hidden-false"></th>
 								</tr>
 							</tbody>
 						</table>

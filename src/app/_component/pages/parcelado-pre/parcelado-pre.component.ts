@@ -164,14 +164,10 @@ export class ParceladoPreComponent implements OnInit {
 
   formartTable(acao) {
     const inter = setInterval(() => {
-      const table = document.getElementById('tablePre');
+      let table = document.getElementById('tablePre').innerHTML;
       if (table) {
-        table.querySelectorAll('.log-hidden').forEach(el =>
-          el['style'].display = 'none'
-        )
-        table.querySelectorAll('.log-visible').forEach(el =>
-          el['style'].display = 'block'
-        )
+        table = table.replace(/log-visible-false/g, 'log-visible-true ');
+        table = table.replace(/log-hidden-false/g, 'log-hidden-true ');
 
         clearInterval(inter)
         this.logService.addLog([{
@@ -182,15 +178,8 @@ export class ParceladoPreComponent implements OnInit {
           tipoContrato: this.pre_form.pre_tipo_contrato.value,
           dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
           acao: acao,
-          infoTabela: table.innerHTML
-        }]).subscribe(log => {
-          table.querySelectorAll('.log-hidden').forEach(el =>
-            el['style'].display = 'block'
-          )
-          table.querySelectorAll('.log-visible').forEach(el =>
-            el['style'].display = 'none'
-          )
-        })
+          infoTabela: table
+        }]).subscribe(log => {})
       }
     }, 500);
   }

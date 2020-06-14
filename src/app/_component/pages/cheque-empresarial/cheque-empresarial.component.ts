@@ -241,15 +241,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   formartTable(acao) {
     const inter = setInterval(() => {
-      const table = document.getElementById('tableCheque');
+      let table = document.getElementById('tableCheque').innerHTML;
+      
       if (table) {
-        table.querySelectorAll('.log-hidden').forEach(el =>
-          el['style'].display = 'none'
-        )
-        table.querySelectorAll('.log-visible').forEach(el =>
-          el['style'].display = 'block'
-        )
-
+        table = table.replace(/log-visible-false/g, 'log-visible-true ');
+        table = table.replace(/log-hidden-false/g, 'log-hidden-true ');
         clearInterval(inter)
         this.logService.addLog([{
           data: this.getCurrentDate(),
@@ -259,17 +255,9 @@ export class ChequeEmpresarialComponent implements OnInit {
           tipoContrato: this.ce_form.ce_tipo_contrato.value,
           dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
           acao: acao,
-          infoTabela: table.innerHTML
-        }]).subscribe(log => {
-          table.querySelectorAll('.log-hidden').forEach(el =>
-            el['style'].display = 'block'
-          )
-          table.querySelectorAll('.log-visible').forEach(el =>
-            el['style'].display = 'none'
-          )
-        })
+          infoTabela: table
+        }]).subscribe(log => {})
       }
-
     }, 0);
   }
 

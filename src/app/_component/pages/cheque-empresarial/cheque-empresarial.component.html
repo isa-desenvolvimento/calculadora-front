@@ -318,7 +318,7 @@
 
                                     <th class="align-title-top" rowspan="2">Lançamentos</th>
                                     <th width="80" class="align-title-top" rowspan="2">Valor devedor atualizado</th>
-                                    <th width="80" class="align-title-top log-hidden" rowspan="2">Ação</th>
+                                    <th width="80" class="align-title-top log-hidden-false" rowspan="2">Ação</th>
                                 </tr>
                                 <tr align="center">
                                     <th>Dias</th>
@@ -330,42 +330,42 @@
                                 <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
                                     <td>
                                         <input type="text" style="width: 120px; font-size: 11px"
-                                            class="form-control col-md-11 col-sm-12 log-hidden" name="ce_data_calculo"
+                                            class="form-control col-md-11 col-sm-12 log-hidden-false" name="ce_data_calculo"
                                             max="3000-12-31" min="1000-01-01" [value]="formatDate(row)" disabled>
-                                        <span class="log-visible">{{formatDate(row)}}</span>
+                                        <span class="log-visible-false">{{formatDate(row)}}</span>
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px"
-                                            class="form-control custom-select log-hidden" name="ce_indiceDB"
+                                            class="form-control custom-select log-hidden-false" name="ce_indiceDB"
                                             id="ce_indiceDB"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase', 'dataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="indice.type === row.indiceDB">
                                                 {{indice.type}}</option>
                                         </select>
-                                        <span class="log-visible">{{row.indiceDB}}</span>
+                                        <span class="log-visible-false">{{row.indiceDB}}</span>
                                     </td>
                                     <td>
                                         {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBase) || "---"}}
                                     </td>
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
-                                            class="form-control col-md-11 col-sm-12 log-hidden" name="ce_data_calculo"
+                                            class="form-control col-md-11 col-sm-12 log-hidden-false" name="ce_data_calculo"
                                             max="3000-12-31" min="{{row.dataBase}}" [value]="row.dataBaseAtual"
                                             (change)="changeDate($event, row)">
-                                        <span class="log-visible">{{formatDate(row.dataBaseAtual)}}</span>
+                                        <span class="log-visible-false">{{formatDate(row.dataBaseAtual)}}</span>
 
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px"
-                                            class="form-control custom-select log-hidden" name="ce_indice"
+                                            class="form-control custom-select log-hidden-false" name="ce_indice"
                                             id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual', 'dataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice.type"
                                                 [selected]="indice.type === row.indiceBA">
                                                 {{indice.type}}</option>
                                         </select>
-                                        <span class="log-visible">{{row.indiceBA}}</span>
+                                        <span class="log-visible-false">{{row.indiceBA}}</span>
 
                                     </td>
                                     <td>
@@ -395,7 +395,7 @@
                                     <td>
                                         {{formatCurrency(row.valorDevedorAtualizado)}}
                                     </td>
-                                    <td (click)="deleteRow(row)" class="log-hidden"><i
+                                    <td (click)="deleteRow(row)" class="log-hidden-false"><i
                                             style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i>
                                     </td>
                                 </tr>
@@ -412,7 +412,7 @@
                                     <th class="footer-table"></th>
                                     <th class="footer-table"></th>
                                     <th class="footer-table">{{formatCurrency(total_subtotal || 0)}}</th>
-                                    <th class="footer-table log-hidden"></th>
+                                    <th class="footer-table log-hidden-false"></th>
                                 </tr>
                             </tfoot>
                         </table>
@@ -439,16 +439,6 @@
                         </div>
 
                     </div>
-                    <div class="col-lg-12 col-sm-12">
-                        <!-- <form class=" float-right form-inline dt-buttons">
-                            <div class="stats float-right">
-                                <button type="button" tabindex="0" aria-controls="tableCheque" class="btn btn-link btn-round">Exportar Pdf</button>
-                            </div>
-                            <div class="stats float-right">
-                                <button type="button" tabindex="0" aria-controls="tableCheque" class="btn btn-link btn-round">Exportar Xls</button>
-                            </div>
-                        </form>
-                    </div> -->
                 </div>
             </div>
         </div>
