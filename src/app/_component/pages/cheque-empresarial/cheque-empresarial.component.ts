@@ -140,6 +140,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           doc['styles']['tableHeader'] = {...doc['styles']['tableHeader'], fontSize: 8, color: 'black', fillColor: 'white'}
           doc['styles']['tableFooter'] = {...doc['styles']['tableFooter'], fontSize: 8, color: 'black', fillColor: 'white'}
 
+          doc['content'][0].text = 'MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO';
           doc['content'][1]['table']['widths'] = [80, 100, 40, 50, 100, 40, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'];
 
           const footer = doc['content'][1]['table']['body'].pop();
@@ -159,6 +160,27 @@ export class ChequeEmpresarialComponent implements OnInit {
 
               row.map(item => item.alignment =  'center');
             }
+          })
+
+          doc['content'].push({
+            style: {fontSize: 10},
+            alignment: 'left',
+            margin: [0,20, 10, 0],
+            text: `Honorários ${this.formDefaultValues.formHonorarios || 0}% : ${this.formatCurrency(this.total_honorarios)}` 
+          })
+
+          doc['content'].push({
+            style: {fontSize: 10},
+            alignment: 'left',
+            margin: [0, 0, 10, 0],
+            text: `Multa sob contrato ${this.formDefaultValues.formMultaSobContrato || 0}% : ${this.formatCurrency(this.total_multa_sob_contrato)}` 
+          })
+
+          doc['content'].push({
+            style: {fontSize: 10},
+            alignment: 'left',
+            margin: [0, 0, 10, 0],
+            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_multa_sob_contrato)}` 
           })
 
         }
