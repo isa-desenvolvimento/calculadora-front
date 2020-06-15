@@ -124,7 +124,26 @@ export class ChequeEmpresarialComponent implements OnInit {
       ordering: false,
       searching: false,
       dom: 'Bfrtip',
-      buttons: ['excel', 'pdf'],
+      buttons: [{
+        extend: 'pdfHtml5',
+        orientation: 'landscape',
+        pageSize: 'LEGAL',
+        exportOptions: {
+          columns: [0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13]
+        },
+        customize: doc => {
+          console.log(doc);
+          
+          doc['content'][1]['table']['body'].map((row, index) => {
+            if (index!== 0) {
+              row[1].text = this.tableData.dataRows[index - 1]['indiceDB'];
+              row[4].text = this.tableData.dataRows[index - 1]['indiceBA'];
+            }
+
+          })
+
+        }
+      }],
       // pagingType: 'full_numbers',
       language: {
         "decimal": "",
