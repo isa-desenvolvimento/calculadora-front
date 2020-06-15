@@ -75,7 +75,7 @@ export class IndicesComponent implements OnInit {
       drawCallback: () => {
         $('.paginate_button').on('click', () => {
           const info = $('#tableIndice').DataTable().page.info();
-          this.indicesService.getIndicePage(this.indice_form.indice.value, info).subscribe(indices => {
+          this.indicesService.getIndicePage(this.indice_form.indice.value, info.page, info.length).subscribe(indices => {
             this.tableData.dataRows = indices;
             setTimeout(() => {
               this.tableLoading = false;
@@ -148,7 +148,7 @@ export class IndicesComponent implements OnInit {
     this.tableLoading = true;
     const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
 
-    this.indicesService.getIndicePage(this.indice_form.indice.value, 1).subscribe(indices => {
+    this.indicesService.getIndicePage(this.indice_form.indice.value, 1, 10).subscribe(indices => {
       this.tableData.dataRows = indices;
       setTimeout(() => {
         this.tableLoading = false;
