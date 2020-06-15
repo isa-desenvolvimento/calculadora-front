@@ -499,9 +499,9 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   changeDate(e, row) {
-    this.indicesService.getIndiceData((this.ce_form_riscos.ce_indice.value || row["indiceBA"], row["dataBaseAtual"]), e.target.value).subscribe(indi => {
+    this.indicesService.getIndiceData((this.ce_form_riscos.ce_indice.value || row["indiceBA"]), e.target.value).subscribe(indi => {
       row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
-      row['indiceDataBaseAtual'] = indi['valor']
+      row['indiceDataBaseAtual'] = indi['valor'];
       this.simularCalc(true);
     })
   }
@@ -654,20 +654,16 @@ export class ChequeEmpresarialComponent implements OnInit {
       return 1;
     }
 
-    return await this.indicesService.getIndiceData(indice, dataBaseAtual).subscribe(indi => {
-      return indi['valor']
-    });
-
-    // return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
-    //   let date = moment(dataBaseAtual).format("DD/MM/YYYY");
-
-
-    // switch (ind.type) {
-    //   case "Encargos Contratuais %":
-    //     return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
-    //     break;
-    //   default:
-    //     break;
+    switch (indice) {
+      case "Encargos Contratuais %":
+        return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : 1;
+        break;
+      default:
+        return await this.indicesService.getIndiceData(indice, dataBaseAtual).subscribe(indi => {
+          return indi['valor']
+        });
+        break;
+    }
   }
 
   deleteRow(row) {
