@@ -72,15 +72,16 @@ export class IndicesComponent implements OnInit {
           "sortDescending": ": Ordernar para baixo"
         }
       },
-      drawCallback: e => {
+      drawCallback: () => {
         $('.paginate_button').on('click', () => {
-         this.indicesService.getIndicePage(this.indice_form.indice.value, e.iDraw).subscribe(indices => {
-          this.tableData.dataRows = indices;
-          setTimeout(() => {
-            this.tableLoading = false;
-            return;
-          }, 100);
-        })
+          const info = $('#tableIndice').DataTable().page.info();
+          this.indicesService.getIndicePage(this.indice_form.indice.value, info).subscribe(indices => {
+            this.tableData.dataRows = indices;
+            setTimeout(() => {
+              this.tableLoading = false;
+              return;
+            }, 100);
+          })
         });
       }
     }

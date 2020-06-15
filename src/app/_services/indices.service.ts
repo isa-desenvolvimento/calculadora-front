@@ -50,8 +50,8 @@ export class IndicesService {
     return this.http.get<Indices[]>(`${environment.API_PATH}/indices?indice=${indice}`);
   }
 
-  getIndicePage(indice: string, page: number) {
-    return this.http.get<Indices[]>(`${environment.API_PATH}/indices?indice=${indice}&page=${page}`);
+  getIndicePage(indice: string, info: any) {
+    return this.http.get<Indices[]>(`${environment.API_PATH}/indices?indice=${indice}`, info);
   }
 
   getIndiceData(indice: string, data: string) {
