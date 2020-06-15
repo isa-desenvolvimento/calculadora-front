@@ -127,19 +127,60 @@ export class ChequeEmpresarialComponent implements OnInit {
       buttons: [{
         extend: 'pdfHtml5',
         orientation: 'landscape',
+        header: true,
+        footer: true,
         pageSize: 'LEGAL',
         exportOptions: {
-          columns: [0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13]
+          columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         },
         customize: doc => {
           console.log(doc);
-          
+
+          doc['defaultStyle'] = {...doc['defaultStyle'], fontSize: 8}
+          doc['styles']['tableHeader'] = {...doc['styles']['tableHeader'], fontSize: 8, color: 'black', fillColor: 'white'}
+          doc['styles']['tableFooter'] = {...doc['styles']['tableFooter'], fontSize: 8, color: 'black', fillColor: 'white'}
+
+          doc['content'][0].text = 'MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO';
+          doc['content'][1]['table']['widths'] = [80, 100, 40, 50, 100, 40, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'];
+
+          const footer = doc['content'][1]['table']['body'].pop();
+          const valor =  footer.pop();
+          footer.map((value, index) => {
+            if (index !== 0) {
+              value.text = "";
+            }
+          })
+          footer.push(valor);
+          doc['content'][1]['table']['body'].push(footer);
+
           doc['content'][1]['table']['body'].map((row, index) => {
-            if (index!== 0) {
+            if (index !== 0 && this.tableData.dataRows.length - 1 >= index -1 ) {
               row[1].text = this.tableData.dataRows[index - 1]['indiceDB'];
               row[4].text = this.tableData.dataRows[index - 1]['indiceBA'];
-            }
 
+              row.map(item => item.alignment =  'center');
+            }
+          })
+
+          doc['content'].push({
+            style: {fontSize: 10},
+            alignment: 'left',
+            margin: [0,20, 10, 0],
+            text: `Honorários ${this.formDefaultValues.formHonorarios || 0}% : ${this.formatCurrency(this.total_honorarios)}` 
+          })
+
+          doc['content'].push({
+            style: {fontSize: 10},
+            alignment: 'left',
+            margin: [0, 0, 10, 0],
+            text: `Multa sob contrato ${this.formDefaultValues.formMultaSobContrato || 0}% : ${this.formatCurrency(this.total_multa_sob_contrato)}` 
+          })
+
+          doc['content'].push({
+            style: {fontSize: 10},
+            alignment: 'left',
+            margin: [0, 0, 10, 0],
+            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_multa_sob_contrato)}` 
           })
 
         }
@@ -545,26 +586,33 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   getIndiceDataBase(indice, dataBaseAtual) {
-    return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
-      let date = moment(dataBaseAtual).format("DD/MM/YYYY");
+    if (!indice || !dataBaseAtual) {
+      return 1;
+    }
+    
+    this.indicesService.getIndiceData(indice, dataBaseAtual).subscribe(indi => parseFloat(indi['valor']), error => 1);
 
-      switch (ind.type) {
-        case "INPC/IBGE":
-          return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
-          break;
-        case "CDI":
-          return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
-          break;
-        case "IGPM":
-          return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
-          break;
-        case "Encargos Contratuais %":
-          return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
-          break;
-        default:
-          break;
-      }
-    })[0]);
+    // return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
+    //   let date = moment(dataBaseAtual).format("DD/MM/YYYY");
+
+
+    //   switch (ind.type) {
+    //     case "INPC/IBGE":
+    //       return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
+    //       break;
+    //     case "CDI":
+    //       return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
+    //       break;
+    //     case "IGPM":
+    //       return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
+    //       break;
+    //     case "Encargos Contratuais %":
+    //       return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // })[0]);
   }
 
   deleteRow(row) {
