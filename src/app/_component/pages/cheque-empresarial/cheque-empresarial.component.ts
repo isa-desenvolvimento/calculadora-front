@@ -127,19 +127,38 @@ export class ChequeEmpresarialComponent implements OnInit {
       buttons: [{
         extend: 'pdfHtml5',
         orientation: 'landscape',
+        header: true,
+        footer: true,
         pageSize: 'LEGAL',
         exportOptions: {
-          columns: [0, 1, 2, 3,4,5,6,7,8,9,10,11,12,13]
+          columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         },
         customize: doc => {
           console.log(doc);
-          
+
+          doc['defaultStyle'] = {...doc['defaultStyle'], fontSize: 8}
+          doc['styles']['tableHeader'] = {...doc['styles']['tableHeader'], fontSize: 8, color: 'black', fillColor: 'white'}
+          doc['styles']['tableFooter'] = {...doc['styles']['tableFooter'], fontSize: 8, color: 'black', fillColor: 'white'}
+
+          doc['content'][1]['table']['widths'] = [80, 100, 40, 50, 100, 40, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'];
+
+          const footer = doc['content'][1]['table']['body'].pop();
+          const valor =  footer.pop();
+          footer.map((value, index) => {
+            if (index !== 0) {
+              value.text = "";
+            }
+          })
+          footer.push(valor);
+          doc['content'][1]['table']['body'].push(footer);
+
           doc['content'][1]['table']['body'].map((row, index) => {
-            if (index!== 0) {
+            if (index !== 0 && this.tableData.dataRows.length - 1 >= index -1 ) {
               row[1].text = this.tableData.dataRows[index - 1]['indiceDB'];
               row[4].text = this.tableData.dataRows[index - 1]['indiceBA'];
-            }
 
+              row.map(item => item.alignment =  'center');
+            }
           })
 
         }
