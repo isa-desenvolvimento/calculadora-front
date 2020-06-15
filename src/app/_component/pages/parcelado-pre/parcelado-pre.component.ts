@@ -963,16 +963,6 @@ export class ParceladoPreComponent implements OnInit {
     value: "3"
   }]
 
-
-  get datasCDI() {
-    return this.indicesService.getCDI();
-  };
-  get datasIGPM() {
-    return this.indicesService.getIGPM();
-  };
-  get datasINPC() {
-    return this.indicesService.getINPC();
-  };
   get pastas() {
     return this.pastasContratosService.getPastas();
   }

@@ -22,10 +22,12 @@ export class IndicesComponent implements OnInit {
 
   updateLoading = false;
   alertType = '';
+  request = true;
 
   listaINPC = [];
   listaCDI = [];
   listaIGPM = [];
+  infoTable = {};
 
   listaAdd = [];
 
@@ -48,6 +50,25 @@ export class IndicesComponent implements OnInit {
 
     this.dtOptions = {
       paging: true,
+      serverSide: true,
+      ajax: (dataTablesParameters: any, callback) => {
+        const info = $('#tableIndice').DataTable().page.info();
+        const indiceType = this.indice_form.indice.value;
+        const length = dataTablesParameters.length || 10;
+        const page = info.page || 0;
+        const draw = dataTablesParameters.draw || 1;
+
+        this.indicesService.getIndicePage(indiceType, length, page, draw).subscribe(resp => {
+          this.tableData.dataRows = resp['data'];
+
+          callback({
+            recordsTotal: resp['recordsTotal'],
+            recordsFiltered: resp['recordsFiltered'],
+            pages:  resp['recordsTotal'] /  resp['length'],
+            data: []
+          });
+        });
+      },
       language: {
         "decimal": "",
         "emptyTable": "Sem dados para exibir",
@@ -71,39 +92,8 @@ export class IndicesComponent implements OnInit {
           "sortAscending": ": Ordernar para cima",
           "sortDescending": ": Ordernar para baixo"
         }
-      },
-      drawCallback: () => {
-        $('.paginate_button').on('click', () => {
-          const info = $('#tableIndice').DataTable().page.info();
-          this.indicesService.getIndicePage(this.indice_form.indice.value, info.page, info.length).subscribe(indices => {
-            this.tableData.dataRows = indices;
-            setTimeout(() => {
-              this.tableLoading = false;
-              return;
-            }, 100);
-          })
-        });
       }
     }
-  }
-  buttonInRowClick(event: any): void {
-    event.stopPropagation();
-    console.log('Button in the row clicked.');
-  }
-
-  wholeRowClick(): void {
-    console.log('Whole row clicked.');
-  }
-
-  nextButtonClickEvent(): void {
-    //do next particular records like  101 - 200 rows.
-    //we are calling to api
-
-    console.log('next clicked')
-  }
-  previousButtonClickEvent(): void {
-    //do previous particular the records like  0 - 100 rows.
-    //we are calling to API
   }
 
   verifyNumber(value) {
@@ -143,21 +133,23 @@ export class IndicesComponent implements OnInit {
     this.tableLoading = false;
   }
 
-  changeIndices() {
-    this.tableData.dataRows = [];
-    this.tableLoading = true;
-    const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
+  changeIndices(callback, request = true) {
+    if (request) {
+      this.tableData.dataRows = [];
+      this.tableLoading = true;
+      const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
 
-    this.indicesService.getIndicePage(this.indice_form.indice.value, 10, 1).subscribe(indices => {
-      this.tableData.dataRows = indices;
-      setTimeout(() => {
-        this.tableLoading = false;
-        return;
-      }, 100);
-    })
+      this.indicesService.getIndicePage(this.indice_form.indice.value, 10, 1, 1).subscribe(indices => {
+        this.tableData.dataRows = indices['data'];
+        this.infoTable = indices;
 
-    //if (DATAINPUT) table = table.filter(indice => indice.data === DATAINPUT)
-
+        setTimeout(() => {
+          this.tableLoading = false;
+          this.request = false
+        }, 100);
+      })
+      this.request = true
+    }
   }
 
   changeIndiceTable(e, row, column) {
@@ -205,14 +197,4 @@ export class IndicesComponent implements OnInit {
   get getIndice() {
     return this.indicesService.getIndice(this.indice_form.indice.value);
   }
-  get datasCDI() {
-    return this.indicesService.getCDI();
-  };
-  get datasIGPM() {
-    return this.indicesService.getIGPM();
-  };
-  get datasINPC() {
-    return this.indicesService.getINPC();
-  };
-
 }

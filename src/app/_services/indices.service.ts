@@ -17,41 +17,12 @@ export class IndicesService {
 
   constructor(private http: HttpClient) { }
 
-  formatDate(date, format = "DD/MM/YYYY") {
-    return moment(date).format(format);
-  }
-
-  tranformJSON(indice, json) {
-    const indicesFormated = [];
-    Object.entries(json).forEach(([key, value]) => {
-      indicesFormated.push({
-        indice,
-        data: this.formatDate(key, "YYYY-DD-MM"),
-        valor: value
-      })
-    })
-
-    return indicesFormated;
-  }
-
-  public getINPC(): Observable<any> {
-    return this.inpc.default;
-  }
-
-  public getIGPM(): Observable<any> {
-    return this.igpm.default;
-  }
-
-  public getCDI(): Observable<any> {
-    return this.cdi.default
-  }
-
   getIndice(indice: string) {
     return this.http.get<Indices[]>(`${environment.API_PATH}/indices?indice=${indice}`);
   }
 
-  getIndicePage(indice: string, pageSize: number, pageNumber: number) {
-    return this.http.get<Indices[]>(`${environment.API_PATH}/indices?indice=${indice}&pageSize=${pageSize}&pageNumber=${pageNumber}&getAll=${false}`);
+  getIndicePage(indice: string, pageSize: number, pageNumber: number, draw: number) {
+    return this.http.get<Indices[]>(`${environment.API_PATH}/indices?pageSize=${pageSize}&pageNumber=${pageNumber}&indice=${indice}&getAll=${false}&draw=${draw}`);
   }
 
   getIndiceData(indice: string, data: string) {
