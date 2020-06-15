@@ -589,34 +589,25 @@ export class ChequeEmpresarialComponent implements OnInit {
     !isInlineChange && this.toggleUpdateLoading();
   }
 
-  getIndiceDataBase(indice, dataBaseAtual) {
+  async getIndiceDataBase(indice, dataBaseAtual) {
     if (!indice || !dataBaseAtual) {
       return 1;
     }
     
-    this.indicesService.getIndiceData(indice, dataBaseAtual).subscribe(indi => parseFloat(indi['valor']), error => 1);
+    return await this.indicesService.getIndiceData(indice, dataBaseAtual).subscribe(indi => {
+      return indi['valor']
+    });
 
     // return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
     //   let date = moment(dataBaseAtual).format("DD/MM/YYYY");
 
 
-    //   switch (ind.type) {
-    //     case "INPC/IBGE":
-    //       return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
-    //       break;
-    //     case "CDI":
-    //       return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
-    //       break;
-    //     case "IGPM":
-    //       return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
-    //       break;
-    //     case "Encargos Contratuais %":
-    //       return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // })[0]);
+      // switch (ind.type) {
+      //   case "Encargos Contratuais %":
+      //     return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
+      //     break;
+      //   default:
+      //     break;
   }
 
   deleteRow(row) {
@@ -641,13 +632,24 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
-    this.indicesService.getIndiceData(e.target.value, row[columnData]).subscribe(indi => {
-      row[innerIndice] = e.target.value;
-      row[indiceToChangeInline] = indi['valor']
-      setTimeout(() => {
-        this.simularCalc(true);
-      }, 500);
-    });
+    switch (e.target.value) {
+      case "Encargos Contratuais %":
+        row[innerIndice] = e.target.value;
+        row[indiceToChangeInline] = !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : 1;
+        setTimeout(() => {
+          this.simularCalc(true);
+        })
+        break; 
+      default:
+        this.indicesService.getIndiceData(e.target.value, row[columnData]).subscribe(indi => {
+          row[innerIndice] = e.target.value;
+          row[indiceToChangeInline] = indi['valor'];
+          setTimeout(() => {
+            this.simularCalc(true);
+          }, 500);
+        });
+      break;
+    }
   }
 
   // Mock formulário de riscos
