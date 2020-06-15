@@ -61,6 +61,7 @@ export class ParceladoPreComponent implements OnInit {
   pagas: any;
 
   dtOptions: DataTables.Settings = {};
+  dtOptionsAmortizacao: DataTables.Settings = {};
   last_data_table: Object;
   min_data: string;
   ultima_atualizacao: String;
@@ -130,11 +131,43 @@ export class ParceladoPreComponent implements OnInit {
     })
 
     this.dtOptions = {
-      paging: true,
-      searching: true,
-      scrollCollapse: true,
+      paging: false,
+      searching: false,
+      ordering: false,
       dom: 'Bfrtip',
-      buttons: ['copy', 'csv', 'excel', 'pdf', 'print'],
+      buttons: ['excel', 'pdf'],
+      language: {
+        "decimal": "",
+        "emptyTable": "Sem dados para exibir",
+        "info": "Mostrando _START_ de _END_ de _TOTAL_ registros",
+        "infoEmpty": "Mostrando 0 de 0 de 0 registros",
+        "infoFiltered": "(filtered from _MAX_ total registros)",
+        "infoPostFix": "",
+        "thousands": ",",
+        "lengthMenu": "Mostrando _MENU_ registros",
+        "loadingRecords": "Carregando...",
+        "processing": "Processando...",
+        "search": "Buscar:",
+        "zeroRecords": "Nenhum registro encontrado com esses parâmetros",
+        "paginate": {
+          "first": "Primeira",
+          "last": "Última",
+          "next": "Próxima",
+          "previous": "Anterior"
+        },
+        "aria": {
+          "sortAscending": ": Ordernar para cima",
+          "sortDescending": ": Ordernar para baixo"
+        }
+      }
+    }
+
+    this.dtOptionsAmortizacao = {
+      paging: false,
+      searching: false,
+      ordering: false,
+      scrollY:  '300px',
+      scrollCollapse: true,
       language: {
         "decimal": "",
         "emptyTable": "Sem dados para exibir",
@@ -455,6 +488,7 @@ export class ParceladoPreComponent implements OnInit {
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
+    this.tableData.dataRows = [];
     this.preFormRiscos.reset({ pre_data_calculo: this.getCurrentDate('YYYY-MM-DD') });
 
     const contractRef = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value + this.pre_form.pre_tipo_contrato.value;

@@ -198,7 +198,7 @@
 					</div>
 					<!-- Table cadastro de parcelas -->
 					<div class="col-md-12" *ngIf="!(tableDataParcelas.dataRows.length === 0)">
-						<table [dtOptions]="dtOptions" datatable class="table table-hover">
+						<table [dtOptions]="dtOptionsAmortizacao" datatable class="table table-hover">
 							<thead>
 								<tr align="center">
 									<th>Nº Parcela</th>
@@ -287,7 +287,7 @@
 					</div>
 					<!-- Table amortização -->
 					<div class="col-md-12" *ngIf="!(tableDataAmortizacao.dataRows.length === 0)">
-						<table [dtOptions]="dtOptions" datatable class="table table-hover">
+						<table [dtOptions]="dtOptionsAmortizacao" datatable class="table table-hover">
 							<thead>
 								<tr align="center">
 									<th>Data de Laçamento</th>
@@ -372,8 +372,8 @@
 									</td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<select [ngClass]="{'parcelas-vincendas': row.vincenda}"
-											class="parcelado-font-size form-control custom-select log-hidden-false" name="pre_indiceDV"
-											id="pre_indiceDV"
+											class="parcelado-font-size form-control custom-select log-hidden-false"
+											name="pre_indiceDV" id="pre_indiceDV"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV', 'dataVencimento')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type"
 												[selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
@@ -395,8 +395,8 @@
 									</td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										<select [ngClass]="{'parcelas-vincendas': row.vincenda}"
-											class="parcelado-font-size form-control custom-select log-hidden-false" name="pre_indice"
-											id="pre_indice"
+											class="parcelado-font-size form-control custom-select log-hidden-false"
+											name="pre_indice" id="pre_indice"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA', 'dataCalcAmor')">
 											<option *ngFor="let indice of indipre_field" [value]="indice.type"
 												[selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
@@ -428,10 +428,13 @@
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
 										{{formatCurrency(row.totalDevedor)}} </td>
 									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.status}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}" class="log-hidden-false" (click)="deleteRow(row)"><i
-											style="color: red; cursor: pointer;" class="nc-icon nc-simple-remove"></i>
+									<td [ngClass]="{'parcelas-vincendas': row.vincenda}" class="log-hidden-false"
+										(click)="deleteRow(row)"><i style="color: red; cursor: pointer;"
+											class="nc-icon nc-simple-remove"></i>
 									</td>
 								</tr>
+							</tbody>
+							<tfoot>
 								<tr class="parcelado-font-size">
 									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS VENCIDAS
 									</th>
@@ -468,7 +471,7 @@
 									<th class="footer-table"></th>
 									<th class="footer-table log-hidden-false"></th>
 								</tr>
-							</tbody>
+							</tfoot>
 						</table>
 						<div class="d-flex justify-content-center" *ngIf="tableLoading" style="padding: 200px">
 							<div class="spinner-grow text-primary" style="width: 4rem; height: 4rem;" role="status">
