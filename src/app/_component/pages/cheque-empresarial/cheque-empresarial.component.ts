@@ -179,9 +179,9 @@ export class ChequeEmpresarialComponent implements OnInit {
 
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-        this.toggleUpdateLoading()
-        this.alertType = 'risco-atualizado';
       }
+      this.alertType = 'risco-atualizado';
+      this.toggleUpdateLoading()
     }, err => {
       this.errorMessage = "Falha ao atualizar risco.";
     });
@@ -195,9 +195,9 @@ export class ChequeEmpresarialComponent implements OnInit {
 
       if (this.tableData.dataRows.length === this.controleLancamentos) {
         this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-        this.toggleUpdateLoading()
-        this.alertType = 'risco-atualizado';
       }
+      this.alertType = 'risco-atualizado';
+      this.toggleUpdateLoading()
       // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
     }, err => {
       this.tableLoading = false;
@@ -243,7 +243,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   formartTable(acao) {
     const inter = setInterval(() => {
       let table = document.getElementById('tableCheque').innerHTML;
-      
+
       if (table) {
         table = table.replace(/log-visible-false/g, 'log-visible-true ');
         table = table.replace(/log-hidden-false/g, 'log-hidden-true ');
@@ -257,7 +257,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           dataSimulacao: this.ce_form_riscos.ce_data_calculo.value,
           acao: acao,
           infoTabela: table
-        }]).subscribe(log => {})
+        }]).subscribe(log => { })
       }
     }, 0);
   }
