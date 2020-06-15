@@ -55,7 +55,7 @@ export class IndicesService {
   }
 
   getIndiceData(indice: string, data: string) {
-    return this.http.get<Indices[]>(`${environment.API_PATH}/indices?indice=${indice}&data=${data}`);
+    return this.http.get<Indices[]>(`${environment.API_PATH}/indices/byDate?indice=${indice}&data=${data}`);
   }
 
   addIndice(indiceList: any) {

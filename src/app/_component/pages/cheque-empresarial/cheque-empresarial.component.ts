@@ -336,58 +336,62 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.last_data_table = [];
 
     const localTypeIndice = this.ce_form_riscos.ce_indice.value;
-    const localTypeValue = this.getIndiceDataBase(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value);
 
-    const localLancamentos = this.ce_form_amortizacao.ceFA_valor_lancamento.value;
-    const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
-    const localDataBaseAtual = this.ce_form_amortizacao.ceFA_data_base_atual.value;
 
-    const localInfoParaCalculo: InfoParaCalculo = {
-      formMulta: this.ce_form_riscos.ce_multa.value,
-      formJuros: this.ce_form_riscos.ce_juros_mora.value,
-      formHonorarios: this.ce_form_riscos.ce_honorarios.value,
-      formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value,
-      formIndice: null,
-      formIndiceEncargos: null
-    };
 
-    setTimeout(() => {
-      this.payloadLancamento = ({
-        dataBase: localDataBase,
-        indiceDB: localTypeIndice,
-        indiceDataBase: localTypeValue,
-        indiceBA: localTypeIndice,
-        indiceDataBaseAtual: localTypeValue,
-        dataBaseAtual: localDataBaseAtual,
-        valorDevedor: localValorDevedor,
-        encargosMonetarios: {
-          correcaoPeloIndice: null,
-          jurosAm: {
-            dias: null,
-            percentsJuros: null,
-            moneyValue: null,
+    this.indicesService.getIndiceData(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value).subscribe(indi => {
+      const localTypeValue =indi['valor'];
+      const localLancamentos = this.ce_form_amortizacao.ceFA_valor_lancamento.value;
+      const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
+      const localDataBaseAtual = this.ce_form_amortizacao.ceFA_data_base_atual.value;
+  
+      const localInfoParaCalculo: InfoParaCalculo = {
+        formMulta: this.ce_form_riscos.ce_multa.value,
+        formJuros: this.ce_form_riscos.ce_juros_mora.value,
+        formHonorarios: this.ce_form_riscos.ce_honorarios.value,
+        formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value,
+        formIndice: null,
+        formIndiceEncargos: null
+      };
+  
+      setTimeout(() => {
+        this.payloadLancamento = ({
+          dataBase: localDataBase,
+          indiceDB: localTypeIndice,
+          indiceDataBase: localTypeValue,
+          indiceBA: localTypeIndice,
+          indiceDataBaseAtual: localTypeValue,
+          dataBaseAtual: localDataBaseAtual,
+          valorDevedor: localValorDevedor,
+          encargosMonetarios: {
+            correcaoPeloIndice: null,
+            jurosAm: {
+              dias: null,
+              percentsJuros: null,
+              moneyValue: null,
+            },
+            multa: null,
           },
-          multa: null,
-        },
-        lancamentos: localLancamentos,
-        tipoLancamento: localTipoLancamento,
-        valorDevedorAtualizado: null,
-        contractRef: contractRef,
-        ultimaAtualizacao: '',
-        infoParaCalculo: { ...localInfoParaCalculo }
-      });
-      // Removendo inicio e fim amortizacao
-      // this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
-      this.tableData.dataRows.push(this.payloadLancamento)
-      this.tableLoading = false;
-    }, 0);
-    this.resetFields('ceFormAmortizacao');
-
-    setTimeout(() => {
-      this.toggleUpdateLoading()
-      this.alertType = 'lancamento-incluido';
-      this.simularCalc(true)
-    }, 500)
+          lancamentos: localLancamentos,
+          tipoLancamento: localTipoLancamento,
+          valorDevedorAtualizado: null,
+          contractRef: contractRef,
+          ultimaAtualizacao: '',
+          infoParaCalculo: { ...localInfoParaCalculo }
+        });
+        // Removendo inicio e fim amortizacao
+        // this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
+        this.tableData.dataRows.push(this.payloadLancamento)
+        this.tableLoading = false;
+      }, 0);
+      this.resetFields('ceFormAmortizacao');
+  
+      setTimeout(() => {
+        this.toggleUpdateLoading()
+        this.alertType = 'lancamento-incluido';
+        this.simularCalc(true)
+      }, 500)
+    }); 
   }
 
   pesquisarContratos() {
@@ -445,11 +449,11 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   changeDate(e, row) {
-    row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
-
-    row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value || row["indiceBA"], row["dataBaseAtual"]);
-
-    this.simularCalc(true);
+    this.indicesService.getIndiceData((this.ce_form_riscos.ce_indice.value || row["indiceBA"], row["dataBaseAtual"]), e.target.value).subscribe(indi => {
+      row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
+      row['indiceDataBaseAtual'] = indi['valor']
+      this.simularCalc(true);
+    })
   }
 
   formatDate(row) {
@@ -637,12 +641,13 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
-    row[innerIndice] = e.target.value;
-    row[indiceToChangeInline] = this.getIndiceDataBase(e.target.value, row[columnData]);
-
-    setTimeout(() => {
-      this.simularCalc(true);
-    }, 500);
+    this.indicesService.getIndiceData(e.target.value, row[columnData]).subscribe(indi => {
+      row[innerIndice] = e.target.value;
+      row[indiceToChangeInline] = indi['valor']
+      setTimeout(() => {
+        this.simularCalc(true);
+      }, 500);
+    });
   }
 
   // Mock formulário de riscos
