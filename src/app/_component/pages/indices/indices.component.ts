@@ -71,8 +71,38 @@ export class IndicesComponent implements OnInit {
           "sortAscending": ": Ordernar para cima",
           "sortDescending": ": Ordernar para baixo"
         }
+      },
+      drawCallback: e => {
+        $('.paginate_button').on('click', () => {
+         this.indicesService.getIndicePage(this.indice_form.indice.value, e.iDraw).subscribe(indices => {
+          this.tableData.dataRows = indices;
+          setTimeout(() => {
+            this.tableLoading = false;
+            return;
+          }, 100);
+        })
+        });
       }
     }
+  }
+  buttonInRowClick(event: any): void {
+    event.stopPropagation();
+    console.log('Button in the row clicked.');
+  }
+
+  wholeRowClick(): void {
+    console.log('Whole row clicked.');
+  }
+
+  nextButtonClickEvent(): void {
+    //do next particular records like  101 - 200 rows.
+    //we are calling to api
+
+    console.log('next clicked')
+  }
+  previousButtonClickEvent(): void {
+    //do previous particular the records like  0 - 100 rows.
+    //we are calling to API
   }
 
   verifyNumber(value) {
@@ -99,7 +129,7 @@ export class IndicesComponent implements OnInit {
       indiceList.forEach(indice => {
         this.tableData.dataRows.push(indice);
       })
-      this.indicesForm.reset({indice: this.indice_form.indice.value});
+      this.indicesForm.reset({ indice: this.indice_form.indice.value });
       this.alertType = 'indice-incluido';
       this.toggleUpdateLoading()
 
@@ -117,7 +147,7 @@ export class IndicesComponent implements OnInit {
     this.tableLoading = true;
     const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
 
-    this.indicesService.getIndice(this.indice_form.indice.value).subscribe(indices => {
+    this.indicesService.getIndicePage(this.indice_form.indice.value, 1).subscribe(indices => {
       this.tableData.dataRows = indices;
       setTimeout(() => {
         this.tableLoading = false;
