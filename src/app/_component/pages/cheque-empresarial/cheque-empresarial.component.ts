@@ -136,15 +136,15 @@ export class ChequeEmpresarialComponent implements OnInit {
         customize: doc => {
           console.log(doc);
 
-          doc['defaultStyle'] = {...doc['defaultStyle'], fontSize: 8}
-          doc['styles']['tableHeader'] = {...doc['styles']['tableHeader'], fontSize: 8, color: 'black', fillColor: 'white'}
-          doc['styles']['tableFooter'] = {...doc['styles']['tableFooter'], fontSize: 8, color: 'black', fillColor: 'white'}
+          doc['defaultStyle'] = { ...doc['defaultStyle'], fontSize: 8 }
+          doc['styles']['tableHeader'] = { ...doc['styles']['tableHeader'], fontSize: 8, color: 'black', fillColor: 'white' }
+          doc['styles']['tableFooter'] = { ...doc['styles']['tableFooter'], fontSize: 8, color: 'black', fillColor: 'white' }
 
           doc['content'][0].text = 'MOVIMENTAÇÕES POSTERIORES AO VENCIMENTO';
           doc['content'][1]['table']['widths'] = [80, 100, 40, 50, 100, 40, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'];
 
           const footer = doc['content'][1]['table']['body'].pop();
-          const valor =  footer.pop();
+          const valor = footer.pop();
           footer.map((value, index) => {
             if (index !== 0) {
               value.text = "";
@@ -154,33 +154,33 @@ export class ChequeEmpresarialComponent implements OnInit {
           doc['content'][1]['table']['body'].push(footer);
 
           doc['content'][1]['table']['body'].map((row, index) => {
-            if (index !== 0 && this.tableData.dataRows.length - 1 >= index -1 ) {
+            if (index !== 0 && this.tableData.dataRows.length - 1 >= index - 1) {
               row[1].text = this.tableData.dataRows[index - 1]['indiceDB'];
               row[4].text = this.tableData.dataRows[index - 1]['indiceBA'];
 
-              row.map(item => item.alignment =  'center');
+              row.map(item => item.alignment = 'center');
             }
           })
 
           doc['content'].push({
-            style: {fontSize: 10},
+            style: { fontSize: 10 },
             alignment: 'left',
-            margin: [0,20, 10, 0],
-            text: `Honorários ${this.formDefaultValues.formHonorarios || 0}% : ${this.formatCurrency(this.total_honorarios)}` 
+            margin: [0, 20, 10, 0],
+            text: `Honorários ${this.formDefaultValues.formHonorarios || 0}% : ${this.formatCurrency(this.total_honorarios)}`
           })
 
           doc['content'].push({
-            style: {fontSize: 10},
+            style: { fontSize: 10 },
             alignment: 'left',
             margin: [0, 0, 10, 0],
-            text: `Multa sob contrato ${this.formDefaultValues.formMultaSobContrato || 0}% : ${this.formatCurrency(this.total_multa_sob_contrato)}` 
+            text: `Multa sob contrato ${this.formDefaultValues.formMultaSobContrato || 0}% : ${this.formatCurrency(this.total_multa_sob_contrato)}`
           })
 
           doc['content'].push({
-            style: {fontSize: 10},
+            style: { fontSize: 10 },
             alignment: 'left',
             margin: [0, 0, 10, 0],
-            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_multa_sob_contrato)}` 
+            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_multa_sob_contrato)}`
           })
 
         }
@@ -335,16 +335,15 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.subtotal_data_calculo = this.total_date_now;
     this.last_data_table = [];
 
+    const localLancamentos = this.ce_form_amortizacao.ceFA_valor_lancamento.value;
+    const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
+    const localDataBaseAtual = this.ce_form_amortizacao.ceFA_data_base_atual.value;
+
     const localTypeIndice = this.ce_form_riscos.ce_indice.value;
 
+    if (localTypeIndice === "Encargos Contratuais %") {
+      const localTypeValue = this.ce_form_riscos.ce_encargos_contratuais.value;
 
-
-    this.indicesService.getIndiceData(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value).subscribe(indi => {
-      const localTypeValue =indi['valor'];
-      const localLancamentos = this.ce_form_amortizacao.ceFA_valor_lancamento.value;
-      const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
-      const localDataBaseAtual = this.ce_form_amortizacao.ceFA_data_base_atual.value;
-  
       const localInfoParaCalculo: InfoParaCalculo = {
         formMulta: this.ce_form_riscos.ce_multa.value,
         formJuros: this.ce_form_riscos.ce_juros_mora.value,
@@ -353,7 +352,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         formIndice: null,
         formIndiceEncargos: null
       };
-  
+
       setTimeout(() => {
         this.payloadLancamento = ({
           dataBase: localDataBase,
@@ -385,13 +384,64 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.tableLoading = false;
       }, 0);
       this.resetFields('ceFormAmortizacao');
-  
+
       setTimeout(() => {
         this.toggleUpdateLoading()
         this.alertType = 'lancamento-incluido';
         this.simularCalc(true)
       }, 500)
-    }); 
+    } else {
+      this.indicesService.getIndiceData(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value).subscribe(indi => {
+        const localTypeValue = indi['valor'];
+
+        const localInfoParaCalculo: InfoParaCalculo = {
+          formMulta: this.ce_form_riscos.ce_multa.value,
+          formJuros: this.ce_form_riscos.ce_juros_mora.value,
+          formHonorarios: this.ce_form_riscos.ce_honorarios.value,
+          formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value,
+          formIndice: null,
+          formIndiceEncargos: null
+        };
+
+        setTimeout(() => {
+          this.payloadLancamento = ({
+            dataBase: localDataBase,
+            indiceDB: localTypeIndice,
+            indiceDataBase: localTypeValue,
+            indiceBA: localTypeIndice,
+            indiceDataBaseAtual: localTypeValue,
+            dataBaseAtual: localDataBaseAtual,
+            valorDevedor: localValorDevedor,
+            encargosMonetarios: {
+              correcaoPeloIndice: null,
+              jurosAm: {
+                dias: null,
+                percentsJuros: null,
+                moneyValue: null,
+              },
+              multa: null,
+            },
+            lancamentos: localLancamentos,
+            tipoLancamento: localTipoLancamento,
+            valorDevedorAtualizado: null,
+            contractRef: contractRef,
+            ultimaAtualizacao: '',
+            infoParaCalculo: { ...localInfoParaCalculo }
+          });
+          // Removendo inicio e fim amortizacao
+          // this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
+          this.tableData.dataRows.push(this.payloadLancamento)
+          this.tableLoading = false;
+        }, 0);
+        this.resetFields('ceFormAmortizacao');
+
+        setTimeout(() => {
+          this.toggleUpdateLoading()
+          this.alertType = 'lancamento-incluido';
+          this.simularCalc(true)
+        }, 500)
+      });
+    }
   }
 
   pesquisarContratos() {
@@ -510,10 +560,20 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.ce_form_riscos.ce_indice.value && (row['indiceDB'] = this.ce_form_riscos.ce_indice.value);
           this.ce_form_riscos.ce_indice.value && (row['indiceBA'] = this.ce_form_riscos.ce_indice.value);
 
-          this.ce_form_riscos.ce_indice.value && (row['indiceDataBase'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value, row['dataBase']));
-          this.ce_form_riscos.ce_indice.value && (row['indiceDataBaseAtual'] = this.getIndiceDataBase(this.ce_form_riscos.ce_indice.value, row['dataBaseAtual']));
+          if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %") {
+            const valorEncargos = this.ce_form_riscos.ce_encargos_contratuais.value || 1;
+            row['indiceDataBaseAtual'] = valorEncargos;
+            row['indiceDataBase'] = valorEncargos;
 
-          this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" && this.ce_form_riscos.ce_encargos_contratuais && (row['indiceDataBaseAtual'] = this.ce_form_riscos.ce_encargos_contratuais.value);
+          } else {
+            this.indicesService.getIndiceData(this.ce_form_riscos.ce_indice.value, row['dataBase']).subscribe(indi => {
+              this.ce_form_riscos.ce_indice.value && (row['indiceDataBase'] = indi['valor']);
+
+              this.indicesService.getIndiceData(this.ce_form_riscos.ce_indice.value, row['dataBaseAtual']).subscribe(indi2 => {
+                this.ce_form_riscos.ce_indice.value && (row['indiceDataBaseAtual'] = indi2['valor']);
+              })
+            })
+          }
         }
 
         // Table Values
@@ -593,7 +653,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     if (!indice || !dataBaseAtual) {
       return 1;
     }
-    
+
     return await this.indicesService.getIndiceData(indice, dataBaseAtual).subscribe(indi => {
       return indi['valor']
     });
@@ -602,12 +662,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     //   let date = moment(dataBaseAtual).format("DD/MM/YYYY");
 
 
-      // switch (ind.type) {
-      //   case "Encargos Contratuais %":
-      //     return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
-      //     break;
-      //   default:
-      //     break;
+    // switch (ind.type) {
+    //   case "Encargos Contratuais %":
+    //     return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
+    //     break;
+    //   default:
+    //     break;
   }
 
   deleteRow(row) {
@@ -639,7 +699,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         setTimeout(() => {
           this.simularCalc(true);
         })
-        break; 
+        break;
       default:
         this.indicesService.getIndiceData(e.target.value, row[columnData]).subscribe(indi => {
           row[innerIndice] = e.target.value;
@@ -648,7 +708,7 @@ export class ChequeEmpresarialComponent implements OnInit {
             this.simularCalc(true);
           }, 500);
         });
-      break;
+        break;
     }
   }
 
