@@ -429,51 +429,105 @@ export class ParceladoPreComponent implements OnInit {
       this.total_data_calculo = moment(inputExternoDataCalculo).format("DD/MM/YYYY")
       this.subtotal_data_calculo = this.total_date_now;
       this.last_data_table = [];
-
-      const indiceValor = this.getIndiceDataBase(indice, dataVencimento);
       const amortizacao = this.tableDataAmortizacao.dataRows.length && this.tableDataAmortizacao.dataRows[key] ?
         this.tableDataAmortizacao.dataRows[key] : { preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo };
-      const indiceDataCalcAmor = this.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento']);
 
-      this.tableData.dataRows.push({
-        nparcelas: parcela['nparcelas'],
-        parcelaInicial: parcela['parcelaInicial'],
-        dataVencimento: dataVencimento,
-        indiceDV: indice,
-        indiceDataVencimento: indiceValor,
-        indiceDCA: indice,
-        indiceDataCalcAmor: indiceDataCalcAmor,
-        dataCalcAmor: amortizacao['preFA_data_vencimento'],
-        valorNoVencimento: parcela['valorNoVencimento'],
-        encargosMonetarios: {
-          correcaoPeloIndice: null,
-          jurosAm: {
-            dias: null,
-            percentsJuros: null,
-            moneyValue: null,
-          },
-          multa: null,
-        },
-        subtotal: 0,
-        valorPMTVincenda: 0,
-        amortizacao: amortizacao['preFA_saldo_devedor'],
-        totalDevedor: 0,
-        status: parcela['status'],
-        contractRef: this.pre_form.pre_contrato.value || 0,
-        ultimaAtualizacao: 0,
-        totalParcelasVencidas: 0,
-        totalParcelasVincendas: 0,
-        vincendas: false,
-      })
+      switch (indice) {
+        case "Encargos Contratuais %":
+          const encargos = !!this.pre_form_riscos.pre_encargos_contratuais.value ? this.pre_form_riscos.pre_encargos_contratuais.value : 1;
+          const indiceValor = encargos
+          const indiceDataCalcAmor = encargos
+          this.tableData.dataRows.push({
+            nparcelas: parcela['nparcelas'],
+            parcelaInicial: parcela['parcelaInicial'],
+            dataVencimento: dataVencimento,
+            indiceDV: indice,
+            indiceDataVencimento: indiceValor,
+            indiceDCA: indice,
+            indiceDataCalcAmor: indiceDataCalcAmor,
+            dataCalcAmor: amortizacao['preFA_data_vencimento'],
+            valorNoVencimento: parcela['valorNoVencimento'],
+            encargosMonetarios: {
+              correcaoPeloIndice: null,
+              jurosAm: {
+                dias: null,
+                percentsJuros: null,
+                moneyValue: null,
+              },
+              multa: null,
+            },
+            subtotal: 0,
+            valorPMTVincenda: 0,
+            amortizacao: amortizacao['preFA_saldo_devedor'],
+            totalDevedor: 0,
+            status: parcela['status'],
+            contractRef: this.pre_form.pre_contrato.value || 0,
+            ultimaAtualizacao: 0,
+            totalParcelasVencidas: 0,
+            totalParcelasVincendas: 0,
+            vincendas: false,
+          })
+          
+          if (this.tableDataParcelas.dataRows.length - 1 === key) {
+            setTimeout(() => {
+              this.preFormCadastroParcelas.reset();
+              this.tableDataParcelas.dataRows = [];
+              this.toggleUpdateLoading()
+              this.alertType = 'lancamento-incluido';
+              this.simularCalc(true)
+            }, 500)
+          }
+          break;
+        default:
+          this.indicesService.getIndiceData(indice, dataVencimento).subscribe(indiceDataVencimento => {
+            this.indicesService.getIndiceData(indice, amortizacao['preFA_data_vencimento']).subscribe(indiceDataCalc => {
+              const indiceValor = indiceDataVencimento['valor'];
+              const indiceDataCalcAmor = indiceDataCalc['valor'];
+              this.tableData.dataRows.push({
+                nparcelas: parcela['nparcelas'],
+                parcelaInicial: parcela['parcelaInicial'],
+                dataVencimento: dataVencimento,
+                indiceDV: indice,
+                indiceDataVencimento: indiceValor,
+                indiceDCA: indice,
+                indiceDataCalcAmor: indiceDataCalcAmor,
+                dataCalcAmor: amortizacao['preFA_data_vencimento'],
+                valorNoVencimento: parcela['valorNoVencimento'],
+                encargosMonetarios: {
+                  correcaoPeloIndice: null,
+                  jurosAm: {
+                    dias: null,
+                    percentsJuros: null,
+                    moneyValue: null,
+                  },
+                  multa: null,
+                },
+                subtotal: 0,
+                valorPMTVincenda: 0,
+                amortizacao: amortizacao['preFA_saldo_devedor'],
+                totalDevedor: 0,
+                status: parcela['status'],
+                contractRef: this.pre_form.pre_contrato.value || 0,
+                ultimaAtualizacao: 0,
+                totalParcelasVencidas: 0,
+                totalParcelasVincendas: 0,
+                vincendas: false,
+              })
+            })
+          });
+          if (this.tableDataParcelas.dataRows.length - 1 === key) {
+            setTimeout(() => {
+              this.preFormCadastroParcelas.reset();
+              this.tableDataParcelas.dataRows = [];
+              this.toggleUpdateLoading()
+              this.alertType = 'lancamento-incluido';
+              this.simularCalc(true)
+            }, 500)
+          }
+
+          break;
+      }
     })
-
-    setTimeout(() => {
-      this.preFormCadastroParcelas.reset();
-      this.tableDataParcelas.dataRows = [];
-      this.toggleUpdateLoading()
-      this.alertType = 'lancamento-incluido';
-      this.simularCalc(true)
-    }, 500)
   }
 
   changeCadastroParcelas(e, row, col) {
@@ -627,7 +681,7 @@ export class ParceladoPreComponent implements OnInit {
         const dataVencimento = moment(row["dataVencimento"]).format("YYYY-MM-DD");
         const dataCalcAmor = moment(row["dataCalcAmor"]).format("YYYY-MM-DD");
         const indiceDataVencimento = row['indiceDataVencimento'] / 100;
-        const indiceDataCalcAmor =row['indiceDataCalcAmor']/ 100;
+        const indiceDataCalcAmor = row['indiceDataCalcAmor'] / 100;
 
         const valorNoVencimento = parseFloat(row['valorNoVencimento']);
         const vincenda = dataVencimento > inputExternoDataCalculo;
