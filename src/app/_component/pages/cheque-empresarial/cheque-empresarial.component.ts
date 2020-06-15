@@ -586,26 +586,33 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   getIndiceDataBase(indice, dataBaseAtual) {
-    return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
-      let date = moment(dataBaseAtual).format("DD/MM/YYYY");
+    if (!indice || !dataBaseAtual) {
+      return 1;
+    }
+    
+    this.indicesService.getIndiceData(indice, dataBaseAtual).subscribe(indi => parseFloat(indi['valor']), error => 1);
 
-      switch (ind.type) {
-        case "INPC/IBGE":
-          return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
-          break;
-        case "CDI":
-          return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
-          break;
-        case "IGPM":
-          return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
-          break;
-        case "Encargos Contratuais %":
-          return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
-          break;
-        default:
-          break;
-      }
-    })[0]);
+    // return parseFloat(this.indice_field.filter(ind => ind.type === indice).map(ind => {
+    //   let date = moment(dataBaseAtual).format("DD/MM/YYYY");
+
+
+    //   switch (ind.type) {
+    //     case "INPC/IBGE":
+    //       return !!this.datasINPC[date] ? this.datasINPC[date] : ind.value;
+    //       break;
+    //     case "CDI":
+    //       return !!this.datasCDI[date] ? this.datasCDI[date] : ind.value;
+    //       break;
+    //     case "IGPM":
+    //       return !!this.datasIGPM[date] ? this.datasIGPM[date] : ind.value;
+    //       break;
+    //     case "Encargos Contratuais %":
+    //       return !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : ind.value;
+    //       break;
+    //     default:
+    //       break;
+    //   }
+    // })[0]);
   }
 
   deleteRow(row) {
