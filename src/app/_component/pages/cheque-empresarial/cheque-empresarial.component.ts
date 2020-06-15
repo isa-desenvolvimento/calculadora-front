@@ -121,6 +121,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     this.dtOptions = {
       paging: false,
+      ordering: false,
       searching: false,
       dom: 'Bfrtip',
       buttons: ['excel', 'pdf'],
@@ -332,6 +333,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   pesquisarContratos() {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
+    this.tableData.dataRows = [];
     this.ceFormRiscos.reset({ ce_data_calculo: this.getCurrentDate('YYYY-MM-DD') });
 
     const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value + this.ce_form.ce_tipo_contrato.value;
