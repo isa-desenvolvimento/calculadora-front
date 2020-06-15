@@ -148,7 +148,7 @@ export class IndicesComponent implements OnInit {
     this.tableLoading = true;
     const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
 
-    this.indicesService.getIndicePage(this.indice_form.indice.value, 1, 10).subscribe(indices => {
+    this.indicesService.getIndicePage(this.indice_form.indice.value, 10, 1).subscribe(indices => {
       this.tableData.dataRows = indices;
       setTimeout(() => {
         this.tableLoading = false;
