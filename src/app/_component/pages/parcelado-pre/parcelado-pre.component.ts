@@ -199,7 +199,7 @@ export class ParceladoPreComponent implements OnInit {
             style: { fontSize: 10 },
             alignment: 'left',
             margin: [0, 1, 10, 0],
-            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_multa_sob_contrato)}`
+            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_grandtotal)}`
           })
 
         }
