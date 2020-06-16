@@ -1,19 +1,10 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs/Observable';
 import { Indices } from '../_models/indices';
 import { environment } from '../../environments/environment';
-import * as moment from 'moment'; // add this 1 of 4
-
-import * as INPC from './indices-INPC.json';
-import * as CDI from './indices-CDI.json';
-import * as IGPM from './indices-IGPM.json';
 
 @Injectable({ providedIn: 'root' })
 export class IndicesService {
-  inpc: any = INPC;
-  cdi: any = CDI;
-  igpm: any = IGPM;
 
   constructor(private http: HttpClient) { }
 

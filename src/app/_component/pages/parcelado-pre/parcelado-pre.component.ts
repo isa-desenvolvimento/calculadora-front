@@ -237,7 +237,7 @@ export class ParceladoPreComponent implements OnInit {
       return parcelaLocal;
     });
 
-    const payloadPut = [...payload].filter((parcela => parcela['id']));
+    const payloadPut = payload.filter((parcela => parcela['id']));
 
     payloadPut.length > 0 && this.parceladoPreService.updateLancamento(payloadPut).subscribe(parceladoPreList => {
       this.updateLoadingBtn = false;
@@ -253,7 +253,7 @@ export class ParceladoPreComponent implements OnInit {
       this.errorMessage = "Falha ao atualizar risco.";
     });
 
-    const payloadPost = [...payload].filter((parcela => !parcela['id']));
+    const payloadPost = payload.filter((parcela => !parcela['id']));
 
     payloadPost.length > 0 && this.parceladoPreService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
       this.updateLoadingBtn = false;

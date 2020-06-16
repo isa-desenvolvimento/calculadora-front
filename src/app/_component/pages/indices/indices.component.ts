@@ -50,6 +50,7 @@ export class IndicesComponent implements OnInit {
 
     this.dtOptions = {
       paging: true,
+      searching: false,
       serverSide: true,
       ajax: (dataTablesParameters: any, callback) => {
         const info = $('#tableIndice').DataTable().page.info();
@@ -117,9 +118,8 @@ export class IndicesComponent implements OnInit {
     }];
 
     this.indicesService.addIndice(indiceList).subscribe(resp => {
-      indiceList.forEach(indice => {
-        this.tableData.dataRows.push(indice);
-      })
+      //this.tableData.dataRows.push(indice);
+      $('#tableIndice').DataTable().ajax.reload();
       this.indicesForm.reset({ indice: this.indice_form.indice.value });
       this.alertType = 'indice-incluido';
       this.toggleUpdateLoading()
@@ -169,9 +169,7 @@ export class IndicesComponent implements OnInit {
 
   deleteRow(row) {
     this.indicesService.removeIndice(row.id).subscribe(resp => {
-
-      const index = this.tableData.dataRows.indexOf(row);
-      this.tableData.dataRows.splice(index, 1);
+      $('#tableIndice').DataTable().ajax.reload();
 
       this.alertType = 'registro-excluido';
       this.toggleUpdateLoading()

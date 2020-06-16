@@ -230,7 +230,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       return lancamentoLocal;
     });
 
-    const payloadPut = [...payload].filter((lancamento => lancamento['id']));
+    const payloadPut = payload.filter((lancamento => lancamento['id']));
 
     payloadPut.length > 0 && this.chequeEmpresarialService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
       this.updateLoadingBtn = false;
@@ -246,7 +246,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.errorMessage = "Falha ao atualizar risco.";
     });
 
-    const payloadPost = [...payload].filter((lancamento => !lancamento['id']));
+    const payloadPost = payload.filter((lancamento => !lancamento['id']));
 
     payloadPost.length > 0 && this.chequeEmpresarialService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
       this.updateLoadingBtn = false;
@@ -309,7 +309,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         table = table.replace(/log-hidden-false/g, 'log-hidden-true ');
         clearInterval(inter)
         this.logService.addLog([{
-          data: this.getCurrentDate(),
+          data: this.getCurrentDate("YYYY-MM-DD"),
           usuario: window.localStorage.getItem('username').toUpperCase(),
           pasta: this.ce_form.ce_pasta.value,
           contrato: this.ce_form.ce_contrato.value,
