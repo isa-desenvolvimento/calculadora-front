@@ -467,7 +467,7 @@ export class ParceladoPreComponent implements OnInit {
             totalParcelasVincendas: 0,
             vincendas: false,
           })
-          
+
           if (this.tableDataParcelas.dataRows.length - 1 === key) {
             setTimeout(() => {
               this.preFormCadastroParcelas.reset();
@@ -513,17 +513,22 @@ export class ParceladoPreComponent implements OnInit {
                 totalParcelasVincendas: 0,
                 vincendas: false,
               })
+
+
+              if (this.tableDataParcelas.dataRows.length - 1 === key) {
+                setTimeout(() => {
+                  this.preFormCadastroParcelas.reset();
+                  this.tableDataParcelas.dataRows = [];
+                  this.toggleUpdateLoading()
+                  this.alertType = 'lancamento-incluido';
+                  this.simularCalc(true)
+                }, 500)
+              }
             })
+          }, erro => {
+            this.alertType = 'sem-indice';
+            this.toggleUpdateLoading()
           });
-          if (this.tableDataParcelas.dataRows.length - 1 === key) {
-            setTimeout(() => {
-              this.preFormCadastroParcelas.reset();
-              this.tableDataParcelas.dataRows = [];
-              this.toggleUpdateLoading()
-              this.alertType = 'lancamento-incluido';
-              this.simularCalc(true)
-            }, 500)
-          }
 
           break;
       }
@@ -672,6 +677,9 @@ export class ParceladoPreComponent implements OnInit {
                   row['indiceDataVencimento'] = dtBase['valor'] / 100;
                   row['indiceDataCalcAmor'] = dtBaseAtual['valor'] / 100;
                 })
+              }, erro => {
+                this.alertType = 'sem-indice';
+                this.toggleUpdateLoading()
               });
               break;
           }
@@ -779,6 +787,9 @@ export class ParceladoPreComponent implements OnInit {
       default:
         return await this.indicesService.getIndiceData(indice, dataBaseAtual).toPromise().then(indi => {
           return indi['valor']
+        }, erro => {
+          this.alertType = 'sem-indice';
+          this.toggleUpdateLoading()
         });
         break;
     }
@@ -875,6 +886,9 @@ export class ParceladoPreComponent implements OnInit {
           setTimeout(() => {
             this.simularCalc(true);
           }, 100);
+        }, erro => {
+          this.alertType = 'sem-indice';
+          this.toggleUpdateLoading()
         });
         break;
     }

@@ -440,6 +440,9 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.alertType = 'lancamento-incluido';
           this.simularCalc(true)
         }, 500)
+      }, erro => {
+        this.alertType = 'sem-indice';
+        this.toggleUpdateLoading()
       });
     }
   }
@@ -503,6 +506,9 @@ export class ChequeEmpresarialComponent implements OnInit {
       row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
       row['indiceDataBaseAtual'] = indi['valor'];
       this.simularCalc(true);
+    }, err => {
+      this.alertType = 'sem-indice';
+      this.toggleUpdateLoading()
     })
   }
 
@@ -572,6 +578,11 @@ export class ChequeEmpresarialComponent implements OnInit {
               this.indicesService.getIndiceData(this.ce_form_riscos.ce_indice.value, row['dataBaseAtual']).subscribe(indi2 => {
                 this.ce_form_riscos.ce_indice.value && (row['indiceDataBaseAtual'] = indi2['valor']);
               })
+            }, err => {
+              this.alertType = 'sem-indice';
+              this.toggleUpdateLoading()
+              origin = null;
+              return;
             })
           }
         }
@@ -634,14 +645,16 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizado;
         }
 
+        if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
+          this.formartTable('Simulação');
+          this.toggleUpdateLoading()
+          this.alertType = 'calculo-simulado';
+        }
+
         return parseFloat(row['valorDevedorAtualizado']);
       });
 
-      if (origin === 'btn') {
-        this.formartTable('Simulação');
-        this.toggleUpdateLoading()
-        this.alertType = 'calculo-simulado';
-      }
+
 
       this.tableLoading = false;
     }, 0);
@@ -703,7 +716,10 @@ export class ChequeEmpresarialComponent implements OnInit {
           setTimeout(() => {
             this.simularCalc(true);
           }, 500);
-        });
+        }), err => {
+          this.alertType = 'sem-indice';
+          this.toggleUpdateLoading()
+        };
         break;
     }
   }
