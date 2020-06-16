@@ -33,6 +33,10 @@
         style="position: fixed; right: 10px; top: 10px; z-index: 1030">
         <div class="alert alert-warning" role="alert"> Nenhuma lançamento encontrado! </div>
     </div>
+    <div *ngIf="updateLoading && alertType === 'preencher-indice'" class="col-lg-3  mt-3"
+        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
+        <div class="alert alert-warning" role="alert"> É necessário informar o índice.</div>
+    </div>
     <div *ngIf="updateLoading && alertType === 'sem-indice'" class="col-lg-3  mt-3"
         style="position: fixed; right: 10px; top: 10px; z-index: 1030">
         <div class="alert alert-danger" role="alert"> Nenhuma índice cadastrado nessa data! </div>
@@ -156,7 +160,7 @@
                                 Risco</button>
                         </div>
                         <div class="stats form-group mb-2 ml-md-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)"
+                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)  || updateLoadingBtn"
                                 (click)="simularCalc(false, 'btn')" class="btn btn-info btn-round">Simular
                                 Cálculo</button>
                         </div>

@@ -275,7 +275,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.updateLoading = true;
     setTimeout(() => {
       this.updateLoading = false;
-    }, 3000);
+    }, 5000);
   }
 
   // convenience getter for easy access to form fields
@@ -322,6 +322,15 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   incluirLancamentos() {
+
+    if (!this.ce_form_riscos.ce_indice.value) {
+      this.updateLoadingBtn = true;
+      this.toggleUpdateLoading()
+      this.alertType = 'preencher-indice';
+      return;
+    }
+
+    this.updateLoadingBtn = false;
     this.tableLoading = true;
 
     const contractRef = this.ce_form.ce_pasta.value + this.ce_form.ce_contrato.value + this.ce_form.ce_tipo_contrato.value;

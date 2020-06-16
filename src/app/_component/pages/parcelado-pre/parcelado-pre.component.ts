@@ -351,7 +351,7 @@ export class ParceladoPreComponent implements OnInit {
     this.updateLoading = true;
     setTimeout(() => {
       this.updateLoading = false;
-    }, 3000);
+    }, 5000);
   }
 
   // convenience getter for easy access to form fields
