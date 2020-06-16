@@ -88,7 +88,7 @@
                                     <td class="details-control" (click)="toggleDetails(row)"><i
                                             style="color: green; cursor: pointer;" class="nc-icon nc-minimal-right"></i>
                                     </td>
-                                    <td>{{row.data}}</td>
+                                    <td>{{formatDate(row.data, "DD/MM/YYYY hh:ss")}}</td>
                                     <td>{{row.usuario}}</td>
                                     <td>{{row.pasta}}</td>
                                     <td>{{row.contrato}}</td>
