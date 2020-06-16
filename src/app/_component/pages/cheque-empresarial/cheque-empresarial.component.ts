@@ -134,7 +134,6 @@ export class ChequeEmpresarialComponent implements OnInit {
           columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]
         },
         customize: doc => {
-          console.log(doc);
 
           doc['defaultStyle'] = { ...doc['defaultStyle'], fontSize: 8 }
           doc['styles']['tableHeader'] = { ...doc['styles']['tableHeader'], fontSize: 8, color: 'black', fillColor: 'white' }

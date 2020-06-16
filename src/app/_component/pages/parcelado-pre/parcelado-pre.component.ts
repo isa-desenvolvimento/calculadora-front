@@ -135,7 +135,75 @@ export class ParceladoPreComponent implements OnInit {
       searching: false,
       ordering: false,
       dom: 'Bfrtip',
-      buttons: ['excel', 'pdf'],
+      buttons: [{
+        extend: 'pdfHtml5',
+        orientation: 'landscape',
+        header: true,
+        footer: true,
+        pageSize: 'LEGAL',
+        exportOptions: {
+          columns: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17]
+        },
+        customize: doc => {
+
+          doc['defaultStyle'] = { ...doc['defaultStyle'], fontSize: 8 }
+          doc['styles']['tableHeader'] = { ...doc['styles']['tableHeader'], fontSize: 8, color: 'black', fillColor: 'white' }
+          doc['styles']['tableFooter'] = { ...doc['styles']['tableFooter'], fontSize: 8, color: 'black', fillColor: 'white' }
+
+          doc['content'][0].text = 'DEMONSTRATIVO DE SALDO DEVEDOR';
+          doc['content'][1]['table']['widths'] = [80, 50, 100, 50, 50, 100, 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto', 'auto'];
+
+          const footer = doc['content'][1]['table']['body'].pop();
+
+          let valor = footer.pop();
+          footer.map((value, index) => {
+            if (index !== 0) {
+              value.text = "";
+            }
+          })
+          footer.push(valor);
+
+          doc['content'][1]['table']['body'].push(footer);
+
+          doc['content'][1]['table']['body'].map((row, index) => {
+            if (index !== 0 && this.tableData.dataRows.length - 1 >= index - 1) {
+              row[2].text = this.tableData.dataRows[index - 1]['indiceDV'];
+              row[5].text = this.tableData.dataRows[index - 1]['indiceDCA'];
+
+              row.map(item => item.alignment = 'center');
+            }
+          })
+
+          doc['content'].push({
+            style: { fontSize: 10 },
+            alignment: 'left',
+            margin: [0, 20, 10, 0],
+            text: `SUBTOTAL APURADO EM ${this.subtotal_data_calculo || "---------"} : ${this.formatCurrency(this.total_subtotal)}`
+          })
+
+          doc['content'].push({
+            style: { fontSize: 10 },
+            alignment: 'left',
+            margin: [0, 1, 10, 0],
+            text: `Honorários ${this.formDefaultValues.formHonorarios || 0}% : ${this.formatCurrency(this.total_honorarios)}`
+          })
+
+          doc['content'].push({
+            style: { fontSize: 10 },
+            alignment: 'left',
+            margin: [0, 1, 10, 0],
+            text: `Multa sob contrato ${this.formDefaultValues.formMultaSobContrato || 0}% : ${this.formatCurrency(this.total_multa_sob_contrato)}`
+          })
+
+          doc['content'].push({
+            style: { fontSize: 10 },
+            alignment: 'left',
+            margin: [0, 1, 10, 0],
+            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_multa_sob_contrato)}`
+          })
+
+        }
+      }],
       language: {
         "decimal": "",
         "emptyTable": "Sem dados para exibir",
@@ -204,7 +272,7 @@ export class ParceladoPreComponent implements OnInit {
 
         clearInterval(inter)
         this.logService.addLog([{
-          data: this.getCurrentDate(),
+          data: this.getCurrentDate("YYYY-MM-DD"),
           usuario: window.localStorage.getItem('username').toUpperCase(),
           pasta: this.pre_form.pre_pasta.value,
           contrato: this.pre_form.pre_contrato.value,
@@ -297,7 +365,7 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   formatCurrency(value) {
-    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
+    return value === "NaN" || value === null || value === "null" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
   }
 
   formatCurrencyAmortizacao(value) {
@@ -563,10 +631,8 @@ export class ParceladoPreComponent implements OnInit {
         }
 
         setTimeout(() => {
-          if (parceladoPreList.length - 1 === key) {
-            this.changeFormValues(parcela.infoParaCalculo, true);
-            this.simularCalc(true, null, true);
-          }
+          this.changeFormValues(parcela.infoParaCalculo, true);
+          this.simularCalc(true, null, true);
         }, 1000);
 
         return parcela;
@@ -762,6 +828,12 @@ export class ParceladoPreComponent implements OnInit {
         totalDevedor: totalDevedorTotalVincendas || 0,
         valorPMTVincenda: valorPMTVincendaTotalVincendas || 0
       }
+
+      this.subtotal_data_calculo = this.total_data_calculo = this.formatDate(inputExternoDataCalculo)
+      this.total_subtotal = totalDevedorTotalVincendas + totalDevedorTotal;
+      this.total_honorarios = (this.total_subtotal + this.amortizacaoGeral) * (this.formDefaultValues["formHonorarios"]/100)
+      this.total_multa_sob_contrato =  (this.total_subtotal + this.amortizacaoGeral + this.total_honorarios) * (this.formDefaultValues["formMultaSobContrato"]/100)
+      this.total_grandtotal = this.total_subtotal + this.amortizacaoGeral + this.total_honorarios + this.total_multa_sob_contrato;
 
       if (origin === 'btn') {
         this.toggleUpdateLoading()
