@@ -400,7 +400,9 @@ export class ChequeEmpresarialComponent implements OnInit {
       }, 500)
     } else {
       this.indicesService.getIndiceData(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value).subscribe(indi => {
+
         const localTypeValue = indi['valor'];
+
 
         const localInfoParaCalculo: InfoParaCalculo = {
           formMulta: this.ce_form_riscos.ce_multa.value,
@@ -446,7 +448,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         setTimeout(() => {
           this.toggleUpdateLoading()
           this.alertType = 'lancamento-incluido';
-          this.simularCalc(true)
+          this.simularCalc(false)
         }, 500)
       }, erro => {
         this.alertType = 'sem-indice';
@@ -580,9 +582,8 @@ export class ChequeEmpresarialComponent implements OnInit {
             row['indiceDataBase'] = valorEncargos;
           } else {
             this.indicesService.getIndiceData(this.ce_form_riscos.ce_indice.value, row['dataBase']).subscribe(indi => {
-              this.ce_form_riscos.ce_indice.value && (row['indiceDataBase'] = indi['valor']);
-
               this.indicesService.getIndiceData(this.ce_form_riscos.ce_indice.value, row['dataBaseAtual']).subscribe(indi2 => {
+                this.ce_form_riscos.ce_indice.value && (row['indiceDataBase'] = indi['valor']);
                 this.ce_form_riscos.ce_indice.value && (row['indiceDataBaseAtual'] = indi2['valor']);
 
                 // Table Values
@@ -629,7 +630,6 @@ export class ChequeEmpresarialComponent implements OnInit {
 
                 this.subtotal_data_calculo = moment(last_date_base).format("DD/MM/YYYY");
                 this.total_data_calculo = moment(last_date_base_atual).format("DD/MM/YYYY");
-                this.total_data_calculo
 
                 this.min_data = last_date_base_atual;
                 // this.total_subtotal = 1000;
@@ -707,7 +707,6 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         this.subtotal_data_calculo = moment(last_date_base).format("DD/MM/YYYY");
         this.total_data_calculo = moment(last_date_base_atual).format("DD/MM/YYYY");
-        this.total_data_calculo
 
         this.min_data = last_date_base_atual;
         // this.total_subtotal = 1000;
@@ -783,7 +782,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         row[indiceToChangeInline] = !!this.ce_form_riscos.ce_encargos_contratuais.value ? this.ce_form_riscos.ce_encargos_contratuais.value : 1;
         setTimeout(() => {
           this.simularCalc(true);
-        },500)
+        }, 500)
         break;
       default:
         this.indicesService.getIndiceData(e.target.value, row[columnData]).subscribe(indi => {
