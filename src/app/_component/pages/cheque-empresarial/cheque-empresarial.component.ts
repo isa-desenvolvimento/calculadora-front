@@ -341,7 +341,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.total_date_now = moment(localDataBase).format("DD/MM/YYYY");
     this.total_data_calculo = moment(this.ce_form_riscos.ce_data_calculo.value).format("DD/MM/YYYY") || this.getCurrentDate();
     this.subtotal_data_calculo = this.total_date_now;
-    this.last_data_table = [];
+    this.last_data_table = [...this.tableData.dataRows].pop();
 
     const localLancamentos = this.ce_form_amortizacao.ceFA_valor_lancamento.value;
     const localTipoLancamento = this.ce_form_amortizacao.ceFA_tipo_lancamento.value;
@@ -399,57 +399,59 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.simularCalc(true)
       }, 500)
     } else {
-      this.indicesService.getIndiceData(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value).subscribe(indi => {
+      this.indicesService.getIndiceData(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value).subscribe(indiceDataBaseAtual => {
+        this.indicesService.getIndiceData(localTypeIndice, this.last_data_table['dataBase']).subscribe(indiceDataBase => {
 
-        const localTypeValue = indi['valor'];
+          const localTypeDBAValue = indiceDataBaseAtual['valor'];
+          const localTypeDBValue = indiceDataBase['valor'];
 
+          const localInfoParaCalculo: InfoParaCalculo = {
+            formMulta: this.ce_form_riscos.ce_multa.value,
+            formJuros: this.ce_form_riscos.ce_juros_mora.value,
+            formHonorarios: this.ce_form_riscos.ce_honorarios.value,
+            formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value,
+            formIndice: null,
+            formIndiceEncargos: null
+          };
 
-        const localInfoParaCalculo: InfoParaCalculo = {
-          formMulta: this.ce_form_riscos.ce_multa.value,
-          formJuros: this.ce_form_riscos.ce_juros_mora.value,
-          formHonorarios: this.ce_form_riscos.ce_honorarios.value,
-          formMultaSobContrato: this.ce_form_riscos.ce_multa_sobre_constrato.value,
-          formIndice: null,
-          formIndiceEncargos: null
-        };
-
-        setTimeout(() => {
-          this.payloadLancamento = ({
-            dataBase: localDataBase,
-            indiceDB: localTypeIndice,
-            indiceDataBase: localTypeValue,
-            indiceBA: localTypeIndice,
-            indiceDataBaseAtual: localTypeValue,
-            dataBaseAtual: localDataBaseAtual,
-            valorDevedor: localValorDevedor,
-            encargosMonetarios: {
-              correcaoPeloIndice: null,
-              jurosAm: {
-                dias: null,
-                percentsJuros: null,
-                moneyValue: null,
+          setTimeout(() => {
+            this.payloadLancamento = ({
+              dataBase: localDataBase,
+              indiceDB: localTypeIndice,
+              indiceDataBase: localTypeDBValue,
+              indiceBA: localTypeIndice,
+              indiceDataBaseAtual: localTypeDBAValue,
+              dataBaseAtual: localDataBaseAtual,
+              valorDevedor: localValorDevedor,
+              encargosMonetarios: {
+                correcaoPeloIndice: null,
+                jurosAm: {
+                  dias: null,
+                  percentsJuros: null,
+                  moneyValue: null,
+                },
+                multa: null,
               },
-              multa: null,
-            },
-            lancamentos: localLancamentos,
-            tipoLancamento: localTipoLancamento,
-            valorDevedorAtualizado: null,
-            contractRef: contractRef,
-            ultimaAtualizacao: '',
-            infoParaCalculo: { ...localInfoParaCalculo }
-          });
-          // Removendo inicio e fim amortizacao
-          // this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
-          this.tableData.dataRows.push(this.payloadLancamento)
-          this.tableLoading = false;
-        }, 0);
-        this.resetFields('ceFormAmortizacao');
+              lancamentos: localLancamentos,
+              tipoLancamento: localTipoLancamento,
+              valorDevedorAtualizado: null,
+              contractRef: contractRef,
+              ultimaAtualizacao: '',
+              infoParaCalculo: { ...localInfoParaCalculo }
+            });
+            // Removendo inicio e fim amortizacao
+            // this.ce_form_amortizacao.ceFA_tipo_amortizacao.value ? this.tableData.dataRows.unshift(this.payloadLancamento) : this.tableData.dataRows.push(this.payloadLancamento);
+            this.tableData.dataRows.push(this.payloadLancamento)
+            this.tableLoading = false;
+          }, 0);
+          this.resetFields('ceFormAmortizacao');
 
-        setTimeout(() => {
-          this.toggleUpdateLoading()
-          this.alertType = 'lancamento-incluido';
-          this.simularCalc(false)
-        }, 500)
+          setTimeout(() => {
+            this.toggleUpdateLoading()
+            this.alertType = 'lancamento-incluido';
+            this.simularCalc(true)
+          }, 500)
+        })
       }, erro => {
         this.alertType = 'sem-indice';
         this.toggleUpdateLoading()
