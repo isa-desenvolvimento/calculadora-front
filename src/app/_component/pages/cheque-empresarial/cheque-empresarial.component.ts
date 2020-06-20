@@ -396,13 +396,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       setTimeout(() => {
         this.toggleUpdateLoading()
         this.alertType = 'lancamento-incluido';
+        this.valorDevedor();
         this.simularCalc(true)
-      }, 500)
+      }, 1000)
     } else {
-
-      const dataBase= this.ce_form_amortizacao.ceFA_data_vencimento.value || this.last_data_table['dataBase'];
+      const dataBase = this.ce_form_amortizacao.ceFA_data_vencimento.value || this.last_data_table['dataBase'];
       this.indicesService.getIndiceData(localTypeIndice, this.ce_form_amortizacao.ceFA_data_base_atual.value).subscribe(indiceDataBaseAtual => {
-        this.indicesService.getIndiceData(localTypeIndice, this.last_data_table['dataBase']).subscribe(indiceDataBase => {
+        this.indicesService.getIndiceData(localTypeIndice, dataBase).subscribe(indiceDataBase => {
 
           const localTypeDBAValue = indiceDataBaseAtual['valor'];
           const localTypeDBValue = indiceDataBase['valor'];
@@ -451,8 +451,9 @@ export class ChequeEmpresarialComponent implements OnInit {
           setTimeout(() => {
             this.toggleUpdateLoading()
             this.alertType = 'lancamento-incluido';
+            this.valorDevedor();
             this.simularCalc(true)
-          }, 500)
+          }, 1000)
         })
       }, erro => {
         this.alertType = 'sem-indice';
@@ -560,18 +561,27 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   }
 
-  simularCalc(isInlineChange = false, origin = null, search = false) {
-    this.tableLoading = true;
-    this.changeFormValues(this.formDefaultValues, search);
-    setTimeout(() => {
 
-      let tableDataUpdated = this.tableData.dataRows.map((row, index) => {
-
+  valorDevedor() {
+    this.tableData.dataRows.map((row, index) => {
+      setTimeout(() => {
         if (index > 0) {
           (row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado']);
           (row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual']);
         }
+      }, 0);
+    })
+  }
 
+
+  simularCalc(isInlineChange = false, origin = null, search = false) {
+    this.tableLoading = true;
+    this.changeFormValues(this.formDefaultValues, search);
+
+    this.valorDevedor();
+    setTimeout(() => {
+
+      this.tableData.dataRows.map((row, index) => {
         const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
         const valorDevedor = parseFloat(row['valorDevedor']);
 
@@ -580,25 +590,26 @@ export class ChequeEmpresarialComponent implements OnInit {
           this.ce_form_riscos.ce_indice.value && (row['indiceDB'] = this.ce_form_riscos.ce_indice.value);
           this.ce_form_riscos.ce_indice.value && (row['indiceBA'] = this.ce_form_riscos.ce_indice.value);
 
-          if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" ||( !this.ce_form_riscos.ce_indice.value && row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %")) {
+          if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" || (!this.ce_form_riscos.ce_indice.value && row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %")) {
             const valorEncargos = this.ce_form_riscos.ce_encargos_contratuais.value || 1;
             row['indiceDataBaseAtual'] = valorEncargos;
             row['indiceDataBase'] = valorEncargos;
+
+            row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
+
+
+            this.valorDevedor();
           } else {
             this.indicesService.getIndiceData(this.ce_form_riscos.ce_indice.value, row['dataBase']).subscribe(indi => {
               this.indicesService.getIndiceData(this.ce_form_riscos.ce_indice.value, row['dataBaseAtual']).subscribe(indi2 => {
                 this.ce_form_riscos.ce_indice.value && (row['indiceDataBase'] = indi['valor']);
                 this.ce_form_riscos.ce_indice.value && (row['indiceDataBaseAtual'] = indi2['valor']);
 
-                // Table Values
+                this.valorDevedor();
 
                 // - Descontos
                 // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
-                if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
-                  row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
-                } else {
-                  row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor / (row['indiceDataBase'] / 100) * (row['indiceDataBaseAtual'] / 100)) - valorDevedor).toFixed(2);
-                }
+                row['encargosMonetarios']['correcaoPeloIndice'] = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor / (row['indiceDataBase'] / 100) * (row['indiceDataBaseAtual'] / 100)) - valorDevedor).toFixed(2);
 
                 // -- dias
                 row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
@@ -668,7 +679,7 @@ export class ChequeEmpresarialComponent implements OnInit {
         }
 
         // Table Values
-
+        this.valorDevedor();
         // - Descontos
         // -- correcaoPeloIndice (encargos contratuais, inpc, iof, cmi)
         if (this.ce_form_riscos.ce_indice.value === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
