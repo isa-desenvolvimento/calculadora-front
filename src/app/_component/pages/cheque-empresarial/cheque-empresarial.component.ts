@@ -447,7 +447,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           let correcao;
           if (this.formDefaultValues.formIndice === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
-            correcao = (valorDevedor * (indiceDataBaseAtual/100) / 30) * qtdDias
+            correcao = (valorDevedor * (indiceDataBaseAtual / 100) / 30) * qtdDias
           } else {
             correcao = (valorDevedor / indiceDataBase * indiceDataBaseAtual) - valorDevedor
           }
@@ -463,16 +463,15 @@ export class ChequeEmpresarialComponent implements OnInit {
           const moneyValue = row['encargosMonetarios']['jurosAm']['moneyValue'] = (((valorDevedor + correcaoPeloIndice) / 30) * qtdDias) * ((this.formDefaultValues.formJuros / 100))
 
           // -- multa 
-          let multa = "0";
+          let multa = 0;
           if (index === 0) {
-            row['encargosMonetarios']['multa'] = multa = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
-             multa = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
-
+            row['encargosMonetarios']['multa'] = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
+            multa = (valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100);
           } else {
             row['encargosMonetarios']['multa'] = "NaN";
           }
 
-          const valorDevedorAtualizado = row['valorDevedorAtualizado'] = valorDevedor + correcaoPeloIndice + parseFloat(moneyValue) + parseFloat(multa) + lancamento;
+          const valorDevedorAtualizado = row['valorDevedorAtualizado'] = valorDevedor + correcaoPeloIndice + moneyValue + multa + lancamento;
 
           // Forms Total
           this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
