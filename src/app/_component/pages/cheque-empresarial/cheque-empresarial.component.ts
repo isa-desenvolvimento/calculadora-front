@@ -473,7 +473,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           // -- dias
           row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
           // -- juros 
-          row['encargosMonetarios']['jurosAm']['percentsJuros'] = (((this.formDefaultValues.formJuros * 100) / 30) * qtdDias).toFixed(2);
+          row['encargosMonetarios']['jurosAm']['percentsJuros'] = (((this.formDefaultValues.formJuros) / 30) * qtdDias).toFixed(2);
           // -- moneyValue
           const moneyValue = row['encargosMonetarios']['jurosAm']['moneyValue'] = (((valorDevedor + correcaoPeloIndice) / 30) * qtdDias) * ((this.formDefaultValues.formJuros / 100))
 
