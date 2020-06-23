@@ -6,9 +6,8 @@ import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.
 import { IndicesService } from '../../../_services/indices.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as moment from 'moment'; // add this 1 of 4
 
-import { getCurrentDate, formatDate, formatCurrency, getLastLine, formartTable, verifyNumber } from '../../util/util';
+import { getCurrentDate, formatDate, formatCurrency, getLastLine, formartTable, verifyNumber, getQtdDias } from '../../util/util';
 import { LISTA_INDICES, LANGUAGEM_TABLE } from '../../util/constants'
 
 import 'datatables.net';
@@ -63,7 +62,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     dataBase: 0,
     dataBaseAtual: 0
   };
-  
+
   formDefaultValues: InfoParaCalculo = {
     formDataCalculo: getCurrentDate("YYYY-MM-DD"),
     formMulta: 0,
@@ -171,7 +170,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     verifyNumber(value)
   }
 
-  
   formatDate(value, format) {
     formatDate(value, format)
   }
@@ -187,6 +185,15 @@ export class ChequeEmpresarialComponent implements OnInit {
         dataSimulacao: this.form_riscos.formDataCalculo,
         acao: acao
       })
+  }
+
+  atualizarRiscoConcluido() {
+    this.controleLancamentos++;
+    this.formartTable('Atualização de Risco');
+    this.ultima_atualizacao = getCurrentDate('YYYY-MM-DD');
+
+    this.alertType = 'risco-atualizado';
+    this.toggleUpdateLoading()
   }
 
   atualizarRisco() {
@@ -209,57 +216,36 @@ export class ChequeEmpresarialComponent implements OnInit {
     const payloadPut = payload.filter((lancamento => lancamento['id']));
 
     payloadPut.length > 0 && this.chequeEmpresarialService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
-      this.updateLoadingBtn = false;
-      this.controleLancamentos = this.controleLancamentos + 1;
-      this.formartTable('Atualização de Risco');
-
-      if (this.tableData.dataRows.length === this.controleLancamentos) {
-        this.ultima_atualizacao = getCurrentDate('YYYY-MM-DD');
-      }
-      this.alertType = 'risco-atualizado';
-      this.toggleUpdateLoading()
+      this.atualizarRiscoConcluido()
     }, err => {
+      this.tableLoading = false;
+      this.alertType = 'registro-nao-incluido';
+      this.toggleUpdateLoading()
       this.errorMessage = "Falha ao atualizar risco.";
     });
 
     const payloadPost = payload.filter((lancamento => !lancamento['id']));
 
     payloadPost.length > 0 && this.chequeEmpresarialService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
-      this.updateLoadingBtn = false;
-      this.controleLancamentos = this.controleLancamentos + 1;
-      this.formartTable('Atualização de Risco');
+      this.atualizarRiscoConcluido()
 
-      if (this.tableData.dataRows.length === this.controleLancamentos) {
-        this.ultima_atualizacao = getCurrentDate('YYYY-MM-DD');
-      }
-      this.alertType = 'risco-atualizado';
-      this.toggleUpdateLoading()
-      // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
     }, err => {
       this.tableLoading = false;
       this.alertType = 'registro-nao-incluido';
       this.toggleUpdateLoading()
-
-      this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+      this.errorMessage = "Falha ao atualizar risco.";
     });
-
-    setTimeout(() => {
-      this.updateLoading = false;
-    }, 3000);
   }
 
   toggleUpdateLoading() {
     this.updateLoading = true;
     setTimeout(() => {
       this.updateLoading = false;
+      this.updateLoadingBtn = false;
     }, 5000);
   }
 
   get ce_form_amortizacao() { return this.ceFormAmortizacao.controls; }
-
-  resetFields(form) {
-    this[form].reset()
-  }
 
   async incluirLancamentos() {
 
@@ -321,7 +307,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableData.dataRows.push(this.payloadLancamento)
       this.tableLoading = false;
     }, 0);
-    this.resetFields('ceFormAmortizacao');
+    this.ceFormAmortizacao.reset();
 
     setTimeout(() => {
       this.toggleUpdateLoading()
@@ -374,25 +360,13 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   }
 
-  getCurrentDate(format = "DD/MM/YYYY hh:mm") {
-    return moment(new Date).format(format);
-  }
+  async changeDate(e, row) {
+    row['dataBaseAtual'] = formatDate(e.target.value, 'YYYY-MM-DD');
+    row['indiceDataBaseAtual'] = await this.getIndiceDataBase(this.formDefaultValues.formIndice, e.target.value);
 
-  getQtdDias(fistDate, secondDate) {
-    const a = moment(fistDate, 'DD/MM/YYYY');
-    const b = moment(secondDate, 'DD/MM/YYYY');
-    return Math.abs(b.diff(a, 'days'));
-  }
-
-  changeDate(e, row) {
-    this.indicesService.getIndiceData((this.formDefaultValues.formIndice || row["indiceBA"]), e.target.value).subscribe(indi => {
-      row['dataBaseAtual'] = moment(e.target.value).format("YYYY-MM-DD");
-      row['indiceDataBaseAtual'] = indi['valor'];
+    setTimeout(() => {
       this.simularCalc(true);
-    }, err => {
-      this.alertType = 'sem-indice';
-      this.toggleUpdateLoading()
-    })
+    }, 100);
   }
 
   setFormRiscos(form) {
@@ -425,21 +399,22 @@ export class ChequeEmpresarialComponent implements OnInit {
         row['indiceDataBase'] = await this.getIndiceDataBase(this.formDefaultValues.formIndice, row['dataBase']);
       }
 
-      // Table Values
+      const indiceDataBaseAtual = row['indiceDataBaseAtual'] / 100;
+      const indiceDataBase = row['indiceDataBase'] / 100;
 
       if (index > 0) {
         row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado'];
         row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual'];
       }
 
-      const qtdDias = this.getQtdDias(moment(row["dataBase"]).format("DD/MM/YYYY"), moment(row["dataBaseAtual"]).format("DD/MM/YYYY"));
+      const qtdDias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
       const valorDevedor = parseFloat(row['valorDevedor']);
 
       let correcao;
       if (this.formDefaultValues.formIndice === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
-        correcao = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor * (row['indiceDataBaseAtual'] / 100) / 30) * qtdDias).toFixed(2);
+        correcao = (valorDevedor * indiceDataBaseAtual / 30) * qtdDias
       } else {
-        correcao = search ? row['encargosMonetarios']['correcaoPeloIndice'] : ((valorDevedor / (row['indiceDataBase'] / 100) * (row['indiceDataBaseAtual'] / 100)) - valorDevedor).toFixed(2);
+        correcao = (valorDevedor / indiceDataBase * indiceDataBaseAtual) - valorDevedor
       }
 
       const correcaoPeloIndice = row['encargosMonetarios']['correcaoPeloIndice'] = parseFloat(correcao);
@@ -529,10 +504,10 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   async updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
     row[innerIndice] = e.target.value;
-    row[indiceToChangeInline] =  await this.getIndiceDataBase(e.target.value, row[columnData]);
+    row[indiceToChangeInline] = await this.getIndiceDataBase(e.target.value, row[columnData]);
 
     setTimeout(() => {
       this.simularCalc(true);
-    }, 500);
+    }, 200);
   }
 }

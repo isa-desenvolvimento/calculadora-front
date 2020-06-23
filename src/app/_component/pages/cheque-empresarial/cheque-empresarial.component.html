@@ -49,20 +49,15 @@
             <div class="card-body ">
                 <div class="row">
                     <div class="col-md-12">
-                       <app-pesquisa (contractRef)="pesquisarContratos($event)"
-                       [tableLoading]="tableLoading" (resetForm)="simulacao.resetForm($event)" 
-                       ></app-pesquisa>
+                        <app-pesquisa (contractRef)="pesquisarContratos($event)" [tableLoading]="tableLoading"
+                            (resetForm)="simulacao.resetForm($event)"></app-pesquisa>
                     </div>
 
                     <div class="col-md-12 col-sm-12">
-                        <app-simulacao 
-                        #simulacao 
-                        [updateLoadingBtn]="updateLoadingBtn" 
-                        [tableDataLength]="tableData.dataRows.length > 0" 
-                        (salvar)="atualizarRisco()"
-                        (simularCalculo)="simularCalc(false, 'btn')"
-                        (formValue)="setFormRiscos($event)"
-                        ></app-simulacao>
+                        <app-simulacao #simulacao [updateLoadingBtn]="updateLoadingBtn"
+                            [tableDataLength]="tableData.dataRows.length > 0" (salvar)="atualizarRisco()"
+                            (simularCalculo)="simularCalc(false, 'btn')" (formValue)="setFormRiscos($event)">
+                        </app-simulacao>
                     </div>
 
                     <div class="col-lg-12 col-sm-12">
@@ -232,9 +227,8 @@
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
                                     <td>
-                                        <input type="text" style="width: 120px; font-size: 11px"
+                                        <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden-false"
-                                            name="ce_data_calculo" max="3000-12-31" min="1000-01-01"
                                             [value]="row.dataBase" disabled>
                                         <span class="log-visible-false">{{formatDate(row.dataBase)}}</span>
                                     </td>
