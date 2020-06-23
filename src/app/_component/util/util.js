@@ -19,17 +19,3 @@ export const formatCurrency = value => {
 }
 
 export const getLastLine = table => [...table].pop();
-
-export const formartTable = (id, log) => {
-    const inter = setInterval(() => {
-        let table = document.getElementById(id).innerHTML;
-
-        if (table) {
-            table = table.replace(/log-visible-false/g, 'log-visible-true ');
-            table = table.replace(/log-hidden-false/g, 'log-hidden-true ');
-            clearInterval(inter)
-            log.infoTabela = table;
-            this.logService.addLog([log]).subscribe()
-        }
-    }, 0);
-}

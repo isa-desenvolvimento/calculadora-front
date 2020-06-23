@@ -6,8 +6,9 @@ import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.
 import { IndicesService } from '../../../_services/indices.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { LogService } from '../../../_services/log.service';
 
-import { getCurrentDate, formatDate, formatCurrency, getLastLine, formartTable, verifyNumber, getQtdDias } from '../../util/util';
+import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
 import { LISTA_INDICES, LANGUAGEM_TABLE } from '../../util/constants'
 
 import 'datatables.net';
@@ -42,6 +43,8 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   indice_field = LISTA_INDICES;
   infoContrato = {};
+  indiceDataBase = null;
+  indiceDataBaseAtual = null;
 
   // total
   total_date_now: any;
@@ -77,6 +80,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
     private indicesService: IndicesService,
+    private logService: LogService,
   ) {
   }
 
@@ -175,16 +179,25 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   formartTable(acao) {
-    formartTable('tableCheque',
-      {
-        data: getCurrentDate("YYYY-MM-DD"),
-        usuario: window.localStorage.getItem('username').toUpperCase(),
-        pasta: this.infoContrato['pasta'],
-        contrato: this.infoContrato['contrato'],
-        tipoContrato: this.infoContrato['tipo_contrato'],
-        dataSimulacao: this.form_riscos.formDataCalculo,
-        acao: acao
-      })
+    const inter = setInterval(() => {
+      let table = document.getElementById('tableCheque').innerHTML;
+
+      if (table) {
+        table = table.replace(/log-visible-false/g, 'log-visible-true ');
+        table = table.replace(/log-hidden-false/g, 'log-hidden-true ');
+        clearInterval(inter)
+        this.logService.addLog([{
+          data: getCurrentDate("YYYY-MM-DD"),
+          usuario: window.localStorage.getItem('username').toUpperCase(),
+          pasta: this.infoContrato['pasta'],
+          contrato: this.infoContrato['contrato'],
+          tipoContrato: this.infoContrato['tipo_contrato'],
+          dataSimulacao: this.form_riscos.formDataCalculo,
+          acao: acao,
+          infoTabela: table
+        }]).subscribe()
+      }
+    }, 0)
   }
 
   atualizarRiscoConcluido() {
@@ -312,7 +325,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.toggleUpdateLoading()
       this.alertType = 'lancamento-incluido';
-      this.simularCalc(true)
+      this.simularCalc(true, 'btn', true)
     }, 500)
   }
 
@@ -377,6 +390,11 @@ export class ChequeEmpresarialComponent implements OnInit {
     });
   }
 
+  resetIndiceVariavel() {
+    this.indiceDataBaseAtual = null;
+    this.indiceDataBase = null;
+  }
+
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
 
@@ -392,78 +410,97 @@ export class ChequeEmpresarialComponent implements OnInit {
 
       // - Indices
       if (!isInlineChange) {
+        this.resetIndiceVariavel()
+
         row['indiceDB'] = this.formDefaultValues.formIndice;
         row['indiceBA'] = this.formDefaultValues.formIndice;
 
         row['indiceDataBaseAtual'] = await this.getIndiceDataBase(this.formDefaultValues.formIndice, row['dataBaseAtual']);
         row['indiceDataBase'] = await this.getIndiceDataBase(this.formDefaultValues.formIndice, row['dataBase']);
+
+        this.indiceDataBaseAtual = row['indiceDataBaseAtual'];
+        this.indiceDataBase = row['indiceDataBase'];
       }
 
-      const indiceDataBaseAtual = row['indiceDataBaseAtual'] / 100;
-      const indiceDataBase = row['indiceDataBase'] / 100;
+      var interval = setInterval(() => {
+        if (search) {
+          this.indiceDataBaseAtual = row['indiceDataBaseAtual'];
+          this.indiceDataBase = row['indiceDataBase'];
+        }
 
-      if (index > 0) {
-        row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado'];
-        row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual'];
-      }
+        if (this.indiceDataBaseAtual && this.indiceDataBase) {
+          clearInterval(interval)
 
-      const qtdDias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
-      const valorDevedor = parseFloat(row['valorDevedor']);
+          row['indiceDataBaseAtual'] = this.indiceDataBaseAtual;
+          row['indiceDataBase'] = this.indiceDataBase;
 
-      let correcao;
-      if (this.formDefaultValues.formIndice === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
-        correcao = (valorDevedor * indiceDataBaseAtual / 30) * qtdDias
-      } else {
-        correcao = (valorDevedor / indiceDataBase * indiceDataBaseAtual) - valorDevedor
-      }
+          const indiceDataBaseAtual = this.indiceDataBaseAtual;
+          const indiceDataBase = this.indiceDataBase;
 
-      const correcaoPeloIndice = row['encargosMonetarios']['correcaoPeloIndice'] = parseFloat(correcao);
-      const lancamento = row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos'];
+          if (index > 0) {
+            row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado'];
+            row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual'];
+          }
 
-      // -- dias
-      row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
-      // -- juros 
-      row['encargosMonetarios']['jurosAm']['percentsJuros'] = search ? row['encargosMonetarios']['jurosAm']['percentsJuros'] : (((this.formDefaultValues.formJuros || this.form_riscos.juros_mora) / 30) * qtdDias).toFixed(2);
-      // -- moneyValue
-      const moneyValue = row['encargosMonetarios']['jurosAm']['moneyValue'] = search ? row['encargosMonetarios']['jurosAm']['moneyValue'] : ((((valorDevedor + correcaoPeloIndice) / 30) * qtdDias) * (((this.formDefaultValues.formJuros || this.form_riscos.juros_mora) / 100))).toFixed(2);
+          const qtdDias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
+          const valorDevedor = parseFloat(row['valorDevedor']);
 
-      // -- multa 
-      let multa = 0;
-      if (index === 0) {
-        row['encargosMonetarios']['multa'] = multa = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
-      } else {
-        row['encargosMonetarios']['multa'] = "NaN";
-      }
+          let correcao;
+          if (this.formDefaultValues.formIndice === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
+            correcao = (valorDevedor * indiceDataBaseAtual / 30) * qtdDias
+          } else {
+            correcao = (valorDevedor / indiceDataBase * indiceDataBaseAtual) - valorDevedor
+          }
 
-      const valorDevedorAtualizado = row['valorDevedorAtualizado'] = valorDevedor + correcaoPeloIndice + parseFloat(moneyValue) + parseFloat(multa) + lancamento;
+          const correcaoPeloIndice = row['encargosMonetarios']['correcaoPeloIndice'] = parseFloat(correcao);
+          const lancamento = row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos'];
 
-      // Forms Total
-      this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
-      const honorarios = this.total_honorarios = valorDevedorAtualizado * this.formDefaultValues.formHonorarios / 100;
+          // -- dias
+          row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
+          // -- juros 
+          row['encargosMonetarios']['jurosAm']['percentsJuros'] = ((this.formDefaultValues.formJuros / 30) * qtdDias).toFixed(2);
+          // -- moneyValue
+          const moneyValue = row['encargosMonetarios']['jurosAm']['moneyValue'] = (((valorDevedor + correcaoPeloIndice) / 30) * qtdDias) * ((this.formDefaultValues.formJuros / 100))
 
-      this.last_data_table = getLastLine(this.tableData.dataRows)
-      let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
-      let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
+          // -- multa 
+          let multa = 0;
+          if (index === 0) {
+            row['encargosMonetarios']['multa'] = multa = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
+          } else {
+            row['encargosMonetarios']['multa'] = "NaN";
+          }
 
-      this.subtotal_data_calculo = formatDate(last_date_base);
-      this.total_data_calculo = formatDate(last_date_base_atual);
-      this.min_data = last_date_base_atual;
+          const valorDevedorAtualizado = row['valorDevedorAtualizado'] = valorDevedor + correcaoPeloIndice + parseFloat(moneyValue) + parseFloat(multa) + lancamento;
 
-      this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
-      const valorDevedorAtualizadoLast = parseFloat(this.last_data_table['valorDevedorAtualizado']);
+          // Forms Total
+          this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
+          const honorarios = this.total_honorarios = valorDevedorAtualizado * this.formDefaultValues.formHonorarios / 100;
 
-      this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
-      this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
+          this.last_data_table = getLastLine(this.tableData.dataRows)
+          let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+          let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
 
-      if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
-        this.formartTable('Simulação');
-        this.toggleUpdateLoading()
-        this.alertType = 'calculo-simulado';
-      }
-    });
+          this.subtotal_data_calculo = formatDate(last_date_base);
+          this.total_data_calculo = formatDate(last_date_base_atual);
+          this.min_data = last_date_base_atual;
 
-    this.tableLoading = false;
-    !isInlineChange && this.toggleUpdateLoading();
+          this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
+          const valorDevedorAtualizadoLast = parseFloat(this.last_data_table['valorDevedorAtualizado']);
+
+          this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
+          this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
+
+          if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
+            this.formartTable('Simulação');
+            this.toggleUpdateLoading()
+            this.alertType = 'calculo-simulado';
+          }
+
+          this.tableLoading = false;
+          !isInlineChange && this.toggleUpdateLoading();
+        }
+      });
+    }, 0);
   }
 
   async getIndiceDataBase(indice, data) {
@@ -503,11 +540,13 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   async updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
+    this[indiceToChangeInline] = null
     row[innerIndice] = e.target.value;
     row[indiceToChangeInline] = await this.getIndiceDataBase(e.target.value, row[columnData]);
 
     setTimeout(() => {
-      this.simularCalc(true);
-    }, 200);
+      this[indiceToChangeInline] = row[indiceToChangeInline]
+      this.simularCalc(true, null, true);
+    }, 0);
   }
 }
