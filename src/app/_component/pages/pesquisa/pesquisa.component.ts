@@ -16,7 +16,6 @@ export class PesquisaComponent implements OnInit {
   @Output() contractRef = new EventEmitter();
   @Output() resetForm = new EventEmitter();
 
-
   contractList_field = [];
   typeContractList_field = [];
   folderData_field = this.agruparPasta();
@@ -29,20 +28,27 @@ export class PesquisaComponent implements OnInit {
 
   ngOnInit(): void {
     this.peForm = this.formBuilder.group({
-      pe_pasta: ['', Validators.required],
-      pe_contrato: ['', Validators.required],
-      pe_tipo_contrato: ['', Validators.required]
+      pasta: ['', Validators.required],
+      contrato: ['', Validators.required],
+      tipo_contrato: ['', Validators.required]
     });
   }
 
   setContractRef() {
-    const pasta = this.pe_form.pe_pasta.value;
-    const contrato = this.pe_form.pe_contrato.value;
-    const tipo_contrato = this.pe_form.pe_tipo_contrato.value;
+    const pasta = this.form.pasta.value;
+    const contrato = this.form.contrato.value;
+    const tipo_contrato = this.form.tipo_contrato.value;
 
     this.txtContractRef = pasta + contrato + tipo_contrato;
     this.resetForm.emit(true);
-    this.contractRef.emit(this.txtContractRef);
+    const info = {
+      pasta,
+      contrato,
+      tipo_contrato,
+      contractRef: this.txtContractRef
+    };
+
+    this.contractRef.emit(info);
   }
 
 
@@ -59,7 +65,7 @@ export class PesquisaComponent implements OnInit {
     this.contractList_field = [];
     this.typeContractList_field = [];
     this.pastas['data'].map(pasta => {
-      if (pasta.PASTA === this.pe_form.pe_pasta.value) {
+      if (pasta.PASTA === this.form.pasta.value) {
         this.contractList_field.push(pasta.CONTRATO);
       }
     });
@@ -71,7 +77,7 @@ export class PesquisaComponent implements OnInit {
   setTypeContract() {
     this.typeContractList_field = [];
     this.pastas['data'].map(pasta => {
-      if (pasta.PASTA === this.pe_form.pe_pasta.value && pasta.CONTRATO === this.pe_form.pe_contrato.value) {
+      if (pasta.PASTA === this.form.pasta.value && pasta.CONTRATO === this.form.contrato.value) {
         this.typeContractList_field.push(pasta.DESCRICAO);
       }
     });
@@ -81,7 +87,5 @@ export class PesquisaComponent implements OnInit {
   }
 
   get pastas() { return this.pastasContratosService.getPastas(); }
-  get pe_form() { return this.peForm.controls; }
-
-
+  get form() { return this.peForm.controls; }
 }

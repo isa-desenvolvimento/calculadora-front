@@ -29,6 +29,7 @@ export interface JurosAm {
 }
 
 export interface InfoParaCalculo {
+    formDataCalculo: string;
     formMulta: number;
     formJuros: number;
     formHonorarios: number;

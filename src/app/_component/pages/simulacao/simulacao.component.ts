@@ -2,7 +2,7 @@ import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { IndicesService } from '../../../_services/indices.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { getCurrentDate, verifyNumber } from '../../util/util';
-import { listIndices } from '../../util/constants'
+import { LISTA_INDICES } from '../../util/constants'
 
 @Component({
   selector: 'app-simulacao',
@@ -19,9 +19,7 @@ export class SimulacaoComponent implements OnInit {
   @Output() simularCalculo = new EventEmitter();
   @Output() salvar = new EventEmitter();
 
-
-  indice_field = listIndices;
-
+  indice_field = LISTA_INDICES;
 
   constructor(
     private formBuilder: FormBuilder,

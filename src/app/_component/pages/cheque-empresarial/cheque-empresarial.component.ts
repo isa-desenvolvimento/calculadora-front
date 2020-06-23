@@ -4,18 +4,12 @@ import { Lancamento, InfoParaCalculo } from '../../../_models/ChequeEmpresarial'
 import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.service';
 
 import { IndicesService } from '../../../_services/indices.service';
-import { LogService } from '../../../_services/log.service';
-import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
-import { timeout } from 'rxjs/operators';
-import { element } from 'protractor';
 
-import { getCurrentDate, formatDate, formatCurrency } from '../../util/util';
-import { listIndices } from '../../util/constants'
-
-import { Observable } from 'rxjs';
+import { getCurrentDate, formatDate, formatCurrency, getLastLine, formartTable, verifyNumber } from '../../util/util';
+import { LISTA_INDICES, LANGUAGEM_TABLE } from '../../util/constants'
 
 import 'datatables.net';
 import 'datatables.net-buttons';
@@ -32,8 +26,6 @@ declare interface TableData {
 
 export class ChequeEmpresarialComponent implements OnInit {
 
-  ceForm: FormGroup;
-  ceFormRiscos: FormGroup;
   ceFormAmortizacao: FormGroup;
   loading = false;
   submitted = false;
@@ -49,7 +41,8 @@ export class ChequeEmpresarialComponent implements OnInit {
   tableHeader = [];
   form_riscos: any = {};
 
-  indice_field = listIndices;
+  indice_field = LISTA_INDICES;
+  infoContrato = {};
 
   // total
   total_date_now: any;
@@ -65,12 +58,12 @@ export class ChequeEmpresarialComponent implements OnInit {
   last_data_table: Object;
   min_data: string;
   ultima_atualizacao: String;
-  loop = 0;
 
   indices = {
     dataBase: 0,
     dataBaseAtual: 0
   };
+  
   formDefaultValues: InfoParaCalculo = {
     formDataCalculo: getCurrentDate("YYYY-MM-DD"),
     formMulta: 0,
@@ -85,28 +78,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     private formBuilder: FormBuilder,
     private chequeEmpresarialService: ChequeEmpresarialService,
     private indicesService: IndicesService,
-    private logService: LogService,
-    private pastasContratosService: PastasContratosService
   ) {
   }
 
   ngOnInit() {
-    this.ceForm = this.formBuilder.group({
-      ce_pasta: ['', Validators.required],
-      ce_contrato: ['', Validators.required],
-      ce_tipo_contrato: ['', Validators.required]
-    });
-    // this.ceFormRiscos = this.formBuilder.group({
-    //   ce_indice: [],
-    //   ce_encargos_monietarios: [],
-    //   ce_data_calculo: getCurrentDate('YYYY-MM-DD'),
-    //   ce_ultima_atualizacao: '',
-    //   ce_encargos_contratuais: [],
-    //   ce_multa: [],
-    //   ce_juros_mora: [],
-    //   ce_honorarios: [],
-    //   ce_multa_sobre_constrato: []
-    // });
     this.tableData = {
       dataRows: []
     }
@@ -116,21 +91,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       ceFA_data_base_atual: ['', Validators.required],
       ceFA_valor_lancamento: ['', Validators.required],
       ceFA_tipo_lancamento: ['', Validators.required],
-      // ceFA_tipo_amortizacao: []
     });
-
-    this.tableHeader = [
-      'Data Base',
-      'Índice',
-      'Índice Data Base',
-      'Data Base Atual',
-      'Índice',
-      'Valor Devedor',
-      'Correção pelo Índice',
-      'Encargos Monetários',
-      'Lançamento',
-      'Valor Devedor Atualizado'
-    ]
 
     this.dtOptions = {
       paging: false,
@@ -197,32 +158,35 @@ export class ChequeEmpresarialComponent implements OnInit {
 
         }
       }],
-      // pagingType: 'full_numbers',
-      language: {
-        "decimal": "",
-        "emptyTable": "Sem dados para exibir",
-        "info": "Mostrando _START_ de _END_ de _TOTAL_ registros",
-        "infoEmpty": "Mostrando 0 de 0 de 0 registros",
-        "infoFiltered": "(filtered from _MAX_ total registros)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Mostrando _MENU_ registros",
-        "loadingRecords": "Carregando...",
-        "processing": "Processando...",
-        "search": "Buscar:",
-        "zeroRecords": "Nenhum registro encontrado com esses parâmetros",
-        "paginate": {
-          "first": "Primeira",
-          "last": "Última",
-          "next": "Próxima",
-          "previous": "Anterior"
-        },
-        "aria": {
-          "sortAscending": ": Ordernar para cima",
-          "sortDescending": ": Ordernar para baixo"
-        }
-      }
-    };
+      language: LANGUAGEM_TABLE
+    }
+  }
+
+
+  formatCurrency(value) {
+    return formatCurrency(value)
+  }
+
+  verifyNumber(value) {
+    verifyNumber(value)
+  }
+
+  
+  formatDate(value, format) {
+    formatDate(value, format)
+  }
+
+  formartTable(acao) {
+    formartTable('tableCheque',
+      {
+        data: getCurrentDate("YYYY-MM-DD"),
+        usuario: window.localStorage.getItem('username').toUpperCase(),
+        pasta: this.infoContrato['pasta'],
+        contrato: this.infoContrato['contrato'],
+        tipoContrato: this.infoContrato['tipo_contrato'],
+        dataSimulacao: this.form_riscos.formDataCalculo,
+        acao: acao
+      })
   }
 
   atualizarRisco() {
@@ -291,46 +255,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     }, 5000);
   }
 
-  // convenience getter for easy access to form fields
-  get ce_form() { return this.ceForm.controls; }
   get ce_form_amortizacao() { return this.ceFormAmortizacao.controls; }
 
   resetFields(form) {
     this[form].reset()
-  }
-
-  formatCurrency(value) {
-    return formatCurrency(value)
-  }
-
-  verifyNumber(value) {
-    value.target.value = Math.abs(value.target.value);
-  }
-
-  getLastLine() {
-    return [...this.tableData.dataRows].pop();
-  }
-
-  formartTable(acao) {
-    const inter = setInterval(() => {
-      let table = document.getElementById('tableCheque').innerHTML;
-
-      if (table) {
-        table = table.replace(/log-visible-false/g, 'log-visible-true ');
-        table = table.replace(/log-hidden-false/g, 'log-hidden-true ');
-        clearInterval(inter)
-        this.logService.addLog([{
-          data: getCurrentDate("YYYY-MM-DD"),
-          usuario: window.localStorage.getItem('username').toUpperCase(),
-          pasta: this.ce_form.ce_pasta.value,
-          contrato: this.ce_form.ce_contrato.value,
-          tipoContrato: this.ce_form.ce_tipo_contrato.value,
-          dataSimulacao: this.form_riscos.data_calculo,
-          acao: acao,
-          infoTabela: table
-        }]).subscribe(log => { })
-      }
-    }, 0);
   }
 
   async incluirLancamentos() {
@@ -346,7 +274,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.tableLoading = true;
 
     const lancamento = this.ce_form_amortizacao;
-    const lastLine = this.getLastLine();
+    const lastLine = getLastLine(this.tableData.dataRows);
 
     const localDataBase = this.tableData.dataRows.length === 0 ? lancamento.ceFA_data_vencimento.value : lastLine["dataBaseAtual"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? lancamento.ceFa_saldo_devedor.value : lastLine["valorDevedorAtualizado"];
@@ -402,19 +330,20 @@ export class ChequeEmpresarialComponent implements OnInit {
     }, 500)
   }
 
-  pesquisarContratos(ref) {
+  pesquisarContratos(infoContrato) {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
     this.tableData.dataRows = [];
 
-    this.contractRef = ref;
+    this.contractRef = infoContrato.contractRef;
+    this.infoContrato = infoContrato;
 
     this.chequeEmpresarialService.getAll().subscribe(chequeEmpresarialList => {
-      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === ref).map(cheque => {
+      this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === infoContrato.contractRef).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
         cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
         const ultimaAtualizacao = [...chequeEmpresarialList].pop();
-        this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
+        this.ultima_atualizacao = formatDate(ultimaAtualizacao.ultimaAtualizacao, 'YYYY-MM-DD');
 
         Object.keys(cheque.infoParaCalculo).filter(value => {
           this.formDefaultValues[value] = cheque.infoParaCalculo[value];
@@ -464,10 +393,6 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.alertType = 'sem-indice';
       this.toggleUpdateLoading()
     })
-  }
-
-  formatDate(row) {
-    return moment(row['dataBase']).format("DD/MM/YYYY");
   }
 
   setFormRiscos(form) {
@@ -541,7 +466,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
       const honorarios = this.total_honorarios = valorDevedorAtualizado * this.formDefaultValues.formHonorarios / 100;
 
-      this.last_data_table = this.getLastLine();
+      this.last_data_table = getLastLine(this.tableData.dataRows)
       let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
       let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
 
@@ -555,7 +480,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
       this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
 
-      if (origin === 'btn' && this.tableData.dataRows.length - 1 === index && this.loop === 5) {
+      if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
         this.formartTable('Simulação');
         this.toggleUpdateLoading()
         this.alertType = 'calculo-simulado';
