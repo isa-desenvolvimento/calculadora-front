@@ -175,7 +175,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   }
 
   formatDate(value, format) {
-    formatDate(value, format)
+    return formatDate(value, format)
   }
 
   formartTable(acao) {
@@ -463,9 +463,11 @@ export class ChequeEmpresarialComponent implements OnInit {
           const moneyValue = row['encargosMonetarios']['jurosAm']['moneyValue'] = (((valorDevedor + correcaoPeloIndice) / 30) * qtdDias) * ((this.formDefaultValues.formJuros / 100))
 
           // -- multa 
-          let multa = 0;
+          let multa = "0";
           if (index === 0) {
             row['encargosMonetarios']['multa'] = multa = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
+             multa = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
+
           } else {
             row['encargosMonetarios']['multa'] = "NaN";
           }

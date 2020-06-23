@@ -69,7 +69,7 @@
                                     id="ceFA_data_vencimento" formControlName="ceFA_data_vencimento" max="3000-12-31"
                                     min="1000-01-01">
                                 <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    {{formatDate(tableData.dataRows[0], 'YYYY-MM-DD')}}
+                                    {{formatDate(tableData.dataRows[0]['dataBase'])}}
                                 </p>
                             </div>
                             <div class="col-md-4 col-sm-12">
@@ -123,35 +123,6 @@
                                     </div>
                                 </fieldset>
                             </div>
-                            <!-- Removendo inicio e fim amortizacao -->
-                            <!-- <div class="col-md-2 col-sm-12"
-                                *ngIf="ce_form_amortizacao.ceFA_tipo_lancamento.value === 'credit'">
-                                <fieldset class="form-group ml-sm-3">
-                                    <div class="form-group row">
-                                        <legend class="col-form-label">
-                                            <label class="form-check-label" for="profile2">Amortização</label>
-                                        </legend>
-                                        <div class="col-sm-7 ml-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio"
-                                                    name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status3" [value]="true">
-                                                <label class="form-check-label" for="status3" style="margin: -30px">
-                                                    Ínicio
-                                                </label>
-                                            </div>
-                                            <div class="form-check ">
-                                                <input class="form-check-input" type="radio"
-                                                    name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status4" [value]="false">
-                                                <label class="form-check-label" for="status4" style="margin: -30px">
-                                                    Fim
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div> -->
                         </form>
                     </div>
                     <div class="col-lg-12 mt-4">
