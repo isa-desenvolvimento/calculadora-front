@@ -5,14 +5,15 @@ import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 
 import { IndicesService } from '../../../_services/indices.service';
 import { LogService } from '../../../_services/log.service';
-import { PastasContratosService } from '../../../_services/pastas-contratos.service';
 
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
-import { timeout } from 'rxjs/operators';
-import { logging } from 'protractor';
+
 import 'datatables.net';
 import 'datatables.net-buttons';
+
+import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
+import { LISTA_INDICES, LANGUAGEM_TABLE } from '../../util/constants'
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -26,21 +27,20 @@ declare interface TableData {
 
 export class ParceladoPreComponent implements OnInit {
 
-  preForm: FormGroup;
-  preFormRiscos: FormGroup;
   preFormAmortizacao: FormGroup;
   preFormCadastroParcelas: FormGroup;
-  loading = false;
-  submitted = false;
-  returnUrl: string;
-  errorMessage = '';
   payloadLancamento: Parcela;
 
   tableLoading = false;
   updateLoading = false;
-  alertType = '';
+  alertType = {};
   updateLoadingBtn = false;
   controleLancamentos = 0;
+
+  contractRef = '';
+  infoContrato = {};
+  indice_field = LISTA_INDICES;
+  form_riscos: any = {};
 
   //tables
   tableData: TableData;
@@ -67,6 +67,7 @@ export class ParceladoPreComponent implements OnInit {
   ultima_atualizacao: String;
 
   formDefaultValues: InfoParaCalculo = {
+    formDataCalculo: getCurrentDate("YYYY-MM-DD"),
     formMulta: 0,
     formJuros: 0,
     formHonorarios: 0,
@@ -80,29 +81,11 @@ export class ParceladoPreComponent implements OnInit {
     private formBuilder: FormBuilder,
     private parceladoPreService: ParceladoPreService,
     private indicesService: IndicesService,
-    private pastasContratosService: PastasContratosService,
     private logService: LogService,
   ) {
   }
 
   ngOnInit() {
-    this.preForm = this.formBuilder.group({
-      pre_pasta: ['', Validators.required],
-      pre_contrato: ['', Validators.required],
-      pre_tipo_contrato: ['', Validators.required],
-    });
-    this.preFormRiscos = this.formBuilder.group({
-      pre_indice: [],
-      pre_encargos_monietarios: [],
-      pre_data_calculo: this.getCurrentDate('YYYY-MM-DD'),
-      pre_ultima_atualizacao: '',
-      pre_encargos_contratuais: [],
-      pre_multa: [],
-      pre_juros_mora: [],
-      pre_honorarios: [],
-      pre_multa_sobre_constrato: [],
-      pre_desagio: []
-    });
     this.tableData = {
       dataRows: []
     }
@@ -204,30 +187,7 @@ export class ParceladoPreComponent implements OnInit {
 
         }
       }],
-      language: {
-        "decimal": "",
-        "emptyTable": "Sem dados para exibir",
-        "info": "Mostrando _START_ de _END_ de _TOTAL_ registros",
-        "infoEmpty": "Mostrando 0 de 0 de 0 registros",
-        "infoFiltered": "(filtered from _MAX_ total registros)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Mostrando _MENU_ registros",
-        "loadingRecords": "Carregando...",
-        "processing": "Processando...",
-        "search": "Buscar:",
-        "zeroRecords": "Nenhum registro encontrado com esses parâmetros",
-        "paginate": {
-          "first": "Primeira",
-          "last": "Última",
-          "next": "Próxima",
-          "previous": "Anterior"
-        },
-        "aria": {
-          "sortAscending": ": Ordernar para cima",
-          "sortDescending": ": Ordernar para baixo"
-        }
-      }
+      language: LANGUAGEM_TABLE
     }
 
     this.dtOptionsAmortizacao = {
@@ -236,30 +196,7 @@ export class ParceladoPreComponent implements OnInit {
       ordering: false,
       scrollY: '300px',
       scrollCollapse: true,
-      language: {
-        "decimal": "",
-        "emptyTable": "Sem dados para exibir",
-        "info": "Mostrando _START_ de _END_ de _TOTAL_ registros",
-        "infoEmpty": "Mostrando 0 de 0 de 0 registros",
-        "infoFiltered": "(filtered from _MAX_ total registros)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Mostrando _MENU_ registros",
-        "loadingRecords": "Carregando...",
-        "processing": "Processando...",
-        "search": "Buscar:",
-        "zeroRecords": "Nenhum registro encontrado com esses parâmetros",
-        "paginate": {
-          "first": "Primeira",
-          "last": "Última",
-          "next": "Próxima",
-          "previous": "Anterior"
-        },
-        "aria": {
-          "sortAscending": ": Ordernar para cima",
-          "sortDescending": ": Ordernar para baixo"
-        }
-      }
+      language: LANGUAGEM_TABLE
     }
   }
 
@@ -272,12 +209,12 @@ export class ParceladoPreComponent implements OnInit {
 
         clearInterval(inter)
         this.logService.addLog([{
-          data: this.getCurrentDate("YYYY-MM-DD"),
+          data: getCurrentDate("YYYY-MM-DD"),
           usuario: window.localStorage.getItem('username').toUpperCase(),
-          pasta: this.pre_form.pre_pasta.value,
-          contrato: this.pre_form.pre_contrato.value,
-          tipoContrato: this.pre_form.pre_tipo_contrato.value,
-          dataSimulacao: this.pre_form_riscos.pre_data_calculo.value,
+          pasta: this.infoContrato['pasta'],
+          contrato: this.infoContrato['contrato'],
+          tipoContrato: this.infoContrato['tipo_contrato'],
+          dataSimulacao: this.form_riscos.formDataCalculo,
           acao: acao,
           infoTabela: table
         }]).subscribe(log => { })
@@ -285,11 +222,34 @@ export class ParceladoPreComponent implements OnInit {
     }, 500);
   }
 
+
+  atualizarRiscoConcluido() {
+    this.updateLoadingBtn = false;
+    this.controleLancamentos++;
+    this.formartTable('Atualização de Risco');
+    this.ultima_atualizacao = getCurrentDate('YYYY-MM-DD');
+
+    this.alertType = {
+      mensagem: 'Risco Atualizado',
+      tipo: 'success'
+    };
+    this.toggleUpdateLoading()
+  }
+
+  atualizarRiscoFalha() {
+    this.updateLoadingBtn = false;
+    this.alertType = {
+      mensagem: 'Falha ao atualizar risco',
+      tipo: 'danger'
+    };
+    this.toggleUpdateLoading()
+  }
+
+
   atualizarRisco() {
     this.controleLancamentos = 0;
 
     const payload = this.tableData.dataRows.map(parcela => {
-
       this.updateLoadingBtn = true;
       let parcelaLocal = { ...parcela };
       parcelaLocal['encargosMonetarios'] = JSON.stringify(parcelaLocal['encargosMonetarios']);
@@ -299,52 +259,25 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['amortizacao'] = parseFloat(parcelaLocal['amortizacao']);
       parcelaLocal['totalDevedor'] = parseFloat(parcelaLocal['totalDevedor']);
       parcelaLocal['subtotal'] = parseFloat(parcelaLocal['subtotal']);
-      parcelaLocal['contractRef'] = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value + this.pre_form.pre_tipo_contrato.value;
-      parcelaLocal['ultimaAtualizacao'] = this.getCurrentDate('YYYY-MM-DD');
+      parcelaLocal['contractRef'] = this.contractRef;
+      parcelaLocal['ultimaAtualizacao'] = getCurrentDate('YYYY-MM-DD');
 
       return parcelaLocal;
     });
 
     const payloadPut = payload.filter((parcela => parcela['id']));
-
     payloadPut.length > 0 && this.parceladoPreService.updateLancamento(payloadPut).subscribe(parceladoPreList => {
-      this.updateLoadingBtn = false;
-      this.controleLancamentos = this.controleLancamentos + 1;
-      this.formartTable('Atualização de Risco');
-
-      if (this.tableData.dataRows.length === this.controleLancamentos) {
-        this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-        this.toggleUpdateLoading()
-        this.alertType = 'risco-atualizado';
-      }
+      this.atualizarRiscoConcluido()
     }, err => {
-      this.errorMessage = "Falha ao atualizar risco.";
+      this.atualizarRiscoFalha()
     });
 
     const payloadPost = payload.filter((parcela => !parcela['id']));
-
     payloadPost.length > 0 && this.parceladoPreService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
-      this.updateLoadingBtn = false;
-      this.controleLancamentos = this.controleLancamentos + 1;
-      this.formartTable('Atualização de Risco');
-
-      if (this.tableData.dataRows.length === this.controleLancamentos) {
-        this.ultima_atualizacao = this.getCurrentDate('YYYY-MM-DD');
-        this.toggleUpdateLoading()
-        this.alertType = 'risco-atualizado';
-      }
-      // lancamento["id"] = lancamentoLocal["id"] = chequeEmpresarialListUpdated["id"];
+      this.atualizarRiscoConcluido()
     }, err => {
-      this.tableLoading = false;
-      this.alertType = 'registro-nao-incluido';
-      this.toggleUpdateLoading()
-
-      this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+      this.atualizarRiscoFalha()
     });
-
-    setTimeout(() => {
-      this.updateLoading = false;
-    }, 3000);
   }
 
   toggleUpdateLoading() {
@@ -355,17 +288,11 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   // convenience getter for easy access to form fields
-  get pre_form() { return this.preForm.controls; }
-  get pre_form_riscos() { return this.preFormRiscos.controls; }
   get pre_form_amortizacao() { return this.preFormAmortizacao.controls; }
   get pre_form_cadastro_parcelas() { return this.preFormCadastroParcelas.controls; }
 
-  resetFields(form) {
-    this[form].reset()
-  }
-
   formatCurrency(value) {
-    return value === "NaN" || value === null || value === "null" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
+    return formatCurrency(value)
   }
 
   formatCurrencyAmortizacao(value) {
@@ -374,11 +301,11 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   verifyNumber(value) {
-    value.target.value = Math.abs(value.target.value);
+    verifyNumber(value)
   }
 
-  getLastLine() {
-    return this.tableData.dataRows.length === 0 ? this.tableData.dataRows.length : this.tableData.dataRows.length - 1;
+  formatDate(value, format) {
+    return formatDate(value, format)
   }
 
   adicionarParcelas() {
@@ -433,7 +360,7 @@ export class ParceladoPreComponent implements OnInit {
 
               switch (!amorti['amortizacaoDataDiferenciadaIncluida']) {
                 case (row['totalDevedor'] > preFASaldoDevedor):
-                  const qtdDias = this.getQtdDias(row['dataCalcAmor'], amorti['preFA_data_vencimento']);
+                  const qtdDias = getQtdDias(row['dataCalcAmor'], amorti['preFA_data_vencimento']);
                   const newParcela = {
                     ...row,
                     nparcelas: `${row['nparcelas']}.1`,
@@ -480,31 +407,49 @@ export class ParceladoPreComponent implements OnInit {
 
       setTimeout(() => {
         this.preFormAmortizacao.reset();
+        this.alertType = {
+          mensagem: 'Amortização incluida!',
+          tipo: 'success'
+        };
         this.toggleUpdateLoading()
-        this.alertType = 'amortizacao-incluido';
         this.simularCalc(true)
       }, 500)
     }
   }
 
   incluirParcelas() {
+
+    if (!this.form_riscos.formIndice) {
+      this.updateLoadingBtn = true;
+      this.alertType = {
+        mensagem: 'É necessário informar o índice.',
+        tipo: 'warning'
+      };
+      this.toggleUpdateLoading()
+      return;
+    }
+
+    this.setFormDefault()
     this.tableLoading = true;
-    this.tableDataParcelas.dataRows.map((parcela, key) => {
-      const indice = this.pre_form_riscos.pre_indice.value || null;
+    this.tableDataParcelas.dataRows.map(async (parcela, key) => {
+
+      const indice = this.form_riscos.formIndice;
       const dataVencimento = parcela['dataVencimento'];
-      const inputExternoDataCalculo = this.pre_form_riscos.pre_data_calculo.value;
-      this.total_date_now = moment(dataVencimento).format("DD/MM/YYYY");
-      this.total_data_calculo = moment(inputExternoDataCalculo).format("DD/MM/YYYY")
+      const inputExternoDataCalculo = this.form_riscos.formDataCalculo
+
+      this.total_date_now = formatDate(dataVencimento);
+      this.total_data_calculo = formatDate(this.form_riscos.formDataCalculo) || getCurrentDate();
       this.subtotal_data_calculo = this.total_date_now;
-      this.last_data_table = [];
+
       const amortizacao = this.tableDataAmortizacao.dataRows.length && this.tableDataAmortizacao.dataRows[key] ?
         this.tableDataAmortizacao.dataRows[key] : { preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo };
 
-      switch (indice) {
-        case "Encargos Contratuais %":
-          const encargos = !!this.pre_form_riscos.pre_encargos_contratuais.value ? this.pre_form_riscos.pre_encargos_contratuais.value : 1;
-          const indiceValor = encargos
-          const indiceDataCalcAmor = encargos
+      const indiceValor = await this.getIndiceDataBase(indice, dataVencimento);
+      const indiceDataCalcAmor = await this.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento']);
+
+      const interval = setInterval(() => {
+        if (indiceValor && indiceDataCalcAmor) {
+          clearInterval(interval);
           this.tableData.dataRows.push({
             nparcelas: parcela['nparcelas'],
             parcelaInicial: parcela['parcelaInicial'],
@@ -529,7 +474,7 @@ export class ParceladoPreComponent implements OnInit {
             amortizacao: amortizacao['preFA_saldo_devedor'],
             totalDevedor: 0,
             status: parcela['status'],
-            contractRef: this.pre_form.pre_contrato.value || 0,
+            contractRef: this.contractRef,
             ultimaAtualizacao: 0,
             totalParcelasVencidas: 0,
             totalParcelasVincendas: 0,
@@ -538,69 +483,29 @@ export class ParceladoPreComponent implements OnInit {
 
           if (this.tableDataParcelas.dataRows.length - 1 === key) {
             setTimeout(() => {
+              this.tableLoading = false;
               this.preFormCadastroParcelas.reset();
               this.tableDataParcelas.dataRows = [];
+              this.alertType = {
+                mensagem: 'Lançamento incluido',
+                tipo: 'success'
+              };
               this.toggleUpdateLoading()
-              this.alertType = 'lancamento-incluido';
               this.simularCalc(true)
             }, 500)
           }
-          break;
-        default:
-          this.indicesService.getIndiceData(indice, dataVencimento).subscribe(indiceDataVencimento => {
-            this.indicesService.getIndiceData(indice, amortizacao['preFA_data_vencimento']).subscribe(indiceDataCalc => {
-              const indiceValor = indiceDataVencimento['valor'];
-              const indiceDataCalcAmor = indiceDataCalc['valor'];
-              this.tableData.dataRows.push({
-                nparcelas: parcela['nparcelas'],
-                parcelaInicial: parcela['parcelaInicial'],
-                dataVencimento: dataVencimento,
-                indiceDV: indice,
-                indiceDataVencimento: indiceValor,
-                indiceDCA: indice,
-                indiceDataCalcAmor: indiceDataCalcAmor,
-                dataCalcAmor: amortizacao['preFA_data_vencimento'],
-                valorNoVencimento: parcela['valorNoVencimento'],
-                encargosMonetarios: {
-                  correcaoPeloIndice: null,
-                  jurosAm: {
-                    dias: null,
-                    percentsJuros: null,
-                    moneyValue: null,
-                  },
-                  multa: null,
-                },
-                subtotal: 0,
-                valorPMTVincenda: 0,
-                amortizacao: amortizacao['preFA_saldo_devedor'],
-                totalDevedor: 0,
-                status: parcela['status'],
-                contractRef: this.pre_form.pre_contrato.value || 0,
-                ultimaAtualizacao: 0,
-                totalParcelasVencidas: 0,
-                totalParcelasVincendas: 0,
-                vincendas: false,
-              })
 
-
-              if (this.tableDataParcelas.dataRows.length - 1 === key) {
-                setTimeout(() => {
-                  this.preFormCadastroParcelas.reset();
-                  this.tableDataParcelas.dataRows = [];
-                  this.toggleUpdateLoading()
-                  this.alertType = 'lancamento-incluido';
-                  this.simularCalc(true)
-                }, 500)
-              }
-            })
-          }, erro => {
-            this.alertType = 'sem-indice';
-            this.toggleUpdateLoading()
-          });
-
-          break;
-      }
+        }
+      }, 0);
     })
+  }
+
+  setFormRiscos(form) {
+    Object.keys(form).filter((value, key) => {
+      if (form[value] && form[value] !== 'undefined') {
+        this.form_riscos[value] = form[value];
+      }
+    });
   }
 
   changeCadastroParcelas(e, row, col) {
@@ -612,26 +517,26 @@ export class ParceladoPreComponent implements OnInit {
     return semFormat ? "---" : "NaN";
   }
 
-  pesquisarContratos() {
+  pesquisarContratos(infoContrato) {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
     this.tableData.dataRows = [];
-    this.preFormRiscos.reset({ pre_data_calculo: this.getCurrentDate('YYYY-MM-DD') });
 
-    const contractRef = this.pre_form.pre_pasta.value + this.pre_form.pre_contrato.value + this.pre_form.pre_tipo_contrato.value;
+    this.contractRef = infoContrato.contractRef;
+    this.infoContrato = infoContrato;
 
     this.parceladoPreService.getAll().subscribe(parceladoPreList => {
-      this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === contractRef).map((parcela, key) => {
+      this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === infoContrato.contractRef).map((parcela, key) => {
         parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
         parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
+        const ultimaAtualizacao = [...parceladoPreList].pop();
+        this.ultima_atualizacao = formatDate(ultimaAtualizacao.ultimaAtualizacao, 'YYYY-MM-DD')
 
-        if (parceladoPreList.length) {
-          const ultimaAtualizacao = [...parceladoPreList].pop();
-          this.ultima_atualizacao = moment(ultimaAtualizacao.ultimaAtualizacao).format('YYYY-MM-DD');
-        }
+        Object.keys(parcela.infoParaCalculo).filter(value => {
+          this.formDefaultValues[value] = parcela.infoParaCalculo[value];
+        });
 
         setTimeout(() => {
-          this.changeFormValues(parcela.infoParaCalculo, true);
           this.simularCalc(true, null, true);
         }, 1000);
 
@@ -639,9 +544,12 @@ export class ParceladoPreComponent implements OnInit {
       });
 
       if (!this.tableData.dataRows.length) {
-        this.toggleUpdateLoading();
         this.tableLoading = false;
-        this.alertType = 'sem-registros'
+        this.alertType = {
+          mensagem: 'Nenhuma parcela encontrada!',
+          tipo: 'warning'
+        };
+        this.toggleUpdateLoading()
         return;
       }
 
@@ -649,63 +557,38 @@ export class ParceladoPreComponent implements OnInit {
     }, err => {
 
       this.tableLoading = false;
-      this.alertType = 'sem-registros';
+      this.alertType = {
+        mensagem: 'Nenhuma parcela encontrada!',
+        tipo: 'warning'
+      };
       this.toggleUpdateLoading()
-      this.errorMessage = err.error.message;
     });
 
   }
 
-  getCurrentDate(format = "DD/MM/YYYY hh:mm") {
-    return moment(new Date).format(format);
+  async changeDate(e, row, data, tipoIndice, tipoIndiceValue) {
+    row[data] = formatDate(e.target.value, 'YYYY-MM-DD');
+    row['indiceDataBaseAtual'] = await this.getIndiceDataBase(this.formDefaultValues.formIndice, e.target.value);
+
+    setTimeout(() => {
+      this.updateInlineIndice(this.formDefaultValues.formIndice, row, tipoIndice, tipoIndiceValue, data);
+    }, 100);
   }
 
-  getQtdDias(fistDate, secondDate) {
-    const a = moment(fistDate, 'YYYY-MM-DD');
-    const b = moment(secondDate, 'YYYY-MM-DD');
-    return Math.abs(b.diff(a, 'days'));
-  }
-
-  changeDate(e, row, data, tipoIndice, tipoIndiceValue) {
-    row[data] = moment(e.target.value).format("YYYY-MM-DD");
-    const indice = this.pre_form_riscos.pre_indice.value || row[tipoIndiceValue];
-
-    this.updateInlineIndice(indice, row, tipoIndice, tipoIndiceValue, data);
-  }
-
-  formatDate(date) {
-    return moment(date).format("DD/MM/YYYY");
-  }
-
-  changeFormValues(infoParaCalculo, search = false) {
-    if (!search) {
-      this.formDefaultValues = {
-        formMulta: this.pre_form_riscos.pre_multa.value || infoParaCalculo["formMulta"],
-        formJuros: this.pre_form_riscos.pre_juros_mora.value || infoParaCalculo["formJuros"],
-        formHonorarios: this.pre_form_riscos.pre_honorarios.value || infoParaCalculo["formHonorarios"],
-        formMultaSobContrato: this.pre_form_riscos.pre_multa_sobre_constrato.value || infoParaCalculo["formMultaSobContrato"],
-        formIndice: this.pre_form_riscos.pre_indice.value || infoParaCalculo["formIndice"],
-        formIndiceEncargos: this.pre_form_riscos.pre_encargos_contratuais.value || infoParaCalculo["formIndiceEncargos"],
-        formIndiceDesagio: this.pre_form_riscos.pre_desagio.value || infoParaCalculo["formIndiceDesagio"]
-      };
-    } else {
-      this.formDefaultValues = {
-        formMulta: infoParaCalculo["formMulta"] || 0,
-        formJuros: infoParaCalculo["formJuros"] || 0,
-        formHonorarios: infoParaCalculo["formHonorarios"] || 0,
-        formMultaSobContrato: infoParaCalculo["formMultaSobContrato"] || 0,
-        formIndice: infoParaCalculo["formIndice"] || "---",
-        formIndiceEncargos: infoParaCalculo["formIndiceEncargos"] || 6,
-        formIndiceDesagio: infoParaCalculo["formIndiceDesagio"] || 0
-
-      };
-    }
-
+  setFormDefault() {
+    Object.keys(this.form_riscos).filter((value, key) => {
+      if (this.form_riscos[value] && this.form_riscos[value] !== 'undefined') {
+        this.formDefaultValues[value] = this.form_riscos[value];
+      }
+    });
   }
 
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
-    this.changeFormValues(this.formDefaultValues, search);
+
+    if (origin === 'btn') {
+      this.setFormDefault()
+    }
 
     setTimeout(() => {
       let moneyValueTotal = 0,
@@ -718,10 +601,9 @@ export class ParceladoPreComponent implements OnInit {
       let valorPMTVincendaTotalVincendas = 0, totalDevedorTotalVincendas = 0;
 
       // Valores inputs
-      const inputExternoDataCalculo = this.pre_form_riscos.pre_data_calculo.value;
-      const inputExternoIndice = this.pre_form_riscos.pre_indice.value;
-      const inputExternoEncargosContratuais = this.pre_form_riscos.pre_encargos_contratuais.value;
-
+      const inputExternoDataCalculo = this.formDefaultValues.formDataCalculo;
+      const inputExternoIndice = this.formDefaultValues.formIndice;
+      const inputExternoEncargosContratuais = this.formDefaultValues.formIndiceEncargos;
 
       this.tableData.dataRows.map(async (row) => {
         let indiceDV = row['indiceDV'];
@@ -744,7 +626,10 @@ export class ParceladoPreComponent implements OnInit {
                   row['indiceDataCalcAmor'] = dtBaseAtual['valor'] / 100;
                 })
               }, erro => {
-                this.alertType = 'sem-indice';
+                this.alertType = {
+                  mensagem: 'Nenhuma índice cadastrado nessa data!',
+                  tipo: 'warning'
+                };
                 this.toggleUpdateLoading()
               });
               break;
@@ -765,7 +650,7 @@ export class ParceladoPreComponent implements OnInit {
 
         // Calculos 
         const correcaoPeloIndice = (valorNoVencimento / indiceDataVencimento * indiceDataCalcAmor) - valorNoVencimento;
-        const qtdDias = this.getQtdDias(dataVencimento, dataCalcAmor);
+        const qtdDias = getQtdDias(dataVencimento, dataCalcAmor);
         porcentagem = porcentagem / 30 * qtdDias;
         const valor = (valorNoVencimento + correcaoPeloIndice) * porcentagem;
         const multa = row['amortizacaoDataDiferenciada'] ? 0 : (valorNoVencimento + correcaoPeloIndice + valor) * (this.formDefaultValues.formMulta / 100);
@@ -829,16 +714,19 @@ export class ParceladoPreComponent implements OnInit {
         valorPMTVincenda: valorPMTVincendaTotalVincendas || 0
       }
 
-      this.subtotal_data_calculo = this.total_data_calculo = this.formatDate(inputExternoDataCalculo)
+      this.subtotal_data_calculo = this.total_data_calculo = formatDate(inputExternoDataCalculo)
       this.total_subtotal = totalDevedorTotalVincendas + totalDevedorTotal;
-      this.total_honorarios = (this.total_subtotal + this.amortizacaoGeral) * (this.formDefaultValues["formHonorarios"]/100)
-      this.total_multa_sob_contrato =  (this.total_subtotal + this.amortizacaoGeral + this.total_honorarios) * (this.formDefaultValues["formMultaSobContrato"]/100)
+      this.total_honorarios = (this.total_subtotal + this.amortizacaoGeral) * (this.formDefaultValues["formHonorarios"] / 100)
+      this.total_multa_sob_contrato = (this.total_subtotal + this.amortizacaoGeral + this.total_honorarios) * (this.formDefaultValues["formMultaSobContrato"] / 100)
       this.total_grandtotal = this.total_subtotal + this.amortizacaoGeral + this.total_honorarios + this.total_multa_sob_contrato;
 
       if (origin === 'btn') {
-        this.toggleUpdateLoading()
-        this.alertType = 'calculo-simulado';
         this.formartTable('Simulação')
+        this.alertType = {
+          mensagem: 'Cálculo Simulado',
+          tipo: 'success'
+        };
+        this.toggleUpdateLoading()
       }
       this.tableLoading = false;
     }, 0);
@@ -847,25 +735,21 @@ export class ParceladoPreComponent implements OnInit {
     !isInlineChange && this.toggleUpdateLoading();
   }
 
-  async getIndiceDataBase(indice, dataBaseAtual) {
-    if (!indice || !dataBaseAtual) {
+  async getIndiceDataBase(indice, data) {
+    if (!indice || !data) {
       return 1;
     }
 
     switch (indice) {
       case "Encargos Contratuais %":
-        return !!this.pre_form_riscos.pre_encargos_contratuais.value ? this.pre_form_riscos.pre_encargos_contratuais.value : 1;
+        return this.formDefaultValues.formIndiceEncargos;
         break;
       default:
-        return await this.indicesService.getIndiceData(indice, dataBaseAtual).toPromise().then(indi => {
-          return indi['valor']
-        }, erro => {
-          this.alertType = 'sem-indice';
-          this.toggleUpdateLoading()
-        });
-        break;
+        return (await this.indicesService.getIndiceData(indice, data))
+          .toPromise().then(ind => ind['valor'])
     }
   }
+
 
   deleteRow(row) {
     const index = this.tableData.dataRows.indexOf(row);
@@ -873,16 +757,22 @@ export class ParceladoPreComponent implements OnInit {
       this.tableData.dataRows.splice(index, 1);
       setTimeout(() => {
         this.simularCalc(false);
+        this.alertType = {
+          mensagem: 'Registro excluido!',
+          tipo: 'danger'
+        };
         this.toggleUpdateLoading()
-        this.alertType = 'registro-excluido'
       }, 0)
     } else {
       this.parceladoPreService.removeLancamento(row.id).subscribe(() => {
         this.tableData.dataRows.splice(index, 1);
         setTimeout(() => {
           this.simularCalc(false);
+          this.alertType = {
+            mensagem: 'Registro excluido!',
+            tipo: 'danger'
+          };
           this.toggleUpdateLoading()
-          this.alertType = 'registro-excluido'
         }, 0)
       })
     }
@@ -929,103 +819,31 @@ export class ParceladoPreComponent implements OnInit {
       }
     }
 
-
     index = this.tableDataAmortizacao.dataRows.indexOf(row);
     this.tableDataAmortizacao.dataRows.splice(index, 1);
 
     setTimeout(() => {
       this.simularCalc(false);
       this.toggleUpdateLoading()
-      this.alertType = 'registro-excluido'
+      this.alertType = {
+        mensagem: 'Registro excluido!',
+        tipo: 'danger'
+      };
+      this.toggleUpdateLoading()
     }, 0)
   }
 
-  async  updateInlineIndice(value, row, innerDataIndice, indiceColumn, columnData) {
+  async updateInlineIndice(value, row, innerDataIndice, indiceColumn, columnData) {
     const index = this.tableData.dataRows.indexOf(row);
+    this[indiceColumn] = null
+    this.tableData.dataRows[index][indiceColumn] = value;
+    this.tableData.dataRows[index][innerDataIndice] = await this.getIndiceDataBase(value, row[columnData]);
 
-    switch (value) {
-      case "Encargos Contratuais %":
-        this.tableData.dataRows[index][indiceColumn] = value;
-        this.tableData.dataRows[index][innerDataIndice] = !!this.pre_form_riscos.pre_encargos_contratuais.value ? this.pre_form_riscos.pre_encargos_contratuais.value : 1;
-        setTimeout(() => {
-          this.simularCalc(true);
-        }, 100);
-        break;
-      default:
-        this.indicesService.getIndiceData(value, row[columnData]).subscribe(indi => {
-          this.tableData.dataRows[index][indiceColumn] = value;
-          this.tableData.dataRows[index][innerDataIndice] = indi['valor'];
-          setTimeout(() => {
-            this.simularCalc(true);
-          }, 100);
-        }, erro => {
-          this.alertType = 'sem-indice';
-          this.toggleUpdateLoading()
-        });
-        break;
-    }
-
+    setTimeout(() => {
+      this[indiceColumn] = row[indiceColumn]
+      this.simularCalc(true, null, true);
+    }, 0);
   }
-
-  // Mock formulário de riscos
-  folderData_field = this.agruparPasta();
-
-  agruparPasta() {
-    let pastasFiltros = [];
-
-    this.pastas['data'].map(pasta => pastasFiltros.push(pasta.PASTA));
-    const setUnico = new Set(pastasFiltros);
-
-    return [...setUnico];
-  }
-
-  contractList_field = [];
-  setContrato() {
-    this.contractList_field = [];
-    this.typeContractList_field = [];
-
-    this.pastas['data'].map(pasta => {
-      if (pasta.PASTA === this.pre_form.pre_pasta.value) {
-        this.contractList_field.push(pasta.CONTRATO);
-      }
-    });
-
-    const setUnico = new Set(this.contractList_field);
-    this.contractList_field = [...setUnico];
-  }
-
-  typeContractList_field = [];
-  setTypeContract() {
-    this.typeContractList_field = [];
-    this.pastas['data'].map(pasta => {
-      if (pasta.PASTA === this.pre_form.pre_pasta.value && pasta.CONTRATO === this.pre_form.pre_contrato.value) {
-        this.typeContractList_field.push(pasta.DESCRICAO);
-      }
-    });
-    const setUnico = new Set(this.typeContractList_field);
-    this.typeContractList_field = [...setUnico];
-  }
-
-  indipre_field = [{
-    type: "---",
-    value: "1"
-  }, {
-    type: "INPC/IBGE",
-    value: "60.872914"
-  },
-  {
-    type: "CDI",
-    value: "71.712333"
-  },
-  {
-    type: "IGPM",
-    value: "1.24"
-  },
-  {
-    type: "Encargos Contratuais %",
-    value: "1"
-  }
-  ];
 
   pre_status_field = [{
     type: "Aberto",
@@ -1048,8 +866,4 @@ export class ParceladoPreComponent implements OnInit {
     type: "Final",
     value: "3"
   }]
-
-  get pastas() {
-    return this.pastasContratosService.getPastas();
-  }
 }

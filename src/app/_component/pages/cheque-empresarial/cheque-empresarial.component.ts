@@ -212,6 +212,15 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.toggleUpdateLoading()
   }
 
+  atualizarRiscoFalha() {
+    this.tableLoading = false;
+    this.alertType = {
+      mensagem: 'Falha ao atualizar risco',
+      tipo: 'danger'
+    };
+    this.toggleUpdateLoading()
+  }
+
   atualizarRisco() {
     this.controleLancamentos = 0;
 
@@ -230,28 +239,18 @@ export class ChequeEmpresarialComponent implements OnInit {
     });
 
     const payloadPut = payload.filter((lancamento => lancamento['id']));
-
     payloadPut.length > 0 && this.chequeEmpresarialService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
       this.atualizarRiscoConcluido()
     }, err => {
-      this.alertType = {
-        mensagem: 'Falha ao atualizar risco',
-        tipo: 'danger'
-      };
-      this.toggleUpdateLoading()
+      this.atualizarRiscoFalha()
     });
 
     const payloadPost = payload.filter((lancamento => !lancamento['id']));
-
     payloadPost.length > 0 && this.chequeEmpresarialService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
       this.atualizarRiscoConcluido()
 
     }, err => {
-      this.alertType = {
-        mensagem: 'Falha ao atualizar risco',
-        tipo: 'danger'
-      };
-      this.toggleUpdateLoading()
+      this.atualizarRiscoFalha();
     });
   }
 

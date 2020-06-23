@@ -1,33 +1,5 @@
 <div class="row ">
-	<div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3 alert-parcelas">
-		<div class="alert alert-success" style="position: fixed; right: 10px; top: 10px; z-index: 1030" role="alert">
-			Risco atualizado </div>
-	</div>
-	<div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3 alert-parcelas">
-		<div class="alert alert-success" style="position: fixed; right: 10px; top: 10px; z-index: 1030" role="alert">
-			Cálculo Simulado </div>
-	</div>
-	<div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3 alert-parcelas">
-		<div class="alert alert-success" style="position: fixed; right: 10px; top: 10px; z-index: 1030" role="alert">
-			Lançamento incluido! </div>
-	</div>
-	<div *ngIf="updateLoading && alertType === 'amortizacao-incluido'" class="col-lg-3  mt-3 alert-parcelas">
-		<div class="alert alert-success" style="position: fixed; right: 10px; top: 10px; z-index: 1030" role="alert">
-			Amortização incluida! </div>
-	</div>
-	<div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3 alert-parcelas">
-		<div class="alert alert-danger" style="position: fixed; right: 10px; top: 10px; z-index: 1030" role="alert">
-			Registro excluido! </div>
-	</div>
-
-	<div *ngIf="updateLoading && alertType === 'sem-registros'" class="col-lg-3  mt-3 alert-parcelas">
-		<div class="alert alert-warning" style="position: fixed; right: 10px; top: 10px; z-index: 1030" role="alert">
-			Nenhuma parcela encontrada! </div>
-	</div>
-	<div *ngIf="updateLoading && alertType === 'sem-indice'" class="col-lg-3  mt-3"
-		style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-		<div class="alert alert-danger" role="alert"> Nenhuma índice cadastrado nessa data! </div>
-	</div>
+	<app-notificacao [mensagem]="alertType.mensagem" [tipo]="alertType.tipo" [show]="updateLoading"></app-notificacao>
 
 	<div class="col-md-12">
 		<div class="card ">
@@ -35,117 +7,16 @@
 			<div class="card-body ">
 				<div class="row">
 					<div class="col-md-12">
-						<form class="row" [formGroup]="preForm">
-							<div class="col-sm-3">
-								<label for="pre_pasta" class="col-form-label">Pasta</label>
-								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_pasta"
-									id="pre_pasta" formControlName="pre_pasta" (change)="setContrato()">
-									<option *ngFor="let folder of folderData_field" [value]="folder"> {{folder}}
-									</option>
-								</select>
-							</div>
-							<div class="col-sm-3">
-								<label for="pre_contrato" class="col-form-label">Contrato</label>
-								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_contrato"
-									id="pre_contrato" formControlName="pre_contrato" required
-									(change)="setTypeContract()">
-									<option *ngFor="let contract of contractList_field" [value]="contract"> {{contract}}
-									</option>
-								</select>
-							</div>
-							<div class="col-sm-3">
-								<label for="nome" class="col-form-label">Tipo de Contrato</label>
-								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_tipo_contrato"
-									id="pre_tipo_contrato" formControlName="pre_tipo_contrato">
-									<option *ngFor="let typeContract of typeContractList_field" [value]="typeContract">
-										{{typeContract}}</option>
-								</select>
-							</div>
-							<div class="col-sm-3">
-								<br />
-								<div class="stats">
-									<button type="button" (click)="pesquisarContratos()" class="btn btn-info btn-round"
-										[disabled]="!preForm.valid || tableLoading">Pesquisar</button>
-									<div class="d-flex justify-content-center" *ngIf="tableLoading"
-										style="position: absolute; top: 33px; right: 80px">
-										<div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;"
-											role="status"> <span class="sr-only">Loading...</span> </div>
-									</div>
-								</div>
-							</div>
-							<div class="col-lg-12 mb-3 mt-3">
-								<hr>
-							</div>
-						</form>
+						<app-pesquisa (contractRef)="pesquisarContratos($event)" [tableLoading]="tableLoading"
+							(resetForm)="simulacao.resetForm($event)" #pesquisa></app-pesquisa>
 					</div>
+
 					<div class="col-md-12 col-sm-12">
-						<form class="row" [formGroup]="preFormRiscos">
-							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Última Atualização</label>
-								<input type="date" class="form-control col-md-11 col-sm-12"
-									name="pre_ultima_atualizacao" [value]="ultima_atualizacao" disabled> </div>
-							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Data do Cálculo</label>
-								<input type="date" class=" form-control col-md-11 col-sm-12" name="pre_data_calculo"
-									formControlName="pre_data_calculo"> </div>
-							<div class="col-md-3 col-sm-12"> </div>
-							<div class="col-md-3 col-sm-12"> </div>
-							<div class="col-md-3 col-sm-12">
-								<label for="pre_indice" class="col-form-label">Índice</label>
-								<select class="form-control custom-select col-md-12 col-sm-12" name="pre_indice"
-									id="pre_indice" formControlName="pre_indice">
-									<option *ngFor="let indice of indipre_field" [value]="indice.type"> {{indice.type}}
-									</option>
-								</select>
-							</div>
-							<div class="col-md-3 col-sm-12"
-								[hidden]="pre_form_riscos.pre_indice.value !== 'Encargos Contratuais %'">
-								<label for="nome" class="col-form-label">Encargos Contratuais %</label>
-								<input type="number" (change)="verifyNumber($event)" min="0"
-									class="form-control col-md-11 col-sm-12 " name="pre_encargos_contratuais"
-									id="pre_encargos_contratuais" formControlName="pre_encargos_contratuais"> </div>
-							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Multa %</label>
-								<input type="number" (change)="verifyNumber($event)" min="0"
-									class="form-control col-md-11 col-sm-12" name="pre_multa" id="pre_multa"
-									formControlName="pre_multa" value> </div>
-							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Juros Mora %</label>
-								<input type="number" (change)="verifyNumber($event)" min="0"
-									class="form-control col-md-11 col-sm-12" name="pre_juros_mora" id="pre_juros_mora"
-									formControlName="pre_juros_mora"> </div>
-							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Honorários %</label>
-								<input type="number" (change)="verifyNumber($event)" min="0"
-									class="form-control col-md-11 col-sm-12" name="pre_honorarios" id="pre_honorarios"
-									formControlName="pre_honorarios"> </div>
-							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Multa sob contrato %</label>
-								<input type="number" (change)="verifyNumber($event)" min="0"
-									class="form-control col-md-11 col-sm-12" name="pre_multa_sobre_constrato"
-									id="pre_multa_sobre_constrato" formControlName="pre_multa_sobre_constrato"> </div>
-							<div class="col-md-3 col-sm-12">
-								<label for="nome" class="col-form-label">Deságio %</label>
-								<input type="number" (change)="verifyNumber($event)" min="0"
-									class="form-control col-md-11 col-sm-12" name="pre_desagio" id="pre_desagio"
-									formControlName="pre_desagio"> </div>
-						</form>
+						<app-simulacao #simulacao [updateLoadingBtn]="updateLoadingBtn"
+							[tableDataLength]="tableData.dataRows.length > 0" (salvar)="atualizarRisco()"
+							(simularCalculo)="simularCalc(false, 'btn')" (formValue)="setFormRiscos($event)">
+						</app-simulacao>
 					</div>
-					<div class="col-md-12 col-sm-12 form-inline mt-3">
-						<div class="stats form-group mb-2">
-							<button type="button" [disabled]="!(tableData.dataRows.length > 0) || updateLoadingBtn"
-								(click)="atualizarRisco()" class="btn btn-info btn-round">Atualizar Risco</button>
-						</div>
-						<div class="stats form-group mb-2 ml-md-2">
-							<button type="button" [disabled]="!(tableData.dataRows.length > 0)"
-								(click)="simularCalc(false, 'btn')" class="btn btn-info btn-round">Simular
-								Cálculo</button>
-						</div>
-					</div>
-				</div>
-				<br>
-				<div class="d-flex justify-content-center" *ngIf="tableLoading && (tableData.dataRows.length === 0)">
-					<div class="spinner-grow text-primary" role="status"> <span class="sr-only">Loading...</span> </div>
 				</div>
 			</div>
 		</div>
@@ -162,7 +33,8 @@
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Nº Parcelas</label>
 								<input type="number" (change)="verifyNumber($event)" min="0"
-									class="form-control col-md-11 col-sm-12" formControlName="nparcelas" value> </div>
+									class="form-control col-md-11 col-sm-12" formControlName="nparcelas" value>
+							</div>
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Parcela inicial</label>
 								<input type="number" (change)="verifyNumber($event)" min="0"
@@ -188,11 +60,12 @@
 							<div class="col-md-12 col-sm-12 form-inline mt-3">
 								<div class="stats form-group mb-2">
 									<button type="button" (click)="adicionarParcelas()" class="btn btn-info btn-round"
-										[disabled]="!preFormCadastroParcelas.valid || !preForm.valid">Adicionar</button>
+										[disabled]="!preFormCadastroParcelas.valid || !pesquisa.peForm.valid">Adicionar</button>
 								</div>
 								<div class="stats form-group mb-2 ml-md-2">
 									<button type="button" (click)="incluirParcelas()" class="btn btn-info btn-round"
-										[disabled]="tableDataParcelas.dataRows.length === 0">Incluir Parcelas</button>
+										[disabled]="tableDataParcelas.dataRows.length === 0">Incluir
+										Parcelas</button>
 								</div>
 							</div>
 
@@ -257,7 +130,8 @@
 								<label for="nome" class="col-form-label">Tipo Amortização</label>
 								<select class="form-control custom-select col-md-12 col-sm-12"
 									formControlName="preFA_tipo">
-									<option *ngFor="let tipo of amortizacao_field" [value]="tipo.type"> {{tipo.type}}
+									<option *ngFor="let tipo of amortizacao_field" [value]="tipo.type">
+										{{tipo.type}}
 									</option>
 								</select>
 							</div>
@@ -265,7 +139,8 @@
 								[hidden]="pre_form_amortizacao.preFA_tipo.value === 'Data do Cálculo'">
 								<label for="nome" class="col-form-label">Data</label>
 								<input type="date" class="form-control col-md-12 col-sm-12"
-									formControlName="preFA_data_vencimento" max="3000-12-31" min="1000-01-01"> </div>
+									formControlName="preFA_data_vencimento" max="3000-12-31" min="1000-01-01">
+							</div>
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Valor</label>
 								<input type="number" (change)="verifyNumber($event)" min="0"
@@ -343,7 +218,8 @@
 									<th class="align-title-top" rowspan="2">Data Cálculo / Amort.</th>
 									<th class="align-title-top" rowspan="2">Índice
 										<b>{{formDefaultValues.formIndice}}</b> </th>
-									<th width="80" class="align-title-top" rowspan="2">Índice Data Cálculo / Amort.</th>
+									<th width="80" class="align-title-top" rowspan="2">Índice Data Cálculo / Amort.
+									</th>
 									<th class="align-title-top" rowspan="2">Valor no Vencimento R$</th>
 									<th width="100" rowspan="2">Correção pelo Índice</th>
 									<th colspan="3">Juros a.m. {{(formDefaultValues.formJuros ||  0 ) + "%"}} </th>
@@ -379,8 +255,8 @@
 											class="parcelado-font-size form-control custom-select log-hidden-false"
 											name="pre_indiceDV" id="pre_indiceDV"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV', 'dataVencimento')">
-											<option *ngFor="let indice of indipre_field" [value]="indice.type"
-												[selected]="indice.type === row.indiceDV"> {{indice.type}}</option>
+											<option *ngFor="let indice of indice_field" [value]="indice"
+												[selected]="indice === row.indiceDV"> {{indice}}</option>
 										</select>
 										<span class="log-visible-false">{{row.indiceDV}}</span>
 
@@ -402,8 +278,8 @@
 											class="parcelado-font-size form-control custom-select log-hidden-false"
 											name="pre_indice" id="pre_indice"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA', 'dataCalcAmor')">
-											<option *ngFor="let indice of indipre_field" [value]="indice.type"
-												[selected]="indice.type === row.indiceDCA"> {{indice.type}}</option>
+											<option *ngFor="let indice of indice_field" [value]="indice"
+												[selected]="indice === row.indiceDCA"> {{indice}}</option>
 										</select>
 										<span class="log-visible-false">{{row.indiceDCA}}</span>
 
@@ -440,7 +316,8 @@
 							</tbody>
 							<tfoot>
 								<tr class="parcelado-font-size">
-									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS VENCIDAS
+									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS
+										VENCIDAS
 									</th>
 									<th class="footer-table" width="100" colspan="1">
 										{{formatCurrency(totalParcelasVencidas.valorNoVencimento)}}</th>
@@ -448,17 +325,21 @@
 										{{formatCurrency(totalParcelasVencidas.correcaoPeloIndice)}}</th>
 									<th class="footer-table"></th>
 									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.moneyValue)}}</th>
+									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.moneyValue)}}
+									</th>
 									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.multa)}}</th>
 									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
 									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.amortizacao)}}</th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.totalDevedor)}}</th>
+									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.amortizacao)}}
+									</th>
+									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.totalDevedor)}}
+									</th>
 									<th class="footer-table"></th>
 									<th class="footer-table log-hidden-false"></th>
 								</tr>
 								<tr align="left" class="parcelado-font-size">
-									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS VINCENDAS
+									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS
+										VINCENDAS
 									</th>
 									<th class="footer-table" width="100" colspan="1"></th>
 									<th class="footer-table" width="100" colspan="1"></th>
@@ -467,7 +348,8 @@
 									<th class="footer-table"></th>
 									<th class="footer-table"></th>
 									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVincendas.valorPMTVincenda)}}
+									<th class="footer-table">
+										{{formatCurrency(totalParcelasVincendas.valorPMTVincenda)}}
 									</th>
 									<th class="footer-table"></th>
 									<th class="footer-table">{{formatCurrency(totalParcelasVincendas.totalDevedor)}}

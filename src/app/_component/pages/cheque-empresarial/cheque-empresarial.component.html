@@ -1,6 +1,6 @@
 <div class="row ">
-    <app-notificacao [mensagem]="alertType.mensagem" [tipo]="alertType.tipo" [show]="updateLoading" ></app-notificacao>
-    
+    <app-notificacao [mensagem]="alertType.mensagem" [tipo]="alertType.tipo" [show]="updateLoading"></app-notificacao>
+
     <div class="col-md-12">
         <div class="card ">
             <div class="card-header ">
@@ -19,7 +19,9 @@
                             (simularCalculo)="simularCalc(false, 'btn')" (formValue)="setFormRiscos($event)">
                         </app-simulacao>
                     </div>
-
+                    <div class="col-lg-12  mt-3">
+                        <hr>
+                    </div>
                     <div class="col-lg-12 col-sm-12">
                         <form class="row" [formGroup]="ceFormAmortizacao">
                             <div class="col-md-4 col-sm-12">
