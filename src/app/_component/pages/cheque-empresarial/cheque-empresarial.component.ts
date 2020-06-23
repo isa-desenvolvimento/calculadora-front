@@ -35,7 +35,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   tableData: TableData;
   tableLoading = false;
   updateLoading = false;
-  alertType = '';
+  alertType = {};
   updateLoadingBtn = false;
   controleLancamentos = 0;
   tableHeader = [];
@@ -54,7 +54,7 @@ export class ChequeEmpresarialComponent implements OnInit {
   total_multa_sob_contrato = 0;
   total_subtotal = 0;
   total_grandtotal = 0;
-  contractRef = ' ';
+  contractRef = '';
 
   dtOptions: DataTables.Settings = {};
   last_data_table: Object;
@@ -205,7 +205,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.formartTable('Atualização de Risco');
     this.ultima_atualizacao = getCurrentDate('YYYY-MM-DD');
 
-    this.alertType = 'risco-atualizado';
+    this.alertType = {
+      mensagem: 'Risco Atualizado',
+      tipo: 'success'
+    };
     this.toggleUpdateLoading()
   }
 
@@ -231,10 +234,11 @@ export class ChequeEmpresarialComponent implements OnInit {
     payloadPut.length > 0 && this.chequeEmpresarialService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
       this.atualizarRiscoConcluido()
     }, err => {
-      this.tableLoading = false;
-      this.alertType = 'registro-nao-incluido';
+      this.alertType = {
+        mensagem: 'Falha ao atualizar risco',
+        tipo: 'danger'
+      };
       this.toggleUpdateLoading()
-      this.errorMessage = "Falha ao atualizar risco.";
     });
 
     const payloadPost = payload.filter((lancamento => !lancamento['id']));
@@ -243,10 +247,11 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.atualizarRiscoConcluido()
 
     }, err => {
-      this.tableLoading = false;
-      this.alertType = 'registro-nao-incluido';
+      this.alertType = {
+        mensagem: 'Falha ao atualizar risco',
+        tipo: 'danger'
+      };
       this.toggleUpdateLoading()
-      this.errorMessage = "Falha ao atualizar risco.";
     });
   }
 
@@ -264,8 +269,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     if (!this.form_riscos.formIndice) {
       this.updateLoadingBtn = true;
+      this.alertType = {
+        mensagem: 'É necessário informar o índice.',
+        tipo: 'warning'
+      };
       this.toggleUpdateLoading()
-      this.alertType = 'preencher-indice';
       return;
     }
 
@@ -325,9 +333,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ceFormAmortizacao.reset();
 
     setTimeout(() => {
-      this.toggleUpdateLoading()
-      this.alertType = 'lancamento-incluido';
       this.simularCalc(true, null, true)
+      this.alertType = {
+        mensagem: 'Registro incluido!',
+        tipo: 'success'
+      };
+      this.toggleUpdateLoading()
     }, 500)
   }
 
@@ -358,19 +369,23 @@ export class ChequeEmpresarialComponent implements OnInit {
       });
 
       if (!this.tableData.dataRows.length) {
-        this.toggleUpdateLoading();
+        this.alertType = {
+          mensagem: 'Nenhuma lançamento encontrado!',
+          tipo: 'warning'
+        };
         this.tableLoading = false;
-        this.alertType = 'sem-registros'
+        this.toggleUpdateLoading()
         return;
       }
 
       this.tableLoading = false;
     }, err => {
-
+      this.alertType = {
+        mensagem: 'Nenhuma lançamento encontrado!',
+        tipo: 'warning'
+      };
       this.tableLoading = false;
-      this.alertType = 'sem-registros';
       this.toggleUpdateLoading()
-      this.errorMessage = err.error.message;
     });
 
   }
@@ -499,8 +514,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
             this.formartTable('Simulação');
+            this.alertType = {
+              mensagem: 'Cálculo Simulado!',
+              tipo: 'success'
+            };
             this.toggleUpdateLoading()
-            this.alertType = 'calculo-simulado';
           }
 
           this.tableLoading = false;
@@ -531,16 +549,22 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableData.dataRows.splice(index, 1);
       setTimeout(() => {
         this.simularCalc(true);
+        this.alertType = {
+          mensagem: 'Registro excluido!',
+          tipo: 'danger'
+        };
         this.toggleUpdateLoading()
-        this.alertType = 'registro-excluido'
       }, 0)
     } else {
       this.chequeEmpresarialService.removeLancamento(row.id).subscribe(() => {
         this.tableData.dataRows.splice(index, 1);
         setTimeout(() => {
           this.simularCalc(true);
+          this.alertType = {
+            mensagem: 'Registro excluido!',
+            tipo: 'danger'
+          };
           this.toggleUpdateLoading()
-          this.alertType = 'registro-excluido'
         }, 0)
       })
     }

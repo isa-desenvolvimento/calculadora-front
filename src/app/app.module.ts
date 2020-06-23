@@ -24,6 +24,7 @@ import { IndicesComponent } from './_component/pages/indices/indices.component';
 import { LogComponent } from './_component/pages/log/log.component';
 import { PesquisaComponent } from './_component/pages/pesquisa/pesquisa.component';
 import { SimulacaoComponent } from './_component/pages/simulacao/simulacao.component';
+import { NotificacaoComponent } from './_component/pages/notificacao/notificacao.component';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,8 @@ import { SimulacaoComponent } from './_component/pages/simulacao/simulacao.compo
     IndicesComponent,
     LogComponent,
     PesquisaComponent,
-    SimulacaoComponent
+    SimulacaoComponent,
+    NotificacaoComponent
   ],
   imports: [
     BrowserModule,

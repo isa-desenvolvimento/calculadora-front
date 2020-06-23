@@ -1,46 +1,6 @@
 <div class="row ">
-    <div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-success" role="alert">
-            Risco atualizado
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-success" role="alert">
-            Cálculo Simulado
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-success" role="alert">
-            Lançamento incluido!
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-danger" role="alert">
-            Registro excluido!
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'registro-nao-incluido'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-danger" role="alert">
-            Falha ao atuliazar risco!
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'sem-registros'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-warning" role="alert"> Nenhuma lançamento encontrado! </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'preencher-indice'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-warning" role="alert"> É necessário informar o índice.</div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'sem-indice'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-danger" role="alert"> Nenhuma índice cadastrado nessa data! </div>
-    </div>
+    <app-notificacao [mensagem]="alertType.mensagem" [tipo]="alertType.tipo" [show]="updateLoading" ></app-notificacao>
+    
     <div class="col-md-12">
         <div class="card ">
             <div class="card-header ">
