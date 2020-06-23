@@ -447,7 +447,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           let correcao;
           if (this.formDefaultValues.formIndice === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
-            correcao = (valorDevedor * indiceDataBaseAtual / 30) * qtdDias
+            correcao = (valorDevedor * (indiceDataBaseAtual/100) / 30) * qtdDias
           } else {
             correcao = (valorDevedor / indiceDataBase * indiceDataBaseAtual) - valorDevedor
           }
@@ -458,7 +458,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           // -- dias
           row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
           // -- juros 
-          row['encargosMonetarios']['jurosAm']['percentsJuros'] = ((this.formDefaultValues.formJuros / 30) * qtdDias).toFixed(2);
+          row['encargosMonetarios']['jurosAm']['percentsJuros'] = (((this.formDefaultValues.formJuros * 100) / 30) * qtdDias).toFixed(2);
           // -- moneyValue
           const moneyValue = row['encargosMonetarios']['jurosAm']['moneyValue'] = (((valorDevedor + correcaoPeloIndice) / 30) * qtdDias) * ((this.formDefaultValues.formJuros / 100))
 
