@@ -269,6 +269,8 @@ export class ChequeEmpresarialComponent implements OnInit {
       return;
     }
 
+    this.setFormDefault()
+
     this.updateLoadingBtn = false;
     this.tableLoading = true;
 
@@ -325,7 +327,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     setTimeout(() => {
       this.toggleUpdateLoading()
       this.alertType = 'lancamento-incluido';
-      this.simularCalc(true, 'btn', true)
+      this.simularCalc(true, null, true)
     }, 500)
   }
 
@@ -390,6 +392,14 @@ export class ChequeEmpresarialComponent implements OnInit {
     });
   }
 
+  setFormDefault() {
+    Object.keys(this.form_riscos).filter((value, key) => {
+      if (this.form_riscos[value] && this.form_riscos[value] !== 'undefined') {
+        this.formDefaultValues[value] = this.form_riscos[value];
+      }
+    });
+  }
+
   resetIndiceVariavel() {
     this.indiceDataBaseAtual = null;
     this.indiceDataBase = null;
@@ -399,11 +409,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.tableLoading = true;
 
     if (origin === 'btn') {
-      Object.keys(this.form_riscos).filter((value, key) => {
-        if (this.form_riscos[value] && this.form_riscos[value] !== 'undefined') {
-          this.formDefaultValues[value] = this.form_riscos[value];
-        }
-      });
+      this.setFormDefault()
     }
 
     this.tableData.dataRows.map(async (row, index) => {
@@ -431,12 +437,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         if (this.indiceDataBaseAtual && this.indiceDataBase) {
           clearInterval(interval)
 
-          row['indiceDataBaseAtual'] = this.indiceDataBaseAtual;
-          row['indiceDataBase'] = this.indiceDataBase;
-
-          const indiceDataBaseAtual = this.indiceDataBaseAtual;
-          const indiceDataBase = this.indiceDataBase;
-
           if (index > 0) {
             row['valorDevedor'] = this.tableData.dataRows[index - 1]['valorDevedorAtualizado'];
             row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual'];
@@ -444,6 +444,12 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           const qtdDias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
           const valorDevedor = parseFloat(row['valorDevedor']);
+
+          row['indiceDataBaseAtual'] = this.indiceDataBaseAtual;
+          row['indiceDataBase'] = this.indiceDataBase;
+
+          const indiceDataBaseAtual = this.indiceDataBaseAtual;
+          const indiceDataBase = this.indiceDataBase;
 
           let correcao;
           if (this.formDefaultValues.formIndice === "Encargos Contratuais %" || row['infoParaCalculo']['formIndice'] === "Encargos Contratuais %") {
@@ -465,7 +471,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           // -- multa 
           let multa = 0;
           if (index === 0) {
-            row['encargosMonetarios']['multa'] = ((valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100)).toFixed(2);
+            row['encargosMonetarios']['multa'] = (valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100);
             multa = (valorDevedor + correcaoPeloIndice + moneyValue) * (this.formDefaultValues.formMulta / 100);
           } else {
             row['encargosMonetarios']['multa'] = "NaN";
