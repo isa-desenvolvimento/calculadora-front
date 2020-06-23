@@ -90,12 +90,12 @@
 									<td>{{row.nparcelas}}</td>
 									<td>
 										<input type="date" class=" parcelado-font-size form-control col-md-11 col-sm-12"
-											(change)="changeCadastroParcelas($event, row, 'dataVencimento')"
+											(blur)="changeCadastroParcelas($event, row, 'dataVencimento')"
 											[value]="row.dataVencimento">
 									</td>
 									<td>
 										<input class=" parcelado-font-size form-control col-md-11 col-sm-12"
-											(change)="changeCadastroParcelas($event, row, 'valorNoVencimento')"
+											(chablurnge)="changeCadastroParcelas($event, row, 'valorNoVencimento')"
 											[value]="formatCurrency(row.valorNoVencimento)">
 									</td>
 									<td>
@@ -247,7 +247,7 @@
 										<input type="date" [ngClass]="{'parcelas-vincendas': row.vincenda} "
 											class=" parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataVencimento" id="pre_dataCalcAmor" [value]="row.dataVencimento"
-											(change)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')">
+											(blur)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')">
 										<span class="log-visible-false">{{formatDate(row.dataVencimento)}}</span>
 									</td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
@@ -269,7 +269,7 @@
 											class="parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31"
 											[value]="row.dataCalcAmor"
-											(change)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')">
+											(blur)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')">
 										<span class="log-visible-false">{{formatDate(row.dataCalcAmor)}}</span>
 
 									</td>

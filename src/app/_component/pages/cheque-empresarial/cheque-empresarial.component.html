@@ -183,7 +183,7 @@
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden-false"
                                             name="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}"
-                                            [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
+                                            [value]="row.dataBaseAtual" (blur)="changeDate($event, row)">
                                         <span class="log-visible-false">{{formatDate(row.dataBaseAtual)}}</span>
                                     </td>
                                     <td width="80">

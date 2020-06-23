@@ -61,11 +61,6 @@ export class ChequeEmpresarialComponent implements OnInit {
   min_data: string;
   ultima_atualizacao: String;
 
-  indices = {
-    dataBase: 0,
-    dataBaseAtual: 0
-  };
-
   formDefaultValues: InfoParaCalculo = {
     formDataCalculo: getCurrentDate("YYYY-MM-DD"),
     formMulta: 0,
