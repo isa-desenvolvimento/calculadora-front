@@ -54,6 +54,9 @@ export class SimulacaoComponent implements OnInit {
 
   resetForm(e) {
     this.formRiscos.reset({ formDataCalculo: getCurrentDate('YYYY-MM-DD') });
+    setTimeout(() => {
+      this.changeInput(e);
+    }, 100);
   }
 
   validarNumeros(e) {
