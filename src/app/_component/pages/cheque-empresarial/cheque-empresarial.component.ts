@@ -527,27 +527,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     }
   }
 
-  updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
-    switch (e.target.value) {
-      case "Encargos Contratuais %":
-        row[innerIndice] = e.target.value;
-        row[indiceToChangeInline] = !!this.form_riscos.encargos_contratuais ? this.form_riscos.encargos_contratuais : 1;
-        setTimeout(() => {
-          this.simularCalc(true);
-        }, 500)
-        break;
-      default:
-        this.indicesService.getIndiceData(e.target.value, row[columnData]).subscribe(indi => {
-          row[innerIndice] = e.target.value;
-          row[indiceToChangeInline] = indi['valor'];
-          setTimeout(() => {
-            this.simularCalc(true);
-          }, 500);
-        }), err => {
-          this.alertType = 'sem-indice';
-          this.toggleUpdateLoading()
-        };
-        break;
-    }
+  async updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
+    row[innerIndice] = e.target.value;
+    row[indiceToChangeInline] =  await this.getIndiceDataBase(e.target.value, row[columnData]);
+
+    setTimeout(() => {
+      this.simularCalc(true);
+    }, 500);
   }
 }

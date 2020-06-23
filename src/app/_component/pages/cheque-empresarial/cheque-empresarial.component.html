@@ -74,7 +74,7 @@
                                     id="ceFA_data_vencimento" formControlName="ceFA_data_vencimento" max="3000-12-31"
                                     min="1000-01-01">
                                 <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    {{formatDate(tableData.dataRows[0])}}
+                                    {{formatDate(tableData.dataRows[0], 'YYYY-MM-DD')}}
                                 </p>
                             </div>
                             <div class="col-md-4 col-sm-12">
@@ -235,8 +235,8 @@
                                         <input type="text" style="width: 120px; font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden-false"
                                             name="ce_data_calculo" max="3000-12-31" min="1000-01-01"
-                                            [value]="formatDate(row)" disabled>
-                                        <span class="log-visible-false">{{formatDate(row)}}</span>
+                                            [value]="row.dataBase" disabled>
+                                        <span class="log-visible-false">{{formatDate(row.dataBase)}}</span>
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px"
@@ -250,7 +250,7 @@
                                         <span class="log-visible-false">{{row.indiceDB}}</span>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBase) || "---"}}
+                                        {{row.indiceDataBase || "---"}}
                                     </td>
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
@@ -258,7 +258,6 @@
                                             name="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}"
                                             [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
                                         <span class="log-visible-false">{{formatDate(row.dataBaseAtual)}}</span>
-
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px"
@@ -273,7 +272,7 @@
 
                                     </td>
                                     <td>
-                                        {{row.indiceDataBaseAtual || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBaseAtual) || "---"}}
+                                        {{row.indiceDataBaseAtual || "---"}}
                                     </td>
                                     <td>
                                         {{formatCurrency(row.valorDevedor)}}

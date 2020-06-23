@@ -9,7 +9,7 @@ export const getQtdDias = (fistDate, secondDate) => {
     return Math.abs(b.diff(a, 'days'));
 }
 
-export const formatDate = (date, format = "DD/MM/YYYY") => moment(row['dataBase']).format("DD/MM/YYYY");
+export const formatDate = (date, format = "DD/MM/YYYY") => moment(date).format("DD/MM/YYYY");
 
 
 export const verifyNumber = value => value = Math.abs(value);
