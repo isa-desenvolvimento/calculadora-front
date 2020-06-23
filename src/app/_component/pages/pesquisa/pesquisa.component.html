@@ -1,0 +1,41 @@
+<div>
+    <form class="row" [formGroup]="peForm">
+        <div class="col-sm-3">
+            <label for="pasta" class="col-form-label">Pasta</label>
+            <select class="form-control custom-select col-md-12 col-sm-12" name="pasta" id="pasta"
+                formControlName="pasta" (change)="setContrato()">
+                <option *ngFor="let folder of folderData_field" [value]="folder">
+                    {{folder}}</option>
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <label for="contrato" class="col-form-label">Contrato</label>
+            <select class="form-control custom-select col-md-12 col-sm-12" name="contrato" id="contrato"
+                formControlName="contrato" required (change)="setTypeContract()">
+                <option *ngFor="let contract of contractList_field" [value]="contract">
+                    {{contract}}</option>
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <label for="nome" class="col-form-label">Tipo de Contrato</label>
+            <select class="form-control custom-select col-md-12 col-sm-12" name="tipo_contrato" id="tipo_contrato"
+                formControlName="tipo_contrato">
+                <option *ngFor="let typeContract of typeContractList_field" [value]="typeContract">
+                    {{typeContract}}</option>
+            </select>
+        </div>
+        <div class="col-sm-3">
+            <br />
+            <div class="stats">
+                <button type="button" (click)="setContractRef()" class="btn btn-info btn-round"
+                    [disabled]="!peForm.valid || tableLoading">Pesquisar</button>
+                <div class="d-flex justify-content-center" *ngIf="tableLoading"
+                    style="position: absolute; top: 33px; right: 80px">
+                    <div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

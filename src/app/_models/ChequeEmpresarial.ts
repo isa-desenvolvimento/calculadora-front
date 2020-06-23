@@ -11,7 +11,7 @@ export interface Lancamento {
     lancamentos: number;
     tipoLancamento: string;
     valorDevedorAtualizado: number;
-    contractRef: number;
+    contractRef: string;
     ultimaAtualizacao: string;
     infoParaCalculo: any
 }
@@ -29,6 +29,7 @@ export interface JurosAm {
 }
 
 export interface InfoParaCalculo {
+    formDataCalculo: string;
     formMulta: number;
     formJuros: number;
     formHonorarios: number;

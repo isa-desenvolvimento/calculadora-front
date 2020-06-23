@@ -30,7 +30,8 @@
               "node_modules/bootstrap/scss/bootstrap.scss",
               "src/assets/scss/paper-dashboard.scss",
               "node_modules/ngx-toastr/toastr.css",
-              "node_modules/datatables.net-buttons-dt/css/buttons.dataTables.css"
+              "node_modules/datatables.net-buttons-dt/css/buttons.dataTables.css",
+              "src/app/_component/pages/notificacao/notificacao.component.css"
             ],
             "scripts": [
               "node_modules/jquery/dist/jquery.js",

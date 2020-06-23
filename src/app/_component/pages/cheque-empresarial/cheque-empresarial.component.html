@@ -1,46 +1,6 @@
 <div class="row ">
-    <div *ngIf="updateLoading && alertType === 'risco-atualizado'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-success" role="alert">
-            Risco atualizado
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'calculo-simulado'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-success" role="alert">
-            Cálculo Simulado
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'lancamento-incluido'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-success" role="alert">
-            Lançamento incluido!
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'registro-excluido'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-danger" role="alert">
-            Registro excluido!
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'registro-nao-incluido'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-danger" role="alert">
-            Falha ao atuliazar risco!
-        </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'sem-registros'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-warning" role="alert"> Nenhuma lançamento encontrado! </div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'preencher-indice'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-warning" role="alert"> É necessário informar o índice.</div>
-    </div>
-    <div *ngIf="updateLoading && alertType === 'sem-indice'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-danger" role="alert"> Nenhuma índice cadastrado nessa data! </div>
-    </div>
+    <app-notificacao [mensagem]="alertType.mensagem" [tipo]="alertType.tipo" [show]="updateLoading"></app-notificacao>
+
     <div class="col-md-12">
         <div class="card ">
             <div class="card-header ">
@@ -49,127 +9,19 @@
             <div class="card-body ">
                 <div class="row">
                     <div class="col-md-12">
-                        <form class="row" [formGroup]="ceForm">
-                            <div class="col-sm-3">
-                                <label for="ce_pasta" class="col-form-label">Pasta</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="ce_pasta"
-                                    id="ce_pasta" formControlName="ce_pasta" (change)="setContrato()">
-                                    <option *ngFor="let folder of folderData_field" [value]="folder">
-                                        {{folder}}</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-3">
-                                <label for="ce_contrato" class="col-form-label">Contrato</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="ce_contrato"
-                                    id="ce_contrato" formControlName="ce_contrato" required
-                                    (change)="setTypeContract()">
-                                    <option *ngFor="let contract of contractList_field" [value]="contract">
-                                        {{contract}}</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-3">
-                                <label for="nome" class="col-form-label">Tipo de Contrato</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="ce_tipo_contrato"
-                                    id="ce_tipo_contrato" formControlName="ce_tipo_contrato">
-                                    <option *ngFor="let typeContract of typeContractList_field" [value]="typeContract">
-                                        {{typeContract}}</option>
-                                </select>
-                            </div>
-                            <div class="col-sm-3">
-                                <br />
-                                <div class="stats">
-                                    <button type="button" (click)="pesquisarContratos()" class="btn btn-info btn-round"
-                                        [disabled]="!ceForm.valid || tableLoading">Pesquisar</button>
-                                    <div class="d-flex justify-content-center" *ngIf="tableLoading"
-                                        style="position: absolute; top: 33px; right: 80px">
-                                        <div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;"
-                                            role="status">
-                                            <span class="sr-only">Loading...</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-12 mb-3 mt-3">
-                                <hr>
-                            </div>
-                        </form>
+                        <app-pesquisa (contractRef)="pesquisarContratos($event)" [tableLoading]="tableLoading"
+                            (resetForm)="simulacao.resetForm($event)"></app-pesquisa>
                     </div>
+
                     <div class="col-md-12 col-sm-12">
-                        <form class="row" [formGroup]="ceFormRiscos">
-
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Última Atualização</label>
-                                <input type="date" class="form-control col-md-11 col-sm-12" name="ce_ultima_atualizacao"
-                                    [value]="ultima_atualizacao" disabled>
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Data do Cálculo</label>
-                                <input type="date" class=" form-control col-md-11 col-sm-12" name="ce_data_calculo"
-                                    id="ce_data_calculo" formControlName="ce_data_calculo">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="ce_indice" class="col-form-label">Índice</label>
-                                <select class="form-control custom-select col-md-12 col-sm-12" name="ce_indice"
-                                    id="ce_indice" formControlName="ce_indice">
-                                    <option *ngFor="let indice of indice_field" [value]="indice.type">
-                                        {{indice.type}}</option>
-                                </select>
-                            </div>
-                            <div class="col-md-3 col-sm-12"
-                                [hidden]="ce_form_riscos.ce_indice.value !== 'Encargos Contratuais %'">
-                                <label for="nome" class="col-form-label">Encargos Contratuais %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12 " name="ce_encargos_contratuais"
-                                    id="ce_encargos_contratuais" formControlName="ce_encargos_contratuais">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Multa %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="ce_multa" id="ce_multa"
-                                    formControlName="ce_multa">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Juros Mora %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="ce_juros_mora" id="ce_juros_mora"
-                                    formControlName="ce_juros_mora">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Honorários %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="ce_honorarios" id="ce_honorarios"
-                                    formControlName="ce_honorarios">
-                            </div>
-                            <div class="col-md-3 col-sm-12">
-                                <label for="nome" class="col-form-label">Multa sob contrato %</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-11 col-sm-12" name="ce_multa_sobre_constrato"
-                                    id="ce_multa_sobre_constrato" formControlName="ce_multa_sobre_constrato">
-                            </div>
-                        </form>
+                        <app-simulacao #simulacao [updateLoadingBtn]="updateLoadingBtn"
+                            [tableDataLength]="tableData.dataRows.length > 0" (salvar)="atualizarRisco()"
+                            (simularCalculo)="simularCalc(false, 'btn')" (formValue)="setFormRiscos($event)">
+                        </app-simulacao>
                     </div>
-                    <div class="col-md-12 col-sm-12 form-inline mt-3">
-                        <div class="stats form-group mb-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0) || updateLoadingBtn"
-                                (click)="atualizarRisco()" class="btn btn-info btn-round">Atualizar
-                                Risco</button>
-                        </div>
-                        <div class="stats form-group mb-2 ml-md-2">
-                            <button type="button" [disabled]="!(tableData.dataRows.length > 0)  || updateLoadingBtn"
-                                (click)="simularCalc(false, 'btn')" class="btn btn-info btn-round">Simular
-                                Cálculo</button>
-                        </div>
-
-                        <div class="col-lg-12  mt-3">
-                            <hr>
-                        </div>
+                    <div class="col-lg-12  mt-3">
+                        <hr>
                     </div>
-
                     <div class="col-lg-12 col-sm-12">
                         <form class="row" [formGroup]="ceFormAmortizacao">
                             <div class="col-md-4 col-sm-12">
@@ -179,7 +31,7 @@
                                     id="ceFA_data_vencimento" formControlName="ceFA_data_vencimento" max="3000-12-31"
                                     min="1000-01-01">
                                 <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    {{formatDate(tableData.dataRows[0])}}
+                                    {{formatDate(tableData.dataRows[0]['dataBase'])}}
                                 </p>
                             </div>
                             <div class="col-md-4 col-sm-12">
@@ -233,35 +85,6 @@
                                     </div>
                                 </fieldset>
                             </div>
-                            <!-- Removendo inicio e fim amortizacao -->
-                            <!-- <div class="col-md-2 col-sm-12"
-                                *ngIf="ce_form_amortizacao.ceFA_tipo_lancamento.value === 'credit'">
-                                <fieldset class="form-group ml-sm-3">
-                                    <div class="form-group row">
-                                        <legend class="col-form-label">
-                                            <label class="form-check-label" for="profile2">Amortização</label>
-                                        </legend>
-                                        <div class="col-sm-7 ml-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio"
-                                                    name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status3" [value]="true">
-                                                <label class="form-check-label" for="status3" style="margin: -30px">
-                                                    Ínicio
-                                                </label>
-                                            </div>
-                                            <div class="form-check ">
-                                                <input class="form-check-input" type="radio"
-                                                    name="ceFA_tipo_amortizacao" formControlName="ceFA_tipo_amortizacao"
-                                                    id="status4" [value]="false">
-                                                <label class="form-check-label" for="status4" style="margin: -30px">
-                                                    Fim
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </fieldset>
-                            </div> -->
                         </form>
                     </div>
                     <div class="col-lg-12 mt-4">
@@ -337,48 +160,46 @@
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
                                     <td>
-                                        <input type="text" style="width: 120px; font-size: 11px"
+                                        <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden-false"
-                                            name="ce_data_calculo" max="3000-12-31" min="1000-01-01"
-                                            [value]="formatDate(row)" disabled>
-                                        <span class="log-visible-false">{{formatDate(row)}}</span>
+                                            [value]="row.dataBase" disabled>
+                                        <span class="log-visible-false">{{formatDate(row.dataBase)}}</span>
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px"
                                             class="form-control custom-select log-hidden-false" name="ce_indiceDB"
                                             id="ce_indiceDB"
                                             (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase', 'dataBase')">
-                                            <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="indice.type === row.indiceDB">
-                                                {{indice.type}}</option>
+                                            <option *ngFor="let indice of indice_field" [value]="indice"
+                                                [selected]="indice === row.indiceDB">
+                                                {{indice}}</option>
                                         </select>
                                         <span class="log-visible-false">{{row.indiceDB}}</span>
                                     </td>
                                     <td>
-                                        {{row.indiceDataBase || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBase) || "---"}}
+                                        {{row.indiceDataBase || "---"}}
                                     </td>
                                     <td width="120">
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden-false"
                                             name="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}"
-                                            [value]="row.dataBaseAtual" (change)="changeDate($event, row)">
+                                            [value]="row.dataBaseAtual" (blur)="changeDate($event, row)">
                                         <span class="log-visible-false">{{formatDate(row.dataBaseAtual)}}</span>
-
                                     </td>
                                     <td width="80">
                                         <select style="width: 80px; font-size: 11px"
                                             class="form-control custom-select log-hidden-false" name="ce_indice"
                                             id="ce_indice"
                                             (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual', 'dataBaseAtual')">
-                                            <option *ngFor="let indice of indice_field" [value]="indice.type"
-                                                [selected]="indice.type === row.indiceBA">
-                                                {{indice.type}}</option>
+                                            <option *ngFor="let indice of indice_field" [value]="indice"
+                                                [selected]="indice === row.indiceBA">
+                                                {{indice}}</option>
                                         </select>
                                         <span class="log-visible-false">{{row.indiceBA}}</span>
 
                                     </td>
                                     <td>
-                                        {{row.indiceDataBaseAtual || getIndiceDataBase(ce_form_riscos.ce_indice.value, row.dataBaseAtual) || "---"}}
+                                        {{row.indiceDataBaseAtual || "---"}}
                                     </td>
                                     <td>
                                         {{formatCurrency(row.valorDevedor)}}

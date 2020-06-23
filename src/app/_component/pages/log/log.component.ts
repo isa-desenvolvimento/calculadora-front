@@ -22,6 +22,7 @@ export class LogComponent implements OnInit {
   updateLoading = false;
   alertType = '';
   row: {};
+  infoContrato = {};
 
   tableData: TableData;
   dtOptions: DataTables.Settings = {};
@@ -115,15 +116,12 @@ export class LogComponent implements OnInit {
     }, 3000);
   }
 
-  pesquisarContratos() {
+  pesquisarContratos(infoContrato) {
     this.tableLoading = true;
-
-    const pasta = this.log_form.log_pasta.value;
-    const contrato = this.log_form.log_contrato.value;
-    const tipoContrato = this.log_form.log_tipo_contrato.value;
+    this.infoContrato = infoContrato;
     this.tableData.dataRows = [];
 
-    this.logService.getLog(pasta, contrato, tipoContrato).subscribe(logs => {
+    this.logService.getLog(infoContrato.pasta, infoContrato.contrato, infoContrato.tipo_contrato).subscribe(logs => {
       if (!logs.length) {
         this.alertType = 'sem-registros';
         this.tableLoading = false;
