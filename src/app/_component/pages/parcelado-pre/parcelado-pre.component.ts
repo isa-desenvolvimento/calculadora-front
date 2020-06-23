@@ -5,9 +5,7 @@ import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 
 import { IndicesService } from '../../../_services/indices.service';
 import { LogService } from '../../../_services/log.service';
-
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import * as moment from 'moment'; // add this 1 of 4
 
 import 'datatables.net';
 import 'datatables.net-buttons';
@@ -637,8 +635,8 @@ export class ParceladoPreComponent implements OnInit {
         }
 
         // Valores brutos
-        const dataVencimento = moment(row["dataVencimento"]).format("YYYY-MM-DD");
-        const dataCalcAmor = moment(row["dataCalcAmor"]).format("YYYY-MM-DD");
+        const dataVencimento = formatDate(row["dataVencimento"], "YYYY-MM-DD");
+        const dataCalcAmor = formatDate(row["dataCalcAmor"], "YYYY-MM-DD");
         const indiceDataVencimento = row['indiceDataVencimento'] / 100;
         const indiceDataCalcAmor = row['indiceDataCalcAmor'] / 100;
 
