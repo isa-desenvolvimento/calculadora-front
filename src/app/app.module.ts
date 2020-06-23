@@ -22,6 +22,8 @@ import { ToastrModule } from "ngx-toastr";
 import { DataTablesModule } from 'angular-datatables';
 import { IndicesComponent } from './_component/pages/indices/indices.component';
 import { LogComponent } from './_component/pages/log/log.component';
+import { PesquisaComponent } from './_component/pages/pesquisa/pesquisa.component';
+import { SimulacaoComponent } from './_component/pages/simulacao/simulacao.component';
 
 @NgModule({
   declarations: [
@@ -35,7 +37,9 @@ import { LogComponent } from './_component/pages/log/log.component';
     ParceladoPosComponent,
     ParceladoPreComponent,
     IndicesComponent,
-    LogComponent
+    LogComponent,
+    PesquisaComponent,
+    SimulacaoComponent
   ],
   imports: [
     BrowserModule,
