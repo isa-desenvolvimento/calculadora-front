@@ -6,8 +6,7 @@ import { LISTA_INDICES } from '../../util/constants'
 
 @Component({
   selector: 'app-simulacao',
-  templateUrl: './simulacao.component.html',
-  styleUrls: ['./simulacao.component.css']
+  templateUrl: './simulacao.component.html'
 })
 export class SimulacaoComponent implements OnInit {
 
@@ -47,6 +46,7 @@ export class SimulacaoComponent implements OnInit {
   }
 
   atualizarRisco() {
+    this.formRiscos.value.formUltimaAtualizacao = getCurrentDate('YYYY-MM-DD');
     this.salvar.emit();
   }
 

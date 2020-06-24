@@ -31,7 +31,11 @@ export class ParceladoPreComponent implements OnInit {
 
   tableLoading = false;
   updateLoading = false;
-  alertType = {};
+  alertType = {
+    mensagem: '',
+    tipo: ''
+  };
+
   updateLoadingBtn = false;
   controleLancamentos = 0;
 
@@ -304,7 +308,7 @@ export class ParceladoPreComponent implements OnInit {
     verifyNumber(value)
   }
 
-  formatDate(value, format) {
+  formatDate(value, format = 'DD/MM/YYYY') {
     return formatDate(value, format)
   }
 
@@ -779,8 +783,11 @@ export class ParceladoPreComponent implements OnInit {
     this.tableDataParcelas.dataRows.splice(index, 1);
     setTimeout(() => {
       this.simularCalc(false);
+      this.alertType = {
+        mensagem: 'Registro excluido!',
+        tipo: 'danger'
+      };
       this.toggleUpdateLoading()
-      this.alertType = 'registro-excluido'
     }, 0)
   }
 

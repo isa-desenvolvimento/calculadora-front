@@ -35,7 +35,10 @@ export class ChequeEmpresarialComponent implements OnInit {
   tableData: TableData;
   tableLoading = false;
   updateLoading = false;
-  alertType = {};
+  alertType = {
+    mensagem: '',
+    tipo: ''
+  };
   updateLoadingBtn = false;
   controleLancamentos = 0;
   tableHeader = [];
@@ -169,7 +172,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     verifyNumber(value)
   }
 
-  formatDate(value, format) {
+  formatDate(value, format = 'DD/MM/YYYY') {
     return formatDate(value, format)
   }
 

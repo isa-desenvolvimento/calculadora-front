@@ -4,8 +4,7 @@ import { PastasContratosService } from '../../../_services/pastas-contratos.serv
 
 @Component({
   selector: 'app-pesquisa',
-  templateUrl: './pesquisa.component.html',
-  styleUrls: ['./pesquisa.component.css']
+  templateUrl: './pesquisa.component.html'
 })
 export class PesquisaComponent implements OnInit {
 
