@@ -52,8 +52,8 @@
 							<div class="col-md-4 col-sm-12">
 								<label for="nome" class="col-form-label">Status</label>
 								<select class="form-control custom-select col-md-12 col-sm-12" formControlName="status">
-									<option *ngFor="let status of pre_status_field" [value]="status.type">
-										{{status.type}}</option>
+									<option *ngFor="let status of status_field" [value]="status">
+										{{status}}</option>
 								</select>
 							</div>
 
@@ -101,8 +101,8 @@
 									<td>
 										<select class="parcelado-font-size form-control custom-select"
 											(change)="changeCadastroParcelas($event, row, 'status')">
-											<option *ngFor="let status of pre_status_field" [value]="status.type"
-												[selected]="status.type === row.status"> {{status.type}}</option>
+											<option *ngFor="let status of pre_status_field" [value]="status"
+												[selected]="status === row.status"> {{status}}</option>
 										</select>
 									</td>
 									<td (click)="deleteRowParcelas(row)"><i style="color: red; cursor: pointer;"
@@ -130,8 +130,8 @@
 								<label for="nome" class="col-form-label">Tipo Amortização</label>
 								<select class="form-control custom-select col-md-12 col-sm-12"
 									formControlName="preFA_tipo">
-									<option *ngFor="let tipo of amortizacao_field" [value]="tipo.type">
-										{{tipo.type}}
+									<option *ngFor="let tipo of amortizacao_field" [value]="tipo">
+										{{tipo}}
 									</option>
 								</select>
 							</div>

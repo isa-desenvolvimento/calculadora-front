@@ -11,7 +11,7 @@ import 'datatables.net';
 import 'datatables.net-buttons';
 
 import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
-import { LISTA_INDICES, LANGUAGEM_TABLE } from '../../util/constants'
+import { LISTA_INDICES, LANGUAGEM_TABLE, LISTA_STATUS, LISTA_AMORTIZACAO } from '../../util/constants'
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -42,9 +42,9 @@ export class ParceladoPreComponent implements OnInit {
   contractRef = '';
   infoContrato = {};
   indice_field = LISTA_INDICES;
+  status_field = LISTA_STATUS;
+  amortizacao_field = LISTA_AMORTIZACAO;
   form_riscos: any = {};
-  indiceDataBase = null;
-  indiceDataBaseAtual = null;
 
   //tables
   tableData: TableData;
@@ -744,36 +744,10 @@ export class ParceladoPreComponent implements OnInit {
     });
   }
 
-  deleteRow(row) {
-    const index = this.tableData.dataRows.indexOf(row);
-    if (!row.id) {
-      this.tableData.dataRows.splice(index, 1);
-      setTimeout(() => {
-        this.simularCalc(false);
-        this.alertType = {
-          mensagem: 'Registro excluido!',
-          tipo: 'danger'
-        };
-        this.toggleUpdateLoading()
-      }, 0)
-    } else {
-      this.parceladoPreService.removeLancamento(row.id).subscribe(() => {
-        this.tableData.dataRows.splice(index, 1);
-        setTimeout(() => {
-          this.simularCalc(false);
-          this.alertType = {
-            mensagem: 'Registro excluido!',
-            tipo: 'danger'
-          };
-          this.toggleUpdateLoading()
-        }, 0)
-      })
-    }
-  }
+  delete(row, table) {
+    const index = this[table].dataRows.indexOf(row);
 
-  deleteRowParcelas(row) {
-    const index = this.tableDataParcelas.dataRows.indexOf(row);
-    this.tableDataParcelas.dataRows.splice(index, 1);
+    this[table].dataRows.splice(index, 1);
     setTimeout(() => {
       this.simularCalc(false);
       this.alertType = {
@@ -782,6 +756,20 @@ export class ParceladoPreComponent implements OnInit {
       };
       this.toggleUpdateLoading()
     }, 0)
+  }
+
+  deleteRow(row) {
+    if (!row.id) {
+      this.delete(row, 'tableData');
+    } else {
+      this.parceladoPreService.removeLancamento(row.id).subscribe(() => {
+        this.delete(row, 'tableData');
+      })
+    }
+  }
+
+  deleteRowParcelas(row) {
+    this.delete(row, 'tableDataParcelas');
   }
 
   deleteRowAmortizacao(row) {
@@ -847,25 +835,4 @@ export class ParceladoPreComponent implements OnInit {
     })
   }
 
-  pre_status_field = [{
-    type: "Aberto",
-    value: "1"
-  },
-  {
-    type: "Pago",
-    value: "2"
-  }]
-
-  amortizacao_field = [{
-    type: "Data do Cálculo",
-    value: "1"
-  },
-  {
-    type: "Data Diferenciada",
-    value: "2"
-  },
-  {
-    type: "Final",
-    value: "3"
-  }]
 }

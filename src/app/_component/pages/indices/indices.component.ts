@@ -3,6 +3,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment'; // add this 1 of 4
 import { IndicesService } from '../../../_services/indices.service';
 
+import { LISTA_INDICES, LANGUAGEM_TABLE } from '../../util/constants'
+import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
+
 declare interface TableData {
   dataRows: Array<Object>;
 }
@@ -20,8 +23,13 @@ export class IndicesComponent implements OnInit {
   tableLoading = false;
   dtOptions: DataTables.Settings = {};
 
+  indices_field = LISTA_INDICES;
+  alertType = {
+    mensagem: '',
+    tipo: ''
+  };
+
   updateLoading = false;
-  alertType = '';
   request = true;
 
   listaINPC = [];
@@ -65,40 +73,25 @@ export class IndicesComponent implements OnInit {
           callback({
             recordsTotal: resp['recordsTotal'],
             recordsFiltered: resp['recordsFiltered'],
-            pages:  resp['recordsTotal'] /  resp['length'],
+            pages: resp['recordsTotal'] / resp['length'],
             data: []
           });
         });
       },
-      language: {
-        "decimal": "",
-        "emptyTable": "Sem dados para exibir",
-        "info": "Mostrando _START_ de _END_ de _TOTAL_ registros",
-        "infoEmpty": "Mostrando 0 de 0 de 0 registros",
-        "infoFiltered": "(filtered from _MAX_ total registros)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Mostrando _MENU_ registros",
-        "loadingRecords": "Carregando...",
-        "processing": "Processando...",
-        "search": "Buscar:",
-        "zeroRecords": "Nenhum registro encontrado com esses parâmetros",
-        "paginate": {
-          "first": "Primeira",
-          "last": "Última",
-          "next": "Próxima",
-          "previous": "Anterior"
-        },
-        "aria": {
-          "sortAscending": ": Ordernar para cima",
-          "sortDescending": ": Ordernar para baixo"
-        }
-      }
+      language: LANGUAGEM_TABLE
     }
   }
 
   verifyNumber(value) {
-    value.target.value = Math.abs(value.target.value);
+    verifyNumber(value)
+  }
+
+  formatCurrency(value) {
+    return formatCurrency(value)
+  }
+
+  formatDate(value, format = 'DD/MM/YYYY') {
+    return formatDate(value, format)
   }
 
   toggleUpdateLoading() {
@@ -121,13 +114,17 @@ export class IndicesComponent implements OnInit {
       //this.tableData.dataRows.push(indice);
       $('#tableIndice').DataTable().ajax.reload();
       this.indicesForm.reset({ indice: this.indice_form.indice.value });
-      this.alertType = 'indice-incluido';
+      this.alertType = {
+        mensagem: 'Índice incluido!',
+        tipo: 'success'
+      };
       this.toggleUpdateLoading()
 
     }, err => {
-      this.alertType = 'registro-nao-incluido';
-      //this.toggleUpdateLoading()
-      //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+      this.alertType = {
+        mensagem: 'Registro não incluido!',
+        tipo: 'danger'
+      };
     });
 
     this.tableLoading = false;
@@ -137,7 +134,7 @@ export class IndicesComponent implements OnInit {
     if (request) {
       this.tableData.dataRows = [];
       this.tableLoading = true;
-      const DATAINPUT = this.indice_form.data.value ? this.formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
+      const DATAINPUT = this.indice_form.data.value ? formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
 
       this.indicesService.getIndicePage(this.indice_form.indice.value, 10, 1, 1).subscribe(indices => {
         this.tableData.dataRows = indices['data'];
@@ -158,12 +155,17 @@ export class IndicesComponent implements OnInit {
     this.tableData.dataRows[index][column] = value;
 
     this.indicesService.updateIndice(row.id, this.tableData.dataRows[index]).subscribe(resp => {
-      this.alertType = 'indice-incluido';
+      this.alertType = {
+        mensagem: 'Índice alterado!',
+        tipo: 'success'
+      };
       this.toggleUpdateLoading()
     }, err => {
-      this.alertType = 'registro-nao-incluido';
-      //this.toggleUpdateLoading()
-      //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+      this.alertType = {
+        mensagem: 'Índice não alterado!',
+        tipo: 'warning'
+      };
+      this.toggleUpdateLoading()
     });
   }
 
@@ -171,28 +173,18 @@ export class IndicesComponent implements OnInit {
     this.indicesService.removeIndice(row.id).subscribe(resp => {
       $('#tableIndice').DataTable().ajax.reload();
 
-      this.alertType = 'registro-excluido';
+      this.alertType = {
+        mensagem: 'Índice excluido!',
+        tipo: 'danger'
+      };
       this.toggleUpdateLoading()
     }, err => {
-      this.alertType = 'registro-nao-incluido';
-      //this.toggleUpdateLoading()
-      //this.errorMessage = "Falha ao atualizar risco."; //registro-nao-incluido
+      this.alertType = {
+        mensagem: 'Índice não excluido!',
+        tipo: 'warning'
+      };
     });
   }
 
-  formatCurrency(value) {
-    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
-  }
-
-  formatDate(date, format = "DD/MM/YYYY") {
-    return moment(date).format(format);
-  }
-
-  indices_field = ["INPC/IBGE", "CDI", "IGPM"];
-
   get indice_form() { return this.indicesForm.controls; }
-
-  get getIndice() {
-    return this.indicesService.getIndice(this.indice_form.indice.value);
-  }
 }
