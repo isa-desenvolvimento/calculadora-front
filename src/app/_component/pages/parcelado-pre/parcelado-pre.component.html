@@ -247,7 +247,7 @@
 										<input type="date" [ngClass]="{'parcelas-vincendas': row.vincenda} "
 											class=" parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataVencimento" id="pre_dataCalcAmor" [value]="row.dataVencimento"
-											(blur)="changeDate($event, row, 'dataVencimento', 'indiceDataVencimento',  'indiceDV')">
+											(blur)="changeDate($event, row, 'dataVencimento', 'indiceDV', 'indiceDataVencimento')">
 										<span class="log-visible-false">{{formatDate(row.dataVencimento)}}</span>
 									</td>
 									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
@@ -269,7 +269,7 @@
 											class="parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31"
 											[value]="row.dataCalcAmor"
-											(blur)="changeDate($event, row, 'dataCalcAmor', 'indiceDataCalcAmor',  'indiceDCA')">
+											(blur)="changeDate($event, row, 'dataCalcAmor', 'indiceDCA', 'indiceDataCalcAmor')">
 										<span class="log-visible-false">{{formatDate(row.dataCalcAmor)}}</span>
 
 									</td>

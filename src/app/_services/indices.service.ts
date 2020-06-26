@@ -31,4 +31,20 @@ export class IndicesService {
   removeIndice(id: number) {
     return this.http.delete(`${environment.API_PATH}/indices/${id}`);
   }
+
+  async getIndiceDataBase(indice, data, formDefaultValues) {
+    if (!indice || !data) {
+      return 1;
+    }
+    switch (indice) {
+      case "Encargos Contratuais %":
+        return new Promise((resolve, reject) => {
+          resolve(formDefaultValues.formIndiceEncargos)
+        })
+        break;
+      default:
+        return (await this.getIndiceData(indice, data))
+          .toPromise().then(ind => ind['valor'])
+    }
+  }
 }

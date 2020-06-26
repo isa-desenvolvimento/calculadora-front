@@ -448,59 +448,63 @@ export class ParceladoPreComponent implements OnInit {
       const amortizacao = this.tableDataAmortizacao.dataRows.length && this.tableDataAmortizacao.dataRows[key] ?
         this.tableDataAmortizacao.dataRows[key] : { preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo };
 
-      const indiceValor = await this.getIndiceDataBase(indice, dataVencimento);
-      const indiceDataCalcAmor = await this.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento']);
+      const getIndiceDataVencimento = new Promise((res, rej) => {
+        this.indicesService.getIndiceDataBase(indice, dataVencimento, this.formDefaultValues).then((data) => res(data))
+      })
 
-      const interval = setInterval(() => {
-        if (indiceValor && indiceDataCalcAmor) {
-          clearInterval(interval);
-          this.tableData.dataRows.push({
-            nparcelas: parcela['nparcelas'],
-            parcelaInicial: parcela['parcelaInicial'],
-            dataVencimento: dataVencimento,
-            indiceDV: indice,
-            indiceDataVencimento: indiceValor,
-            indiceDCA: indice,
-            indiceDataCalcAmor: indiceDataCalcAmor,
-            dataCalcAmor: amortizacao['preFA_data_vencimento'],
-            valorNoVencimento: parcela['valorNoVencimento'],
-            encargosMonetarios: {
-              correcaoPeloIndice: null,
-              jurosAm: {
-                dias: null,
-                percentsJuros: null,
-                moneyValue: null,
-              },
-              multa: null,
+      const getIndiceDataCalcAmor = new Promise((res, rej) => {
+        this.indicesService.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento'], this.formDefaultValues).then((data) => res(data))
+      })
+
+      Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor]).then(resultado => {
+        const indiceValor = typeof (resultado[0]) === 'number' ? resultado[0] : 1;
+        const indiceDataCalcAmor = typeof (resultado[1]) === 'number' ? resultado[1] : 1;
+
+        this.tableData.dataRows.push({
+          nparcelas: parcela['nparcelas'],
+          parcelaInicial: parcela['parcelaInicial'],
+          dataVencimento: dataVencimento,
+          indiceDV: indice,
+          indiceDataVencimento: indiceValor,
+          indiceDCA: indice,
+          indiceDataCalcAmor: indiceDataCalcAmor,
+          dataCalcAmor: amortizacao['preFA_data_vencimento'],
+          valorNoVencimento: parcela['valorNoVencimento'],
+          encargosMonetarios: {
+            correcaoPeloIndice: null,
+            jurosAm: {
+              dias: null,
+              percentsJuros: null,
+              moneyValue: null,
             },
-            subtotal: 0,
-            valorPMTVincenda: 0,
-            amortizacao: amortizacao['preFA_saldo_devedor'],
-            totalDevedor: 0,
-            status: parcela['status'],
-            contractRef: this.contractRef,
-            ultimaAtualizacao: 0,
-            totalParcelasVencidas: 0,
-            totalParcelasVincendas: 0,
-            vincendas: false,
-          })
+            multa: null,
+          },
+          subtotal: 0,
+          valorPMTVincenda: 0,
+          amortizacao: amortizacao['preFA_saldo_devedor'],
+          totalDevedor: 0,
+          status: parcela['status'],
+          contractRef: this.contractRef,
+          ultimaAtualizacao: 0,
+          totalParcelasVencidas: 0,
+          totalParcelasVincendas: 0,
+          vincendas: false,
+        })
 
-          if (this.tableDataParcelas.dataRows.length - 1 === key) {
-            setTimeout(() => {
-              this.tableLoading = false;
-              this.preFormCadastroParcelas.reset();
-              this.tableDataParcelas.dataRows = [];
-              this.alertType = {
-                mensagem: 'Lançamento incluido',
-                tipo: 'success'
-              };
-              this.toggleUpdateLoading()
-              this.simularCalc(false)
-            }, 500)
-          }
-
+        if (this.tableDataParcelas.dataRows.length - 1 === key) {
+          setTimeout(() => {
+            this.tableLoading = false;
+            this.preFormCadastroParcelas.reset();
+            this.tableDataParcelas.dataRows = [];
+            this.alertType = {
+              mensagem: 'Lançamento incluido',
+              tipo: 'success'
+            };
+            this.toggleUpdateLoading()
+            this.simularCalc(true, null, true)
+          }, 0)
         }
-      }, 0);
+      })
     })
   }
 
@@ -570,13 +574,22 @@ export class ParceladoPreComponent implements OnInit {
 
   }
 
-  async changeDate(e, row, data, tipoIndice, tipoIndiceValue) {
-    row[data] = formatDate(e.target.value, 'YYYY-MM-DD');
-    row['indiceDataBaseAtual'] = await this.getIndiceDataBase(this.formDefaultValues.formIndice, e.target.value);
+  async changeDate(e, row, ColunaData, tipoIndice, tipoIndiceValue) {
+    const dataValor = formatDate(e.target.value, 'YYYY-MM-DD');
 
-    setTimeout(() => {
-      this.updateInlineIndice(this.formDefaultValues.formIndice, row, tipoIndice, tipoIndiceValue, data);
-    }, 100);
+    const getIndice = new Promise((res, rej) => {
+      this.indicesService.getIndiceDataBase(this.formDefaultValues.formIndice, dataValor, this.formDefaultValues).then((data) => {
+        res(data)
+      })
+    })
+
+    Promise.all([getIndice]).then(resultado => {
+      row[ColunaData] = dataValor;
+      row[tipoIndiceValue] = resultado[0]
+      setTimeout(() => {
+        this.updateInlineIndice(this.formDefaultValues.formIndice, row, tipoIndiceValue, tipoIndice ,ColunaData);
+      }, 0);
+    })
   }
 
   setFormDefault() {
@@ -609,30 +622,29 @@ export class ParceladoPreComponent implements OnInit {
     let valorPMTVincendaTotalVincendas = 0, totalDevedorTotalVincendas = 0;
 
     this.tableData.dataRows.map(async (row, key) => {
-      let indiceDV = row['indiceDV'];
-      let indiceDCA = row['indiceDCA'];
-
       if (!isInlineChange) {
-        this.resetIndiceVariavel()
-
-        row['indiceDV'] = indiceDV = this.formDefaultValues.formIndice;
-        row['indiceDCA'] = indiceDCA = this.formDefaultValues.formIndice;
-        row['dataCalcAmor'] = this.formDefaultValues.formDataCalculo;
-
-        this.indiceDataBaseAtual = await this.getIndiceDataBase(this.formDefaultValues.formIndice, row['dataVencimento']);
-        this.indiceDataBase = await this.getIndiceDataBase(this.formDefaultValues.formIndice, row['dataCalcAmor']);
+        const indice = this.formDefaultValues.formIndice;
+        row['indiceDV'] = indice;
+        row['indiceDCA'] = indice;
       }
 
+      const getIndiceDataVencimento = new Promise((res, rej) => {
+        this.indicesService.getIndiceDataBase(row['indiceDV'], row['dataVencimento'], this.formDefaultValues).then((data) => {
+          res(data)
+        })
+      })
 
-      const interval = setInterval(() => {
+      const getIndiceDataCalcAmor = new Promise((res, rej) => {
+        this.indicesService.getIndiceDataBase(row['indiceDCA'], row['dataCalcAmor'], this.formDefaultValues).then((data) => {
+          res(data)
+        })
+      })
 
-        if (this.indiceDataBaseAtual && this.indiceDataBase) {
+      Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor]).then(resultado => {
+        row['indiceDataVencimento'] = resultado[0];
+        row['indiceDataCalcAmor'] = resultado[1];
 
-          row['indiceDataVencimento'] = this.indiceDataBaseAtual
-          row['indiceDataCalcAmor'] = this.indiceDataBase
-
-          clearInterval(interval)
-
+        setTimeout(() => {
           // Valores brutos
           const dataVencimento = formatDate(row["dataVencimento"]);
           const dataCalcAmor = formatDate(row["dataCalcAmor"]);
@@ -725,31 +737,12 @@ export class ParceladoPreComponent implements OnInit {
               this.toggleUpdateLoading()
             }
             this.tableLoading = false;
-
-            this.tableData.dataRows.length === 0 && (this.tableLoading = false);
             !isInlineChange && this.toggleUpdateLoading();
           }
-        }
-      }, 0)
+        }, 0);
+      })
     });
-
   }
-
-  async getIndiceDataBase(indice, data) {
-    if (!indice || !data) {
-      return 1;
-    }
-
-    switch (indice) {
-      case "Encargos Contratuais %":
-        return this.formDefaultValues.formIndiceEncargos;
-        break;
-      default:
-        return (await this.indicesService.getIndiceData(indice, data))
-          .toPromise().then(ind => ind['valor'])
-    }
-  }
-
 
   deleteRow(row) {
     const index = this.tableData.dataRows.indexOf(row);
@@ -837,15 +830,21 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   async updateInlineIndice(value, row, innerDataIndice, indiceColumn, columnData) {
-    const index = this.tableData.dataRows.indexOf(row);
-    this[indiceColumn] = null
-    this.tableData.dataRows[index][indiceColumn] = value;
-    this.tableData.dataRows[index][innerDataIndice] = await this.getIndiceDataBase(value, row[columnData]);
+    const getIndice = new Promise((res, rej) => {
+      this.indicesService.getIndiceDataBase(value, row[columnData], this.formDefaultValues).then((data) => {
+        res(data)
+      })
+    })
 
-    setTimeout(() => {
-      this[indiceColumn] = row[indiceColumn]
-      this.simularCalc(true, null, true);
-    }, 0);
+    Promise.all([getIndice]).then(resultado => {
+      const index = this.tableData.dataRows.indexOf(row);
+      this.tableData.dataRows[index][indiceColumn] = value;
+      this.tableData.dataRows[index][innerDataIndice] = resultado[0];
+
+      setTimeout(() => {
+        this.simularCalc(true, null, true);
+      }, 0);
+    })
   }
 
   pre_status_field = [{
