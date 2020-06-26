@@ -26,7 +26,6 @@ declare interface TableData {
 export class ParceladoPreComponent implements OnInit {
 
   preFormAmortizacao: FormGroup;
-  preFormCadastroParcelas: FormGroup;
   payloadLancamento: Parcela;
 
   tableLoading = false;
@@ -48,7 +47,6 @@ export class ParceladoPreComponent implements OnInit {
 
   //tables
   tableData: TableData;
-  tableDataParcelas: TableData;
   tableDataAmortizacao: TableData;
 
   // total
@@ -93,9 +91,7 @@ export class ParceladoPreComponent implements OnInit {
     this.tableData = {
       dataRows: []
     }
-    this.tableDataParcelas = {
-      dataRows: []
-    }
+
     this.tableDataAmortizacao = {
       dataRows: []
     }
@@ -109,13 +105,6 @@ export class ParceladoPreComponent implements OnInit {
       preFA_saldo_devedor: ['', Validators.required],
       preFA_tipo: ['', Validators.required],
     });
-    this.preFormCadastroParcelas = this.formBuilder.group({
-      nparcelas: ['', Validators.required],
-      parcelaInicial: ['', Validators.required],
-      dataVencimento: ['', Validators.required],
-      valorNoVencimento: ['', Validators.required],
-      status: ['', Validators.required]
-    })
 
     this.dtOptions = {
       paging: false,
@@ -293,7 +282,6 @@ export class ParceladoPreComponent implements OnInit {
 
   // convenience getter for easy access to form fields
   get pre_form_amortizacao() { return this.preFormAmortizacao.controls; }
-  get pre_form_cadastro_parcelas() { return this.preFormCadastroParcelas.controls; }
 
   formatCurrency(value) {
     return formatCurrency(value)
@@ -312,15 +300,6 @@ export class ParceladoPreComponent implements OnInit {
     return formatDate(value, format)
   }
 
-  adicionarParcelas() {
-    const nParcelas = this.pre_form_cadastro_parcelas.nparcelas.value;
-    const parcelaInicial = this.pre_form_cadastro_parcelas.parcelaInicial.value;
-    this.tableDataParcelas.dataRows = [];
-
-    for (let index = parcelaInicial; index < (nParcelas + parcelaInicial); index++) {
-      this.tableDataParcelas.dataRows.push({ ...this.preFormCadastroParcelas.value, nparcelas: index });
-    }
-  }
 
   adicionarAmortizacao() {
 
@@ -421,7 +400,27 @@ export class ParceladoPreComponent implements OnInit {
     }
   }
 
-  incluirParcelas() {
+
+  setFormRiscos(form) {
+    Object.keys(form).filter((value, key) => {
+      if (form[value] && form[value] !== 'undefined') {
+        this.form_riscos[value] = form[value];
+      }
+    });
+  }
+
+
+  falhaIndice() {
+    this.updateLoadingBtn = true;
+    this.alertType = {
+      mensagem: 'Não existe índice para essa data',
+      tipo: 'warning'
+    };
+    this.toggleUpdateLoading()
+    return;
+  }
+
+  incluirParcelas(tableDataParcelas) {
 
     if (!this.form_riscos.formIndice) {
       this.updateLoadingBtn = true;
@@ -435,7 +434,8 @@ export class ParceladoPreComponent implements OnInit {
 
     this.setFormDefault()
     this.tableLoading = true;
-    this.tableDataParcelas.dataRows.map(async (parcela, key) => {
+
+    tableDataParcelas.map(async (parcela, key) => {
 
       const indice = this.form_riscos.formIndice;
       const dataVencimento = parcela['dataVencimento'];
@@ -449,11 +449,13 @@ export class ParceladoPreComponent implements OnInit {
         this.tableDataAmortizacao.dataRows[key] : { preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo };
 
       const getIndiceDataVencimento = new Promise((res, rej) => {
-        this.indicesService.getIndiceDataBase(indice, dataVencimento, this.formDefaultValues).then((data) => res(data))
+        this.indicesService.getIndiceDataBase(indice, dataVencimento, this.formDefaultValues).then((data) => res(data)),
+        this.falhaIndice()
       })
 
       const getIndiceDataCalcAmor = new Promise((res, rej) => {
         this.indicesService.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento'], this.formDefaultValues).then((data) => res(data))
+        this.falhaIndice()
       })
 
       Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor]).then(resultado => {
@@ -491,11 +493,9 @@ export class ParceladoPreComponent implements OnInit {
           vincendas: false,
         })
 
-        if (this.tableDataParcelas.dataRows.length - 1 === key) {
+        if (tableDataParcelas.length - 1 === key) {
           setTimeout(() => {
             this.tableLoading = false;
-            this.preFormCadastroParcelas.reset();
-            this.tableDataParcelas.dataRows = [];
             this.alertType = {
               mensagem: 'Lançamento incluido',
               tipo: 'success'
@@ -506,19 +506,6 @@ export class ParceladoPreComponent implements OnInit {
         }
       })
     })
-  }
-
-  setFormRiscos(form) {
-    Object.keys(form).filter((value, key) => {
-      if (form[value] && form[value] !== 'undefined') {
-        this.form_riscos[value] = form[value];
-      }
-    });
-  }
-
-  changeCadastroParcelas(e, row, col) {
-    const index = this.tableDataParcelas.dataRows.indexOf(row);
-    this.tableDataParcelas.dataRows[index][col] = col === 'valorNoVencimento' ? e.target.value.slice(2) : e.target.value;
   }
 
   setCampoSemAlteracao(semFormat = false) {
@@ -587,7 +574,7 @@ export class ParceladoPreComponent implements OnInit {
       row[ColunaData] = dataValor;
       row[tipoIndiceValue] = resultado[0]
       setTimeout(() => {
-        this.updateInlineIndice(this.formDefaultValues.formIndice, row, tipoIndiceValue, tipoIndice ,ColunaData);
+        this.updateInlineIndice(this.formDefaultValues.formIndice, row, tipoIndiceValue, tipoIndice, ColunaData);
       }, 0);
     })
   }
@@ -761,10 +748,6 @@ export class ParceladoPreComponent implements OnInit {
         this.delete(row, 'tableData');
       })
     }
-  }
-
-  deleteRowParcelas(row) {
-    this.delete(row, 'tableDataParcelas');
   }
 
   deleteRowAmortizacao(row) {
