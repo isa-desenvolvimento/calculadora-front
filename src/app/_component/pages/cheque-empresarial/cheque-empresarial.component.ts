@@ -262,7 +262,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   get ce_form_amortizacao() { return this.ceFormAmortizacao.controls; }
 
-  async incluirLancamentos() {
+  incluirLancamentos() {
 
     if (!this.form_riscos.formIndice) {
       this.updateLoadingBtn = true;
@@ -296,94 +296,57 @@ export class ChequeEmpresarialComponent implements OnInit {
     const localTypeIndice = this.form_riscos.formIndice;
     const localInfoParaCalculo: InfoParaCalculo = this.form_riscos;
 
-    switch (localTypeIndice) {
-      case "Encargos Contratuais %":
-        const localTypeIndiceDataBase = this.formDefaultValues.formIndiceEncargos;
-        const localTypeIndiceDataBaseAtual = this.formDefaultValues.formIndiceEncargos;
 
-        this.payloadLancamento = ({
-          dataBase: localDataBase,
-          indiceDB: localTypeIndice,
-          indiceDataBase: localTypeIndiceDataBase,
-          indiceBA: localTypeIndice,
-          indiceDataBaseAtual: localTypeIndiceDataBaseAtual,
-          dataBaseAtual: localDataBaseAtual,
-          valorDevedor: localValorDevedor,
-          encargosMonetarios: {
-            correcaoPeloIndice: null,
-            jurosAm: {
-              dias: null,
-              percentsJuros: null,
-              moneyValue: null,
-            },
-            multa: null,
+    const getIndiceDataBase = new Promise((res, rej) => {
+      this.getIndiceDataBase(localTypeIndice, localDataBase).then((data) => res(data))
+    })
+
+    const getIndiceDataBaseAtual = new Promise((res, rej) => {
+      this.getIndiceDataBase(localTypeIndice, localDataBaseAtual).then((data) => res(data))
+    })
+
+    Promise.all([getIndiceDataBase, getIndiceDataBaseAtual]).then(resultado => {
+      const localTypeIndiceDataBase = typeof (resultado[0]) === 'number' ? resultado[0] : 1;
+      const localTypeIndiceDataBaseAtual = typeof (resultado[1]) === 'number' ? resultado[1] : 1;
+
+      this.payloadLancamento = ({
+        dataBase: localDataBase,
+        indiceDB: localTypeIndice,
+        indiceDataBase: localTypeIndiceDataBase,
+        indiceBA: localTypeIndice,
+        indiceDataBaseAtual: localTypeIndiceDataBaseAtual,
+        dataBaseAtual: localDataBaseAtual,
+        valorDevedor: localValorDevedor,
+        encargosMonetarios: {
+          correcaoPeloIndice: null,
+          jurosAm: {
+            dias: null,
+            percentsJuros: null,
+            moneyValue: null,
           },
-          lancamentos: localLancamentos,
-          tipoLancamento: localTipoLancamento,
-          valorDevedorAtualizado: null,
-          contractRef: this.contractRef,
-          ultimaAtualizacao: '',
-          infoParaCalculo: { ...localInfoParaCalculo }
-        });
-        this.tableData.dataRows.push(this.payloadLancamento)
-        this.tableLoading = false;
+          multa: null,
+        },
+        lancamentos: localLancamentos,
+        tipoLancamento: localTipoLancamento,
+        valorDevedorAtualizado: null,
+        contractRef: this.contractRef,
+        ultimaAtualizacao: '',
+        infoParaCalculo: { ...localInfoParaCalculo }
+      });
+      this.tableData.dataRows.push(this.payloadLancamento)
+      this.tableLoading = false;
 
-        setTimeout(() => {
-          this.ceFormAmortizacao.reset();
+      setTimeout(() => {
+        this.ceFormAmortizacao.reset();
 
-          this.simularCalc(true, null, true)
-          this.alertType = {
-            mensagem: 'Registro incluido!',
-            tipo: 'success'
-          };
-          this.toggleUpdateLoading()
-        }, 0)
-
-        break;
-      default:
-        Promise.all([this.getIndiceDataBase(localTypeIndice, localDataBase), this.getIndiceDataBase(localTypeIndice, localDataBaseAtual)]).then(resultado => {
-          const localTypeIndiceDataBase = resultado[0];
-          const localTypeIndiceDataBaseAtual = resultado[1];
-
-          this.payloadLancamento = ({
-            dataBase: localDataBase,
-            indiceDB: localTypeIndice,
-            indiceDataBase: localTypeIndiceDataBase,
-            indiceBA: localTypeIndice,
-            indiceDataBaseAtual: localTypeIndiceDataBaseAtual,
-            dataBaseAtual: localDataBaseAtual,
-            valorDevedor: localValorDevedor,
-            encargosMonetarios: {
-              correcaoPeloIndice: null,
-              jurosAm: {
-                dias: null,
-                percentsJuros: null,
-                moneyValue: null,
-              },
-              multa: null,
-            },
-            lancamentos: localLancamentos,
-            tipoLancamento: localTipoLancamento,
-            valorDevedorAtualizado: null,
-            contractRef: this.contractRef,
-            ultimaAtualizacao: '',
-            infoParaCalculo: { ...localInfoParaCalculo }
-          });
-          this.tableData.dataRows.push(this.payloadLancamento)
-          this.tableLoading = false;
-
-          setTimeout(() => {
-            this.ceFormAmortizacao.reset();
-
-            this.simularCalc(true, null, true)
-            this.alertType = {
-              mensagem: 'Registro incluido!',
-              tipo: 'success'
-            };
-            this.toggleUpdateLoading()
-          }, 0)
-        })
-    }
+        this.simularCalc(true, null, true)
+        this.alertType = {
+          mensagem: 'Registro incluido!',
+          tipo: 'success'
+        };
+        this.toggleUpdateLoading()
+      }, 0)
+    });
   }
 
   pesquisarContratos(infoContrato) {
@@ -434,7 +397,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   }
 
-  async changeDate(e, row) {
+  changeDate(e, row) {
     const data = formatDate(e.target.value, 'YYYY-MM-DD');
 
     Promise.all([this.getIndiceDataBase(this.formDefaultValues.formIndice, data)]).then(resultado => {
@@ -520,18 +483,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
     this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
 
-    if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
-      this.formartTable('Simulação');
-      this.alertType = {
-        mensagem: 'Cálculo Simulado!',
-        tipo: 'success'
-      };
-      this.toggleUpdateLoading()
-    }
-
-    this.tableLoading = false;
-    !isInlineChange && this.toggleUpdateLoading();
-
     return row;
   }
 
@@ -544,32 +495,42 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     this.tableData.dataRows.map(async (row, index) => {
       if (!isInlineChange) {
-
         const indice = this.formDefaultValues.formIndice;
         row['indiceDB'] = indice;
         row['indiceBA'] = indice;
-
-        switch (indice) {
-          case "Encargos Contratuais %":
-            row['indiceDataBase'] = this.formDefaultValues.formIndiceEncargos;
-            row['indiceDataBaseAtual'] = this.formDefaultValues.formIndiceEncargos;
-            setTimeout(() => {
-              row = this.calcular(row, index, isInlineChange);
-            }, 0);
-            break;
-          default:
-            Promise.all([this.getIndiceDataBase(indice, row['dataBase']), this.getIndiceDataBase(indice, row['dataBaseAtual'])]).then(resultado => {
-              row['indiceDataBase'] = resultado[0]
-              row['indiceDataBaseAtual'] = resultado[1]
-              setTimeout(() => {
-                row = this.calcular(row, index, isInlineChange);
-              }, 0);
-            })
-        }
-        return;
       }
 
-      row = this.calcular(row, index, isInlineChange);
+      const getIndiceDataBase = new Promise((res, rej) => {
+        this.getIndiceDataBase(row['indiceDB'], row['dataBase']).then((data) => {
+          res(data)
+        })
+      })
+
+      const getIndiceDataBaseAtual = new Promise((res, rej) => {
+        this.getIndiceDataBase(row['indiceBA'], row['dataBaseAtual']).then((data) => {
+          res(data)
+        })
+      })
+
+      Promise.all([getIndiceDataBase, getIndiceDataBaseAtual]).then(resultado => {
+        row['indiceDataBase'] = resultado[0]
+        row['indiceDataBaseAtual'] = resultado[1]
+        setTimeout(() => {
+          row = this.calcular(row, index, isInlineChange);
+
+          if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
+            this.alertType = {
+              mensagem: 'Cálculo Simulado!',
+              tipo: 'success'
+            };
+            this.formartTable('Simulação');
+            this.toggleUpdateLoading()
+          }
+
+          this.tableLoading = false;
+          !isInlineChange && this.toggleUpdateLoading();
+        }, 0);
+      })
     });
   }
 
@@ -577,7 +538,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     if (!indice || !data) {
       return 1;
     }
-
     switch (indice) {
       case "Encargos Contratuais %":
         return new Promise((resolve, reject) => {
@@ -589,7 +549,6 @@ export class ChequeEmpresarialComponent implements OnInit {
           .toPromise().then(ind => ind['valor'])
     }
   }
-
 
   deleteRow(row) {
     const index = this.tableData.dataRows.indexOf(row);
@@ -618,14 +577,16 @@ export class ChequeEmpresarialComponent implements OnInit {
     }
   }
 
-  async updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
-    this[indiceToChangeInline] = null
-    row[innerIndice] = e.target.value;
-    row[indiceToChangeInline] = await this.getIndiceDataBase(e.target.value, row[columnData]);
+  updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
+    const indice = e.target.value;
+    const data = row[columnData];
+    Promise.all([this.getIndiceDataBase(indice, data)]).then(resultado => {
+      row[innerIndice] = indice;
+      row[indiceToChangeInline] = resultado[0];
 
-    setTimeout(() => {
-      this[indiceToChangeInline] = row[indiceToChangeInline]
-      this.simularCalc(true, null, true);
-    }, 0);
+      setTimeout(() => {
+        this.simularCalc(true, null, true);
+      }, 0);
+    })
   }
 }
