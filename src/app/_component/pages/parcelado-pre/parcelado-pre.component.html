@@ -101,7 +101,7 @@
 									<td>
 										<select class="parcelado-font-size form-control custom-select"
 											(change)="changeCadastroParcelas($event, row, 'status')">
-											<option *ngFor="let status of pre_status_field" [value]="status"
+											<option *ngFor="let status of status_field" [value]="status"
 												[selected]="status === row.status"> {{status}}</option>
 										</select>
 									</td>

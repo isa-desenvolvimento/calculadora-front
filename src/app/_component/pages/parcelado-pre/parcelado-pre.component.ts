@@ -600,11 +600,6 @@ export class ParceladoPreComponent implements OnInit {
     });
   }
 
-  resetIndiceVariavel() {
-    this.indiceDataBaseAtual = null;
-    this.indiceDataBase = null;
-  }
-
   simularCalc(isInlineChange = false, origin = null, search = false) {
     this.tableLoading = true;
 
