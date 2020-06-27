@@ -167,8 +167,9 @@ export class AmortizacaoComponent implements OnInit {
   }
 
   deleteRowAmortizacao(row) {
-    // let index = this.tableDataAmortizacao.indexOf(row);
-    // const amortizacao = this.tableDataAmortizacao[index];
+    let index = this.tableDataAmortizacao.dataRows.indexOf(row);
+    this.tableDataAmortizacao.dataRows.splice(index, 1);
+    this.incluirAmortizacao.emit(this.tableDataAmortizacao.dataRows)
 
     // if (amortizacao.hasOwnProperty('pagoIndex')) {
     //   const rowtableData = this.pagas[amortizacao['pagoIndex']];
