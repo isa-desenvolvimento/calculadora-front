@@ -50,6 +50,11 @@
             <input type="number" (change)="validarNumeros($event)" min="0" class="form-control col-md-11 col-sm-12"
                 name="multa_sobre_constrato" id="multa_sobre_constrato" formControlName="formMultaSobContrato">
         </div>
+        <div class="col-md-3 col-sm-12"  [hidden]="!isDesagio">
+            <label for="nome" class="col-form-label">Deságio %</label>
+            <input type="number" (change)="validarNumeros($event)" min="0" class="form-control col-md-11 col-sm-12"
+                name="desagio" id="desagio" formControlName="formDesagio">
+        </div>
 
         <div class="col-md-12 col-sm-12 form-inline mt-3">
             <div class="stats form-group mb-2">

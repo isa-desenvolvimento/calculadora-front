@@ -13,6 +13,7 @@ export class SimulacaoComponent implements OnInit {
   formRiscos: FormGroup;
   @Input() updateLoadingBtn: boolean;
   @Input() tableDataLength: boolean;
+  @Input() isDesagio: boolean; 
 
   @Output() formValue = new EventEmitter();
   @Output() simularCalculo = new EventEmitter();
@@ -35,7 +36,8 @@ export class SimulacaoComponent implements OnInit {
       formHonorarios: [],
       formMultaSobContrato: [],
       formIndice:  [],
-      formIndiceEncargos: []
+      formIndiceEncargos: [],
+      formDesagio: []
     });
 
     this.changeInput()

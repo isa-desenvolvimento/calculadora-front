@@ -1,8 +1,3 @@
-
-export const LISTA_INDICES = ["INPC/IBGE", "CDI", "IGPM", "Encargos Contratuais %"];
-export const LISTA_STATUS = ["Aberto", "Pago"];
-export const LISTA_AMORTIZACAO = ["Data do Cálculo", "Data Diferenciada", "Final"];
-
 export const LANGUAGEM_TABLE = {
   "decimal": "",
   "emptyTable": "Sem dados para exibir",
@@ -27,3 +22,14 @@ export const LANGUAGEM_TABLE = {
     "sortDescending": ": Ordernar para baixo"
   }
 }
+
+export const AMORTIZACAO_DATA_ATUAL = "Data do Cálculo";
+export const AMORTIZACAO_DATA_DIFERENCIADA = "Data Diferenciada";
+export const AMORTIZACAO_DATA_FINAL = "Final";
+export const PARCELA_PAGA = "Pago";
+export const PARCELA_ABERTA = "Aberto";
+
+export const LISTA_INDICES = ["INPC/IBGE", "CDI", "IGPM", "Encargos Contratuais %"];
+export const LISTA_STATUS = [PARCELA_PAGA, PARCELA_ABERTA];
+export const LISTA_AMORTIZACAO = ["Data do Cálculo", "Data Diferenciada", "Final"];
+
