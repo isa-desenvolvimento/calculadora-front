@@ -16,7 +16,9 @@ export class AmortizacaoComponent implements OnInit {
   @Input() pesquisaFormValid: boolean;
   @Input() dataCalculo: string;
 
+  
   @Output() incluirAmortizacao = new EventEmitter();
+  @Output() deleteAmortizacao = new EventEmitter();
 
   tableLoading = false;
   updateLoading = false;
@@ -169,7 +171,10 @@ export class AmortizacaoComponent implements OnInit {
   deleteRowAmortizacao(row) {
     let index = this.tableDataAmortizacao.dataRows.indexOf(row);
     this.tableDataAmortizacao.dataRows.splice(index, 1);
-    this.incluirAmortizacao.emit(this.tableDataAmortizacao.dataRows)
+
+    setTimeout(() => {
+      this.deleteAmortizacao.emit(row)
+    }, 0);
 
     // if (amortizacao.hasOwnProperty('pagoIndex')) {
     //   const rowtableData = this.pagas[amortizacao['pagoIndex']];

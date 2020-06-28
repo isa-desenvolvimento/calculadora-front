@@ -741,6 +741,26 @@ export class ParceladoPreComponent implements OnInit {
     }
   }
 
+  deleteRowAmortizacao(row) {
+    const saldo = parseFloat(row.saldo_devedor)
+    switch (row.tipo) {
+      case AMORTIZACAO_DATA_ATUAL:
+        const tableData = this.tableData.dataRows[0];
+        tableData['amortizacao'] = parseFloat(tableData['amortizacao']) - saldo;
+        tableData['totalDevedor'] = parseFloat(tableData['totalDevedor']) + saldo;
+        break;
+      case AMORTIZACAO_DATA_DIFERENCIADA:
+
+        break;
+      case AMORTIZACAO_DATA_FINAL:
+        this.amortizacaoGeral -= saldo;
+        break;
+
+      default:
+        break;
+    }
+  }
+
   async updateInlineIndice(value, row, innerDataIndice, indiceColumn, columnData) {
     const getIndice = new Promise((res, rej) => {
       this.indicesService.getIndiceDataBase(value, row[columnData], this.formDefaultValues).then((data) => {

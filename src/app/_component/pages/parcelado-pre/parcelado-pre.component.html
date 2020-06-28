@@ -25,7 +25,7 @@
 		<app-parcelas [pesquisaFormValid]="pesquisa.peForm.valid" (incluirParcelas)="incluirParcelas($event)"></app-parcelas>
 	</div>
 	<div class="col-md-6">
-		<app-amortizacao [dataCalculo]="simulacao.formRiscos['formDataCalculo']" [pesquisaFormValid]="pesquisa.peForm.valid" (incluirAmortizacao)="adicionarAmortizacao($event)"></app-amortizacao>
+		<app-amortizacao (deleteAmortizacao)="deleteRowAmortizacao($event)" [dataCalculo]="simulacao.formRiscos['formDataCalculo']" [pesquisaFormValid]="pesquisa.peForm.valid" (incluirAmortizacao)="adicionarAmortizacao($event)"></app-amortizacao>
 	</div>
 	<div class="col-md-12 col-sm-12 pt-0" *ngIf="!(tableData.dataRows.length === 0) && !quitado">
 		<div class="row">
