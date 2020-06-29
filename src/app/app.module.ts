@@ -11,7 +11,6 @@ import { UserComponent } from './_component/pages/user/user.component';
 import { TableComponent } from './_component/pages/table/table.component';
 import { DashboardComponent } from './_component/dashboard/dashboard.component';
 import { ChequeEmpresarialComponent } from './_component/pages/cheque-empresarial/cheque-empresarial.component';
-import { ParceladoPosComponent } from './_component/pages/parcelado-pos/parcelado-pos.component';
 import { ParceladoPreComponent } from './_component/pages/parcelado-pre/parcelado-pre.component';'./_component/pages/parcelado-pre/parcelado-pre.component';
 import { AdminLayoutComponent } from './_component/layouts/admin-layout/admin-layout.component';
 
@@ -38,7 +37,6 @@ import { CallbackPipe } from './_pipe/callback.pipe';
     DashboardComponent,
     AdminLayoutComponent,
     ChequeEmpresarialComponent,
-    ParceladoPosComponent,
     ParceladoPreComponent,
     IndicesComponent,
     LogComponent,

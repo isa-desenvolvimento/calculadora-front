@@ -18,6 +18,7 @@ export interface Parcela {
     contractRef: number;
     ultimaAtualizacao: string;
     infoParaCalculo: any;
+    tipoParcela: string;
 }
 
 export interface EncargosMonetarios {

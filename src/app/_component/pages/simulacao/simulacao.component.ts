@@ -1,5 +1,4 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
-import { IndicesService } from '../../../_services/indices.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { getCurrentDate, verifyNumber } from '../../util/util';
 import { LISTA_INDICES } from '../../util/constants'
@@ -22,8 +21,7 @@ export class SimulacaoComponent implements OnInit {
   indice_field = LISTA_INDICES;
 
   constructor(
-    private formBuilder: FormBuilder,
-    private indicesService: IndicesService,
+    private formBuilder: FormBuilder
   ) {
   }
 
