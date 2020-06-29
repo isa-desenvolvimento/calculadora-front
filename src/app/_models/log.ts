@@ -8,4 +8,5 @@ export interface Log {
     dataSimulacao: string;
     acao: string;
     infoTabela: any;
+    modulo: string;
 }

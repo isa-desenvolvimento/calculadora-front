@@ -1,9 +1,5 @@
 <div class="row ">
-
-    <div *ngIf="updateLoading && alertType === 'sem-registros'" class="col-lg-3  mt-3"
-        style="position: fixed; right: 10px; top: 10px; z-index: 1030">
-        <div class="alert alert-warning" role="alert"> Nenhuma registro encontrado! </div>
-    </div>
+    <app-notificacao [mensagem]="alertType.mensagem" [tipo]="alertType.tipo" [show]="updateLoading"></app-notificacao>
 
     <div class="col-md-12">
         <div class="card ">
@@ -42,6 +38,7 @@
                                     <th>Tipo de Contrato</th>
                                     <th>Tipo de Ação</th>
                                     <th>Data Simulação</th>
+                                    <th>Módulo</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,6 +53,7 @@
                                     <td>{{row.tipoContrato}}</td>
                                     <td>{{row.acao}}</td>
                                     <td>{{formatDate(row.dataSimulacao)}}</td>
+                                    <td>{{formatDate(row.modulo)}}</td>
                                 </tr>
                             </tbody>
                         </table>

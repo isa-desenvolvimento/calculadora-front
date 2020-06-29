@@ -7,6 +7,9 @@ import { DataTableDirective } from 'angular-datatables';
 import 'datatables.net';
 import 'datatables.net-buttons';
 
+import { formatDate, formatCurrency, verifyNumber } from '../../util/util';
+import { LANGUAGEM_TABLE } from '../../util/constants'
+
 declare interface TableData {
   dataRows: Array<Object>;
 }
@@ -19,7 +22,10 @@ export class LogComponent implements OnInit {
 
   tableLoading = false;
   updateLoading = false;
-  alertType = '';
+  alertType = {
+    mensagem: '',
+    tipo: ''
+  };
   row: {};
   infoContrato = {};
 
@@ -50,31 +56,7 @@ export class LogComponent implements OnInit {
     this.dtOptions = {
       paging: true,
       scrollCollapse: true,
-      language: {
-        "decimal": "",
-        "emptyTable": "Sem dados para exibir",
-        "info": "Mostrando _START_ de _END_ de _TOTAL_ registros",
-        "infoEmpty": "Mostrando 0 de 0 de 0 registros",
-        "infoFiltered": "(filtered from _MAX_ total registros)",
-        "infoPostFix": "",
-        "thousands": ",",
-        "lengthMenu": "Mostrando _MENU_ registros",
-        "loadingRecords": "Carregando...",
-        "processing": "Processando...",
-        "search": "Buscar:",
-        "zeroRecords": "Nenhum registro encontrado com esses parâmetros",
-        "paginate": {
-          "first": "Primeira",
-          "last": "Última",
-          "next": "Próxima",
-          "previous": "Anterior"
-        },
-        "aria": {
-          "sortAscending": ": Ordernar para cima",
-          "sortDescending": ": Ordernar para baixo"
-        }
-      },
-
+      language: LANGUAGEM_TABLE,
       rowCallback: (row: Node, data: any[] | Object, index: number) => {
         // Unbind first in order to avoid any duplicate handler
         // (see https://github.com/l-lin/angular-datatables/issues/87)
@@ -99,6 +81,18 @@ export class LogComponent implements OnInit {
     };
   }
 
+  formatCurrency(value) {
+    return formatCurrency(value)
+  }
+
+  verifyNumber(value) {
+    verifyNumber(value)
+  }
+
+  formatDate(value, format = 'DD/MM/YYYY') {
+    return formatDate(value, format)
+  }
+
   toggleDetails(row) {
     this.row = row.infoTabela
   }
@@ -112,7 +106,7 @@ export class LogComponent implements OnInit {
     this.updateLoading = true;
     setTimeout(() => {
       this.updateLoading = false;
-    }, 3000);
+    }, 5000);
   }
 
   pesquisarContratos(infoContrato) {
@@ -122,7 +116,10 @@ export class LogComponent implements OnInit {
 
     this.logService.getLog(infoContrato.pasta, infoContrato.contrato, infoContrato.tipo_contrato).subscribe(logs => {
       if (!logs.length) {
-        this.alertType = 'sem-registros';
+        this.alertType = {
+          mensagem: 'Nenhuma registro encontrado!',
+          tipo: 'warning'
+        };
         this.tableLoading = false;
         this.toggleUpdateLoading()
         return;
@@ -132,60 +129,13 @@ export class LogComponent implements OnInit {
       this.tableLoading = false;
 
     }, err => {
+      this.alertType = {
+        mensagem: 'Nenhuma registro encontrado!',
+        tipo: 'warning'
+      };
       this.tableLoading = false;
-      this.alertType = 'sem-registros';
       this.toggleUpdateLoading()
     });
-  }
-
-  formatCurrency(value) {
-    return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
-  }
-
-  formatDate(date, format = "DD/MM/YYYY") {
-    return moment(date).format(format);
-  }
-
-  folderData_field = this.agruparPasta();
-
-  agruparPasta() {
-    let pastasFiltros = [];
-
-    this.pastas['data'].map(pasta => pastasFiltros.push(pasta.PASTA));
-    const setUnico = new Set(pastasFiltros);
-
-    return [...setUnico];
-  }
-
-  contractList_field = [];
-  setContrato() {
-    this.contractList_field = [];
-    this.typeContractList_field = [];
-    this.pastas['data'].map(pasta => {
-      if (pasta.PASTA === this.log_form.log_pasta.value) {
-        this.contractList_field.push(pasta.CONTRATO);
-      }
-    });
-
-    const setUnico = new Set(this.contractList_field);
-    this.contractList_field = [...setUnico];
-  }
-
-  typeContractList_field = [];
-  setTypeContract() {
-    this.typeContractList_field = [];
-    this.pastas['data'].map(pasta => {
-      if (pasta.PASTA === this.log_form.log_pasta.value && pasta.CONTRATO === this.log_form.log_contrato.value) {
-        this.typeContractList_field.push(pasta.DESCRICAO);
-      }
-    });
-
-    const setUnico = new Set(this.typeContractList_field);
-    this.typeContractList_field = [...setUnico];
-  }
-
-  get pastas() {
-    return this.pastasContratosService.getPastas();
   }
 
   get log_form() { return this.logForm.controls; }

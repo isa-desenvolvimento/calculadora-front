@@ -18,7 +18,9 @@ import {
   AMORTIZACAO_DATA_DIFERENCIADA,
   AMORTIZACAO_DATA_FINAL,
   PARCELA_PAGA,
-  PARCELA_ABERTA
+  PARCELA_ABERTA,
+  PARCELADO_PRE,
+  PARCELADO_POS
 } from '../../util/constants'
 
 declare interface TableData {
@@ -202,7 +204,8 @@ export class ParceladoPreComponent implements OnInit {
           tipoContrato: this.infoContrato['tipo_contrato'],
           dataSimulacao: this.form_riscos.formDataCalculo,
           acao: acao,
-          infoTabela: table
+          infoTabela: table,
+          modulo: this.tipoParcela === 'parcelado-pre' ? PARCELADO_PRE : PARCELADO_POS
         }]).subscribe(log => { })
       }
     }, 500);

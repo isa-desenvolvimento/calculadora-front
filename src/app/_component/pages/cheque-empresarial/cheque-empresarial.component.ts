@@ -9,7 +9,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LogService } from '../../../_services/log.service';
 
 import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
-import { LISTA_INDICES, LANGUAGEM_TABLE } from '../../util/constants'
+import { LISTA_INDICES, LANGUAGEM_TABLE, CHEQUE_EMPRESARIAL } from '../../util/constants'
 
 import 'datatables.net';
 import 'datatables.net-buttons';
@@ -192,7 +192,8 @@ export class ChequeEmpresarialComponent implements OnInit {
           tipoContrato: this.infoContrato['tipo_contrato'],
           dataSimulacao: this.form_riscos.formDataCalculo,
           acao: acao,
-          infoTabela: table
+          infoTabela: table,
+          modulo: CHEQUE_EMPRESARIAL
         }]).subscribe()
       }
     }, 0)
