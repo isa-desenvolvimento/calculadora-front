@@ -298,11 +298,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
 
     const getIndiceDataBase = new Promise((res, rej) => {
-      this.getIndiceDataBase(localTypeIndice, localDataBase).then((data) => res(data))
+      this.indicesService.getIndiceDataBase(localTypeIndice, localDataBase, this.formDefaultValues).then((data) => res(data))
     })
 
     const getIndiceDataBaseAtual = new Promise((res, rej) => {
-      this.getIndiceDataBase(localTypeIndice, localDataBaseAtual).then((data) => res(data))
+      this.indicesService.getIndiceDataBase(localTypeIndice, localDataBaseAtual, this.formDefaultValues).then((data) => res(data))
     })
 
     Promise.all([getIndiceDataBase, getIndiceDataBaseAtual]).then(resultado => {
@@ -400,7 +400,13 @@ export class ChequeEmpresarialComponent implements OnInit {
   changeDate(e, row) {
     const data = formatDate(e.target.value, 'YYYY-MM-DD');
 
-    Promise.all([this.getIndiceDataBase(this.formDefaultValues.formIndice, data)]).then(resultado => {
+    const getIndice = new Promise((res, rej) => {
+      this.indicesService.getIndiceDataBase(this.formDefaultValues.formIndice, data, this.formDefaultValues).then((data) => {
+        res(data)
+      })
+    })
+
+    Promise.all([getIndice]).then(resultado => {
       row['dataBaseAtual'] = data;
       row['indiceDataBaseAtual'] = resultado[0]
       setTimeout(() => {
@@ -501,13 +507,13 @@ export class ChequeEmpresarialComponent implements OnInit {
       }
 
       const getIndiceDataBase = new Promise((res, rej) => {
-        this.getIndiceDataBase(row['indiceDB'], row['dataBase']).then((data) => {
+        this.indicesService.getIndiceDataBase(row['indiceDB'], row['dataBase'], this.formDefaultValues).then((data) => {
           res(data)
         })
       })
 
       const getIndiceDataBaseAtual = new Promise((res, rej) => {
-        this.getIndiceDataBase(row['indiceBA'], row['dataBaseAtual']).then((data) => {
+        this.indicesService.getIndiceDataBase(row['indiceBA'], row['dataBaseAtual'], this.formDefaultValues).then((data) => {
           res(data)
         })
       })
@@ -532,22 +538,6 @@ export class ChequeEmpresarialComponent implements OnInit {
         }, 0);
       })
     });
-  }
-
-  async getIndiceDataBase(indice, data) {
-    if (!indice || !data) {
-      return 1;
-    }
-    switch (indice) {
-      case "Encargos Contratuais %":
-        return new Promise((resolve, reject) => {
-          resolve(this.formDefaultValues.formIndiceEncargos)
-        })
-        break;
-      default:
-        return (await this.indicesService.getIndiceData(indice, data))
-          .toPromise().then(ind => ind['valor'])
-    }
   }
 
   deleteRow(row) {
@@ -580,7 +570,14 @@ export class ChequeEmpresarialComponent implements OnInit {
   updateInlineIndice(e, row, innerIndice, indiceToChangeInline, columnData) {
     const indice = e.target.value;
     const data = row[columnData];
-    Promise.all([this.getIndiceDataBase(indice, data)]).then(resultado => {
+
+    const getIndice = new Promise((res, rej) => {
+      this.indicesService.getIndiceDataBase(indice, data, this.formDefaultValues).then((data) => {
+        res(data)
+      })
+    })
+
+    Promise.all([getIndice]).then(resultado => {
       row[innerIndice] = indice;
       row[indiceToChangeInline] = resultado[0];
 

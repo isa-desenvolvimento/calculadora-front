@@ -25,6 +25,9 @@ import { LogComponent } from './_component/pages/log/log.component';
 import { PesquisaComponent } from './_component/pages/pesquisa/pesquisa.component';
 import { SimulacaoComponent } from './_component/pages/simulacao/simulacao.component';
 import { NotificacaoComponent } from './_component/pages/notificacao/notificacao.component';
+import { ParcelasComponent } from './_component/pages/parcelas/parcelas.component';
+import { AmortizacaoComponent } from './_component/pages/amortizacao/amortizacao.component';
+import { CallbackPipe } from './_pipe/callback.pipe';
 
 @NgModule({
   declarations: [
@@ -41,7 +44,10 @@ import { NotificacaoComponent } from './_component/pages/notificacao/notificacao
     LogComponent,
     PesquisaComponent,
     SimulacaoComponent,
-    NotificacaoComponent
+    NotificacaoComponent,
+    ParcelasComponent,
+    AmortizacaoComponent,
+    CallbackPipe
   ],
   imports: [
     BrowserModule,
