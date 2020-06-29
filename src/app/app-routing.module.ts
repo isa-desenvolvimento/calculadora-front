@@ -6,7 +6,6 @@ import { LoginComponent } from './_component/login/login.component';
 import { AdminLayoutComponent } from './_component/layouts/admin-layout/admin-layout.component';
 import { UserComponent } from './_component/pages/user/user.component';
 import { ChequeEmpresarialComponent } from './_component/pages/cheque-empresarial/cheque-empresarial.component';
-import { ParceladoPosComponent } from './_component/pages/parcelado-pos/parcelado-pos.component';
 import { ParceladoPreComponent } from './_component/pages/parcelado-pre/parcelado-pre.component';
 import { IndicesComponent } from './_component/pages/indices/indices.component';
 import { LogComponent } from './_component/pages/log/log.component';
@@ -32,7 +31,7 @@ const routes: Routes = [
 			},
 			{
 				path: 'parcelado-pos',
-				component: ParceladoPosComponent
+				component: ParceladoPreComponent
 			},
 			{
 				path: 'parcelado-pre',

@@ -14,7 +14,7 @@
 					<div class="col-md-12 col-sm-12">
 						<app-simulacao #simulacao [updateLoadingBtn]="updateLoadingBtn"
 							[tableDataLength]="tableData.dataRows.length > 0" (salvar)="atualizarRisco()"
-							(simularCalculo)="simularCalc(false, 'btn')" (formValue)="setFormRiscos($event)" [isDesagio]="true">
+							(simularCalculo)="simularCalc(false, 'btn')" (formValue)="setFormRiscos($event)" [isDesagio]="isDesagio">
 						</app-simulacao>
 					</div>
 				</div>
