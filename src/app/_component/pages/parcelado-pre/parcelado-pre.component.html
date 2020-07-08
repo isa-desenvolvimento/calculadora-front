@@ -151,46 +151,46 @@
 							</tbody>
 							<tfoot>
 								<tr class="parcelado-font-size">
-									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS
+									<th [footer]="'left'" colspan="7">TOTAL DE PARCELAS
 										VENCIDAS
 									</th>
-									<th class="footer-table" width="100" colspan="1">
+									<th footer width="100" colspan="1">
 										{{formatCurrency(totalParcelasVencidas.valorNoVencimento)}}</th>
-									<th class="footer-table" width="100" colspan="1">
+									<th footer width="100" colspan="1">
 										{{formatCurrency(totalParcelasVencidas.correcaoPeloIndice)}}</th>
-									<th class="footer-table"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.moneyValue)}}
+									<th footer></th>
+									<th footer></th>
+									<th footer>{{formatCurrency(totalParcelasVencidas.moneyValue)}}
 									</th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.multa)}}</th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
-									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.amortizacao)}}
+									<th footer>{{formatCurrency(totalParcelasVencidas.multa)}}</th>
+									<th footer>{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
+									<th footer></th>
+									<th footer>{{formatCurrency(totalParcelasVencidas.amortizacao)}}
 									</th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.totalDevedor)}}
+									<th footer>{{formatCurrency(totalParcelasVencidas.totalDevedor)}}
 									</th>
-									<th class="footer-table"></th>
-									<th class="footer-table log-hidden-false"></th>
+									<th footer></th>
+									<th footer class="log-hidden-false"></th>
 								</tr>
 								<tr align="left" class="parcelado-font-size">
-									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS
+									<th [footer]="'left'" colspan="7">TOTAL DE PARCELAS
 										VINCENDAS
 									</th>
-									<th class="footer-table" width="100" colspan="1"></th>
-									<th class="footer-table" width="100" colspan="1"></th>
-									<th class="footer-table" colspan="1"></th>
-									<th class="footer-table" colspan="1"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table">
+									<th footer width="100" colspan="1"></th>
+									<th footer width="100" colspan="1"></th>
+									<th footer colspan="1"></th>
+									<th footer colspan="1"></th>
+									<th footer></th>
+									<th footer></th>
+									<th footer></th>
+									<th footer>
 										{{formatCurrency(totalParcelasVincendas.valorPMTVincenda)}}
 									</th>
-									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVincendas.totalDevedor)}}
+									<th footer></th>
+									<th footer>{{formatCurrency(totalParcelasVincendas.totalDevedor)}}
 									</th>
-									<th class="footer-table"></th>
-									<th class="footer-table log-hidden-false"></th>
+									<th footer></th>
+									<th footer class="log-hidden-false"></th>
 								</tr>
 							</tfoot>
 						</table>

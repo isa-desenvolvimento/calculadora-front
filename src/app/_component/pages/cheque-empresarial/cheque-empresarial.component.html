@@ -233,16 +233,16 @@
                             </tbody>
                             <tfoot>
                                 <tr class="parcelado-font-size">
-                                    <th class="footer-table footer-title-table" colspan="7"> SUBTOTAL APURADO EM
+                                    <th [footer]="'left'" class="footer-title-table" colspan="7"> SUBTOTAL APURADO EM
                                         {{subtotal_data_calculo || "---------"}}</th>
-                                    <th class="footer-table" width="100" colspan="1"></th>
-                                    <th class="footer-table" width="100" colspan="1"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table">{{formatCurrency(total_subtotal || 0)}}</th>
-                                    <th class="footer-table log-hidden-false"></th>
+                                    <th footer width="100" colspan="1"></th>
+                                    <th footer width="100" colspan="1"></th>
+                                    <th footer></th>
+                                    <th footer></th>
+                                    <th footer></th>
+                                    <th footer></th>
+                                    <th footer>{{formatCurrency(total_subtotal || 0)}}</th>
+                                    <th footer class="log-hidden-false"></th>
                                 </tr>
                             </tfoot>
                         </table>

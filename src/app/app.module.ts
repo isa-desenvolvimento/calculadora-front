@@ -28,6 +28,7 @@ import { ParcelasComponent } from './_component/pages/parcelas/parcelas.componen
 import { AmortizacaoComponent } from './_component/pages/amortizacao/amortizacao.component';
 import { CallbackPipe } from './_pipe/callback.pipe';
 import { VincendasDirective } from './_directive/vincendas.directive';
+import { FooterDirective } from './_directive/footer.directive';
 
 @NgModule({
   declarations: [
@@ -47,7 +48,8 @@ import { VincendasDirective } from './_directive/vincendas.directive';
     ParcelasComponent,
     AmortizacaoComponent,
     CallbackPipe,
-    VincendasDirective
+    VincendasDirective,
+    FooterDirective
   ],
   imports: [
     BrowserModule,
