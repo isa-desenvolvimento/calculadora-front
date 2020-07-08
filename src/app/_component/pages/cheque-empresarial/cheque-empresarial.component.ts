@@ -505,8 +505,6 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           const valorDevedorAtualizado = row['valorDevedorAtualizado'] = valorDevedor + correcaoPeloIndice + moneyValue + multa + lancamento;
 
-
-
           if (this.tableData.dataRows.length - 1 === index) {
             // Forms Total
 

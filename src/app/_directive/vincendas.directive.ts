@@ -1,5 +1,5 @@
 import { Directive, ElementRef, Input, OnInit } from '@angular/core';
-import * as moment from 'moment'; // add this 1 of 4
+import { isVincenda} from '../_component/util/util'
 
 @Directive({
   selector: '[vincendas]'
@@ -11,11 +11,7 @@ export class VincendasDirective implements OnInit {
   constructor(private el: ElementRef) { }
   
   ngOnInit() {
-    const dtVencimento =  moment(this.vincendas.dataVencimento);
-    const dtCalcAmor = moment(this.vincendas.infoParaCalculo.formDataCalculo);
-    const vincenda = dtVencimento > dtCalcAmor;
-
-    if (vincenda) {
+    if (isVincenda(this.vincendas.dataVencimento, this.vincendas.infoParaCalculo.formDataCalculo)) {
       this.el.nativeElement.style.backgroundColor = '#f4f3ef';
     }
   }

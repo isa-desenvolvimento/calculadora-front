@@ -10,7 +10,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import 'datatables.net';
 import 'datatables.net-buttons';
 
-import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
+import { getCurrentDate, formatDate, formatCurrency, isVincenda, verifyNumber, getQtdDias } from '../../util/util';
 import {
   LISTA_INDICES,
   LANGUAGEM_TABLE, LISTA_STATUS,
@@ -471,7 +471,7 @@ export class ParceladoPreComponent implements OnInit {
           ultimaAtualizacao: 0,
           totalParcelasVencidas: 0,
           totalParcelasVincendas: 0,
-          vincenda: false,
+          vincenda: isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']),
           tipoParcela: this.tipoParcela
         })
 
@@ -628,7 +628,7 @@ export class ParceladoPreComponent implements OnInit {
           const indiceDataCalcAmor = row['indiceDataCalcAmor'] / 100;
 
           const valorNoVencimento = parseFloat(row['valorNoVencimento']);
-          const vincenda = dataVencimento > this.formDefaultValues.formDataCalculo;
+          const vincenda = isVincenda(row["dataVencimento"],this.formDefaultValues.formDataCalculo);
 
           const amortizacao = parseFloat(row['amortizacao']);
           let porcentagem = (this.formDefaultValues.formJuros / 100) || (parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) / 100);

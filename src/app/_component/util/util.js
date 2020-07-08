@@ -19,3 +19,9 @@ export const formatCurrency = value => {
 }
 
 export const getLastLine = table => [...table].pop();
+
+export const isVincenda = (vencimento, calcAmor) => {
+    const dtVencimento = moment(vencimento);
+    const dtCalcAmor = moment(calcAmor);
+    return dtVencimento > dtCalcAmor;
+}
