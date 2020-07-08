@@ -505,31 +505,37 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           const valorDevedorAtualizado = row['valorDevedorAtualizado'] = valorDevedor + correcaoPeloIndice + moneyValue + multa + lancamento;
 
-          // Forms Total
-          this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
-          const honorarios = this.total_honorarios = valorDevedorAtualizado * this.formDefaultValues.formHonorarios / 100;
 
-          this.last_data_table = getLastLine(this.tableData.dataRows)
-          let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
-          let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
 
-          this.subtotal_data_calculo = formatDate(last_date_base);
-          this.total_data_calculo = formatDate(last_date_base_atual);
-          this.min_data = last_date_base_atual;
+          if (this.tableData.dataRows.length - 1 === index) {
+            // Forms Total
 
-          this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
-          const valorDevedorAtualizadoLast = parseFloat(this.last_data_table['valorDevedorAtualizado']);
+            this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
+            const honorarios = this.total_honorarios = valorDevedorAtualizado * (this.formDefaultValues.formHonorarios / 100);
 
-          this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
-          this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
+            this.last_data_table = getLastLine(this.tableData.dataRows)
+            let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+            let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
 
-          if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
-            this.alertType = {
-              mensagem: 'Cálculo Simulado!',
-              tipo: 'success'
-            };
-            this.formartTable('Simulação');
-            this.toggleUpdateLoading()
+            this.subtotal_data_calculo = formatDate(last_date_base);
+            this.total_data_calculo = formatDate(last_date_base_atual);
+            this.min_data = last_date_base_atual;
+
+            this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
+            const valorDevedorAtualizadoLast = parseFloat(this.last_data_table['valorDevedorAtualizado']);
+
+            this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
+            this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
+
+            if (origin === 'btn') {
+              this.alertType = {
+                mensagem: 'Cálculo Simulado!',
+                tipo: 'success'
+              };
+
+              this.formartTable('Simulação');
+              this.toggleUpdateLoading()
+            }
           }
 
           this.tableLoading = false;
