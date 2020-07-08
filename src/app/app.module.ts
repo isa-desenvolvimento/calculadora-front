@@ -27,6 +27,7 @@ import { NotificacaoComponent } from './_component/pages/notificacao/notificacao
 import { ParcelasComponent } from './_component/pages/parcelas/parcelas.component';
 import { AmortizacaoComponent } from './_component/pages/amortizacao/amortizacao.component';
 import { CallbackPipe } from './_pipe/callback.pipe';
+import { VincendasDirective } from './_directive/vincendas.directive';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { CallbackPipe } from './_pipe/callback.pipe';
     NotificacaoComponent,
     ParcelasComponent,
     AmortizacaoComponent,
-    CallbackPipe
+    CallbackPipe,
+    VincendasDirective
   ],
   imports: [
     BrowserModule,
