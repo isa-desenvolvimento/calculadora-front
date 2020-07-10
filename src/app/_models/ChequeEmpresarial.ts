@@ -14,7 +14,8 @@ export interface Lancamento {
     contractRef: string;
     ultimaAtualizacao: string;
     infoParaCalculo: any,
-    isTipoLancamento: boolean
+    isTipoLancamento: boolean,
+    modulo: string;
 }
 
 export interface EncargosMonetarios {

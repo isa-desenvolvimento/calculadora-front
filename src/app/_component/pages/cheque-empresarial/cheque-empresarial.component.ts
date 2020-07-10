@@ -337,7 +337,8 @@ export class ChequeEmpresarialComponent implements OnInit {
         contractRef: this.contractRef,
         ultimaAtualizacao: '',
         infoParaCalculo: { ...localInfoParaCalculo },
-        isTipoLancamento: isTipoLancamento
+        isTipoLancamento: isTipoLancamento,
+        modulo: CHEQUE_EMPRESARIAL
       });
       this.tableData.dataRows.push(this.payloadLancamento)
       this.tableLoading = false;
@@ -367,6 +368,9 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === infoContrato.contractRef).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
         cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
+        cheque.isTipoLancamento = true;
+        cheque.modulo = CHEQUE_EMPRESARIAL;
+
         const ultimaAtualizacao = [...chequeEmpresarialList].pop();
         this.ultima_atualizacao = formatDate(ultimaAtualizacao.ultimaAtualizacao, 'YYYY-MM-DD');
 
