@@ -225,7 +225,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.controleLancamentos = 0;
 
     const payload = this.tableData.dataRows.map(lancamento => {
-      if (lancamento['isTipoLancamento']) return;
+      if (!lancamento['isTipoLancamento']) return;
 
       this.updateLoadingBtn = true;
       let lancamentoLocal = { ...lancamento };
