@@ -265,6 +265,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   get ce_form_amortizacao() { return this.ceFormAmortizacao.controls; }
 
+  lancamentoInfo() {
+     const lanca = this.tableData.dataRows.filter(row=> !row['isTipoLancamento']);
+    return !!lanca.length;
+  }
+
   incluirLancamentos() {
 
     const lastLine = getLastLine(this.tableData.dataRows);
@@ -279,6 +284,11 @@ export class ChequeEmpresarialComponent implements OnInit {
       };
       this.toggleUpdateLoading()
       return;
+    }
+
+    const veirifcarLancamento = this.lancamentoInfo();
+    if (veirifcarLancamento) {
+      this.tableData.dataRows.pop();
     }
 
     this.setFormDefault()
@@ -342,6 +352,10 @@ export class ChequeEmpresarialComponent implements OnInit {
       });
       this.tableData.dataRows.push(this.payloadLancamento)
       this.tableLoading = false;
+
+      if (!this.lancamentoInfo() && isTipoLancamento) {
+        this.tableData.dataRows.push(lastLine);
+      }
 
       setTimeout(() => {
         this.ceFormAmortizacao.reset({ceFA_tipo: 'lancamento'});
