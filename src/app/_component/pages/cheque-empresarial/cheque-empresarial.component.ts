@@ -418,7 +418,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   setFormRiscos(form) {
     Object.keys(form).filter((value, key) => {
-      if (form[value] && form[value] !== 'undefined') {
+      if (form[value] !== null && form[value] !== 'undefined') {
         this.form_riscos[value] = form[value];
       }
     });
@@ -426,7 +426,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   setFormDefault() {
     Object.keys(this.form_riscos).filter((value, key) => {
-      if (this.form_riscos[value] && this.form_riscos[value] !== 'undefined') {
+      if (this.form_riscos[value] !== null && this.form_riscos[value] !== 'undefined') {
         this.formDefaultValues[value] = this.form_riscos[value];
       }
     });
