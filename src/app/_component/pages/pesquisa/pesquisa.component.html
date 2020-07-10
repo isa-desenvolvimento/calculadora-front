@@ -28,15 +28,15 @@
                     <div >
                         <div class="form-check form-check-inline">
                             <input class="form-check-input" type="radio" name="recuperacaoJudicial"
-                                formControlName="recuperacaoJudicial" id="status1" [value]="true">
-                            <label class="form-check-label" for="status1" style="margin: -30px">
+                                formControlName="recuperacaoJudicial" id="recuperacaoJudicial1" [value]="true">
+                            <label class="form-check-label" for="recuperacaoJudicial1" style="margin: -30px">
                                 Sim
                             </label>
                         </div>
                         <div class="form-check form-check-inline ml-4">
                             <input class="form-check-input" type="radio" name="recuperacaoJudicial"
-                                formControlName="recuperacaoJudicial" id="status2" [value]="false">
-                            <label class="form-check-label" for="status2" style="margin: -30px">
+                                formControlName="recuperacaoJudicial" id="recuperacaoJudicial2" [value]="false">
+                            <label class="form-check-label" for="recuperacaoJudicial2" style="margin: -30px">
                                 Não
                             </label>
                         </div>
@@ -51,7 +51,7 @@
                     [disabled]="!peForm.valid || tableLoading">Pesquisar</button>
                 <div class="d-flex justify-content-center" *ngIf="tableLoading"
                     style="position: absolute; top: 33px; right: 80px">
-                    <div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="status">
+                    <div class="spinner-grow text-primary" style="width: 2rem; height: 2rem;" role="recuperacaoJudicial">
                         <span class="sr-only">Loading...</span>
                     </div>
                 </div>
