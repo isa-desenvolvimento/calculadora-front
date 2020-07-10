@@ -404,7 +404,6 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   incluirParcelas(tableDataParcelas) {
-
     if (!this.form_riscos.formIndice) {
       this.updateLoadingBtn = false;
       this.alertType = {

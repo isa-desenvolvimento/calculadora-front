@@ -48,14 +48,14 @@
                                             {{formatCurrency(tableData.dataRows[0]["valorDevedor"])}}
                                         </p>
                                     </div>
-                                    <div class="col-md-2 col-sm-12">
-                                        <fieldset class="form-group ml-sm-12">
+                                    <div class="col-md-6 col-sm-12">
+                                        <fieldset class="form-group ml-3">
                                             <div class="form-group row">
                                                 <legend class="col-form-label">
                                                     <label class="form-check-label" for="profile2">Tipo</label>
                                                 </legend>
-                                                <div class="col-sm-7 ml-2">
-                                                    <div class="form-check">
+                                                <div >
+                                                    <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio" name="ceFA_tipo"
                                                             formControlName="ceFA_tipo" id="ceFA_tipo1"
                                                             [value]="'lancamento'">
@@ -64,7 +64,7 @@
                                                             Incluir Lançamento
                                                         </label>
                                                     </div>
-                                                    <div class="form-check " title="{{tableData.dataRows.length === 0 ? 'Para habilitar essa opção é necessário ter ao menos um  lançamento' : null}}">
+                                                    <div class="form-check form-check-inline ml-5" title="{{tableData.dataRows.length === 0 ? 'Para habilitar essa opção é necessário ter ao menos um  lançamento' : null}}">
                                                         <input class="form-check-input" type="radio" name="ceFA_tipo"
                                                             formControlName="ceFA_tipo" id="ceFA_tipo2"
                                                             [value]="'atualizacao'" [attr.disabled]="tableData.dataRows.length === 0 ? true : null" >
@@ -95,16 +95,16 @@
                                             style="height: 35px" id="ceFA_valor_lancamento"
                                             formControlName="ceFA_valor_lancamento">
                                     </div>
-                                    <div class="col-md-2 col-sm-12"
+                                    <div class="col-md-6 col-sm-12"
                                         [hidden]="ce_form_amortizacao.ceFA_tipo.value !== 'lancamento'">
-                                        <fieldset class="form-group ml-sm-3">
+                                        <fieldset class="form-group ml-3">
                                             <div class="form-group row">
                                                 <legend class="col-form-label">
                                                     <label class="form-check-label" for="profile2">Tipo de
                                                         Lançamento</label>
                                                 </legend>
-                                                <div class="col-sm-7 ml-2">
-                                                    <div class="form-check">
+                                                <div>
+                                                    <div class="form-check form-check-inline">
                                                         <input class="form-check-input" type="radio"
                                                             name="ceFA_tipo_lancamento"
                                                             formControlName="ceFA_tipo_lancamento" id="status1"
@@ -114,7 +114,7 @@
                                                             Crédito
                                                         </label>
                                                     </div>
-                                                    <div class="form-check ">
+                                                    <div class="form-check form-check-inline ml-5">
                                                         <input class="form-check-input" type="radio"
                                                             name="ceFA_tipo_lancamento"
                                                             formControlName="ceFA_tipo_lancamento" id="status2"
@@ -278,7 +278,7 @@
                             <tfoot>
                                 <tr class="parcelado-font-size">
                                     <th [footer]="'left'" class="footer-title-table" colspan="7"> SUBTOTAL APURADO EM
-                                        {{subtotal_data_calculo || "---------"}}</th>
+                                        {{total_data_calculo || "---------"}}</th>
                                     <th footer width="100" colspan="1"></th>
                                     <th footer width="100" colspan="1"></th>
                                     <th footer></th>
