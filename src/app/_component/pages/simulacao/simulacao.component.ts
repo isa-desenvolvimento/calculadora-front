@@ -37,8 +37,6 @@ export class SimulacaoComponent implements OnInit {
       formIndiceEncargos: [],
       formDesagio: []
     });
-
-    this.changeInput()
   }
 
   simular() {
