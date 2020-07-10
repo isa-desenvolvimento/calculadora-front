@@ -63,6 +63,10 @@ export class PesquisaComponent implements OnInit {
   setContrato() {
     this.contractList_field = [];
     this.typeContractList_field = [];
+    
+    this.peForm.value.contrato = '';
+    this.peForm.value.tipo_contrato = '';
+
     this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.form.pasta.value) {
         this.contractList_field.push(pasta.CONTRATO);
@@ -75,6 +79,8 @@ export class PesquisaComponent implements OnInit {
 
   setTypeContract() {
     this.typeContractList_field = [];
+    this.peForm.value.tipo_contrato = '';
+
     this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.form.pasta.value && pasta.CONTRATO === this.form.contrato.value) {
         this.typeContractList_field.push(pasta.DESCRICAO);

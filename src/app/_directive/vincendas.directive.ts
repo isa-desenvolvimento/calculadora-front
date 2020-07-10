@@ -11,7 +11,7 @@ export class VincendasDirective implements OnInit {
   constructor(private el: ElementRef) { }
   
   ngOnInit() {
-    if (isVincenda(this.vincendas.dataVencimento, this.vincendas.infoParaCalculo.formDataCalculo)) {
+    if (isVincenda(this.vincendas || this.vincendas?.dataVencimento, this.vincendas?.infoParaCalculo?.formDataCalculo)) {
       this.el.nativeElement.style.backgroundColor = '#f4f3ef';
     }
   }

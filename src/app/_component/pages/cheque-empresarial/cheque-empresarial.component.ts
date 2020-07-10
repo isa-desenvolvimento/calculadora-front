@@ -5,7 +5,7 @@ import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.
 
 import { IndicesService } from '../../../_services/indices.service';
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { LogService } from '../../../_services/log.service';
 
 import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
@@ -89,9 +89,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ceFormAmortizacao = this.formBuilder.group({
       ceFA_data_vencimento: [],
       ceFa_saldo_devedor: [],
+      ceFA_tipo: new FormControl({value:'lancamento', disabled: false}, Validators.required),
       ceFA_data_base_atual: ['', Validators.required],
-      ceFA_valor_lancamento: ['', Validators.required],
-      ceFA_tipo_lancamento: ['', Validators.required],
+      ceFA_valor_lancamento: [],
+      ceFA_tipo_lancamento: []
     });
 
     this.dtOptions = {
@@ -224,6 +225,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.controleLancamentos = 0;
 
     const payload = this.tableData.dataRows.map(lancamento => {
+      if (lancamento['isTipoLancamento']) return;
 
       this.updateLoadingBtn = true;
       let lancamentoLocal = { ...lancamento };
@@ -265,7 +267,11 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   incluirLancamentos() {
 
-    if (!this.form_riscos.formIndice) {
+    const lastLine = getLastLine(this.tableData.dataRows);
+
+    const isTipoLancamento = this.ce_form_amortizacao.ceFA_tipo.value === 'lancamento';
+
+    if (!this.form_riscos.formIndice && (!lastLine && !isTipoLancamento)) {
       this.updateLoadingBtn = true;
       this.alertType = {
         mensagem: 'É necessário informar o índice.',
@@ -281,7 +287,6 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.tableLoading = true;
 
     const lancamento = this.ce_form_amortizacao;
-    const lastLine = getLastLine(this.tableData.dataRows);
 
     const localDataBase = this.tableData.dataRows.length === 0 ? lancamento.ceFA_data_vencimento.value : lastLine["dataBaseAtual"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? lancamento.ceFa_saldo_devedor.value : lastLine["valorDevedorAtualizado"];
@@ -290,13 +295,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.total_data_calculo = formatDate(this.form_riscos.formDataCalculo) || getCurrentDate();
     this.subtotal_data_calculo = this.total_date_now;
 
-    const localLancamentos = lancamento.ceFA_valor_lancamento.value;
-    const localTipoLancamento = lancamento.ceFA_tipo_lancamento.value;
+    const localLancamentos = isTipoLancamento ? lancamento.ceFA_valor_lancamento.value : "NaN";
+    const localTipoLancamento = isTipoLancamento ? lancamento.ceFA_tipo_lancamento.value : 'debit';
     const localDataBaseAtual = lancamento.ceFA_data_base_atual.value;
 
-    const localTypeIndice = this.form_riscos.formIndice;
+    const localTypeIndice = isTipoLancamento ? this.form_riscos.formIndice : lastLine.indiceBA ;
     const localInfoParaCalculo: InfoParaCalculo = this.form_riscos;
-
 
     const getIndiceDataBase = new Promise((res, rej) => {
       this.indicesService.getIndiceDataBase(localTypeIndice, localDataBase, this.formDefaultValues).then((data) => res(data))
@@ -332,13 +336,14 @@ export class ChequeEmpresarialComponent implements OnInit {
         valorDevedorAtualizado: null,
         contractRef: this.contractRef,
         ultimaAtualizacao: '',
-        infoParaCalculo: { ...localInfoParaCalculo }
+        infoParaCalculo: { ...localInfoParaCalculo },
+        isTipoLancamento: isTipoLancamento
       });
       this.tableData.dataRows.push(this.payloadLancamento)
       this.tableLoading = false;
 
       setTimeout(() => {
-        this.ceFormAmortizacao.reset();
+        this.ceFormAmortizacao.reset({ceFA_tipo: 'lancamento'});
 
         this.simularCalc(true, null, true)
         this.alertType = {
@@ -485,7 +490,8 @@ export class ChequeEmpresarialComponent implements OnInit {
           }
 
           const correcaoPeloIndice = row['encargosMonetarios']['correcaoPeloIndice'] = parseFloat(correcao);
-          const lancamento = row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos'];
+          const valorLancado = row['isTipoLancamento'] ? row['lancamentos'] : 0;
+          const lancamento = row['tipoLancamento'] === 'credit' ? (valorLancado * (-1)) : valorLancado;
 
           // -- dias
           row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;

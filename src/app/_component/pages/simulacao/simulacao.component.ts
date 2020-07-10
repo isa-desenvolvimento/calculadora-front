@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { getCurrentDate, verifyNumber } from '../../util/util';
-import { LISTA_INDICES } from '../../util/constants'
+import { LISTA_INDICES, ENCARGOS } from '../../util/constants'
 
 @Component({
   selector: 'app-simulacao',
@@ -19,6 +19,7 @@ export class SimulacaoComponent implements OnInit {
   @Output() salvar = new EventEmitter();
 
   indice_field = LISTA_INDICES;
+  isEncargo: boolean;
 
   constructor(
     private formBuilder: FormBuilder
@@ -37,6 +38,8 @@ export class SimulacaoComponent implements OnInit {
       formIndiceEncargos: [],
       formDesagio: []
     });
+
+    this.isEncargo = this.form_riscos.formIndice.value === ENCARGOS;
   }
 
   simular() {
@@ -61,6 +64,7 @@ export class SimulacaoComponent implements OnInit {
   }
 
   changeInput(e = null) {
+    this.isEncargo = this.form_riscos.formIndice.value === ENCARGOS;
     this.formValue.emit(this.formRiscos.value);
   }
 

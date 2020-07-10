@@ -2,7 +2,7 @@
     <form class="row" [formGroup]="peForm">
         <div class="col-sm-3">
             <label for="pasta" class="col-form-label">Pasta</label>
-            <ng-select [items]="folderData_field" bindLabel="pasta" placeholder="Selecione a pasta" appendTo="body"
+            <ng-select  [items]="folderData_field" bindLabel="pasta" placeholder="Selecione a pasta" appendTo="body"
                  formControlName="pasta" (change)="setContrato()">
             </ng-select>
 
