@@ -1,19 +1,19 @@
 <div>
     <form class="row" [formGroup]="peForm">
-        <div class="col-sm-3">
+        <div class="col-md-3 col-sm-12">
             <label for="pasta" class="col-form-label">Pasta</label>
             <ng-select [items]="folderData_field" bindLabel="pasta" placeholder="Selecione a pasta" appendTo="body"
                 formControlName="pasta" (change)="setContrato()">
             </ng-select>
 
         </div>
-        <div class="col-sm-3">
+        <div class="col-md-3 col-sm-12">
             <label for="contrato" class="col-form-label">Contrato</label>
             <ng-select [items]="contractList_field" bindLabel="contrato" placeholder="Selecione o contrato"
                 appendTo="body" formControlName="contrato" (change)="setTypeContract()">
             </ng-select>
         </div>
-        <div class="col-sm-2">
+        <div class="col-md-2 col-sm-12">
             <label for="nome" class="col-form-label">Tipo de Contrato</label>
             <ng-select [items]="typeContractList_field" bindLabel="tipo_contrato"
                 placeholder="Selecione o tipo de contrato" appendTo="body" formControlName="tipo_contrato">
