@@ -38,6 +38,9 @@ export const CHEQUE_EMPRESARIAL = "Cheque Empresarial";
 export const PARCELADO_PRE = "Parcelado Pré";
 export const PARCELADO_POS = "Parcelado Pós";
 
+export const PARCELADO_PRE_URL = "parcelado-pre";
+
+
 
 
 

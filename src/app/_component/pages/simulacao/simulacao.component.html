@@ -19,7 +19,7 @@
         </div>
         <div class="col-md-3 col-sm-12">
             <label for="indice" class="col-form-label">Índice</label>
-            <select class="form-control custom-select col-md-12 col-sm-12" name="indice" #selectIndice
+            <select class="form-control col-md-12 col-sm-12 select-indice" name="indice" #selectIndice 
                 (change)="changeInput($event)" id="indice" formControlName="formIndice">
                 <option *ngFor="let ind of indice_field" [value]="ind"> {{ind}}
                 </option>

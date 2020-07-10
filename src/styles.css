@@ -62,6 +62,16 @@ table.dataTable thead .sorting_desc {
     display: none !important;
 }
 
+.select-indice {
+    width: 92% !important;
+}
+
+@media screen and (max-width: 750px) {
+    .select-indice {
+        width: 100% !important;
+    }
+  }
+
 .dt-button {
     background-color: #51bcda !important;
     color: #FFFFFF !important ;

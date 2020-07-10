@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { getCurrentDate, verifyNumber } from '../../util/util';
-import { LISTA_INDICES, ENCARGOS } from '../../util/constants'
+import { LISTA_INDICES, ENCARGOS, PARCELADO_PRE_URL } from '../../util/constants'
 
 @Component({
   selector: 'app-simulacao',

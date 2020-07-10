@@ -18,10 +18,11 @@ import {
   AMORTIZACAO_DATA_DIFERENCIADA,
   AMORTIZACAO_DATA_FINAL,
   PARCELA_PAGA,
-  PARCELA_ABERTA,
+  PARCELADO_PRE_URL,
   PARCELADO_PRE,
   PARCELADO_POS
 } from '../../util/constants'
+import { LowerCasePipe } from '@angular/common';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -36,8 +37,10 @@ declare interface TableData {
 export class ParceladoPreComponent implements OnInit {
   payloadLancamento: Parcela;
 
-  tipoParcela = window.location.pathname.split("/")[1];
-  isDesagio = this.tipoParcela === 'parcelado-pre';
+  url = window.location.pathname.split("/");
+  indexURL =  this.url.indexOf(PARCELADO_PRE_URL)
+  isDesagio = this.indexURL !== -1;
+  modulo = this.url[this.indexURL];
 
   tableLoading = false;
   updateLoading = false;
@@ -181,7 +184,6 @@ export class ParceladoPreComponent implements OnInit {
       }],
       language: LANGUAGEM_TABLE
     }
-
   }
 
   filterPago(row) {
@@ -205,7 +207,7 @@ export class ParceladoPreComponent implements OnInit {
           dataSimulacao: this.form_riscos.formDataCalculo,
           acao: acao,
           infoTabela: table,
-          modulo: this.tipoParcela === 'parcelado-pre' ? PARCELADO_PRE : PARCELADO_POS
+          modulo: this.isDesagio ? PARCELADO_PRE : PARCELADO_POS
         }]).subscribe(log => { })
       }
     }, 500);
@@ -247,7 +249,7 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['totalDevedor'] = parseFloat(parcelaLocal['totalDevedor']);
       parcelaLocal['subtotal'] = parseFloat(parcelaLocal['subtotal']);
       parcelaLocal['contractRef'] = this.contractRef;
-      parcelaLocal['tipoParcela'] = this.tipoParcela;
+      parcelaLocal['tipoParcela'] = this.modulo;
       parcelaLocal['ultimaAtualizacao'] = getCurrentDate('YYYY-MM-DD');
 
       return parcelaLocal;
@@ -472,7 +474,7 @@ export class ParceladoPreComponent implements OnInit {
           totalParcelasVencidas: 0,
           totalParcelasVincendas: 0,
           vincenda: isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']),
-          tipoParcela: this.tipoParcela
+          tipoParcela: this.modulo
         })
 
         this.updateLoadingBtn = false;
@@ -505,7 +507,7 @@ export class ParceladoPreComponent implements OnInit {
     this.infoContrato = infoContrato;
 
     this.parceladoPreService.getAll().subscribe(parceladoPreList => {
-      this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === infoContrato.contractRef && row["tipoParcela"] === this.tipoParcela).map((parcela, key) => {
+      this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === infoContrato.contractRef && row["tipoParcela"] === this.modulo).map((parcela, key) => {
         parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
         parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
         const ultimaAtualizacao = [...parceladoPreList].pop();
@@ -628,7 +630,7 @@ export class ParceladoPreComponent implements OnInit {
           const indiceDataCalcAmor = row['indiceDataCalcAmor'] / 100;
 
           const valorNoVencimento = parseFloat(row['valorNoVencimento']);
-          const vincenda = isVincenda(row["dataVencimento"],this.formDefaultValues.formDataCalculo);
+          const vincenda = isVincenda(row["dataVencimento"], this.formDefaultValues.formDataCalculo);
 
           const amortizacao = parseFloat(row['amortizacao']);
           let porcentagem = (this.formDefaultValues.formJuros / 100) || (parseFloat(row['encargosMonetarios']['jurosAm']['percentsJuros']) / 100);
