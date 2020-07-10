@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { getCurrentDate, verifyNumber } from '../../util/util';
+import { getCurrentDate, verifyNumber, formatDate } from '../../util/util';
 import { LISTA_INDICES, ENCARGOS, PARCELADO_PRE_URL } from '../../util/constants'
 
 @Component({
@@ -13,7 +13,8 @@ export class SimulacaoComponent implements OnInit {
   @Input() updateLoadingBtn: boolean;
   @Input() tableDataLength: boolean;
   @Input() isDesagio: boolean; 
-
+  @Input() ultimaAtualizacao: string; 
+  
   @Output() formValue = new EventEmitter();
   @Output() simularCalculo = new EventEmitter();
   @Output() salvar = new EventEmitter();
@@ -40,6 +41,10 @@ export class SimulacaoComponent implements OnInit {
     });
 
     this.isEncargo = this.form_riscos.formIndice.value === ENCARGOS;
+  }
+
+  ngAfterViewInit() {
+    this.formRiscos.value.formUltimaAtualizacao = formatDate(this.ultimaAtualizacao, 'YYYY-MM-DD') ;
   }
 
   simular() {
