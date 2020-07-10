@@ -29,6 +29,7 @@ import { AmortizacaoComponent } from './_component/pages/amortizacao/amortizacao
 import { CallbackPipe } from './_pipe/callback.pipe';
 import { VincendasDirective } from './_directive/vincendas.directive';
 import { FooterDirective } from './_directive/footer.directive';
+import { NgSelectModule } from '@ng-select/ng-select';
 
 @NgModule({
   declarations: [
@@ -60,7 +61,8 @@ import { FooterDirective } from './_directive/footer.directive';
     SidebarModule,
     NavbarModule,
     ToastrModule.forRoot(),
-    DataTablesModule
+    DataTablesModule,
+    NgSelectModule
   ],
   providers: [],
   bootstrap: [AppComponent]
