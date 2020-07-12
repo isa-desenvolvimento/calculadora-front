@@ -6,7 +6,7 @@ import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 import { IndicesService } from '../../../_services/indices.service';
 import { LogService } from '../../../_services/log.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import {ParcelasComponent } from '../parcelas/parcelas.component'
+import { ParcelasComponent } from '../parcelas/parcelas.component'
 
 import 'datatables.net';
 import 'datatables.net-buttons';
@@ -60,7 +60,7 @@ export class ParceladoPreComponent implements OnInit {
   form_riscos: any = {};
   quitado = false;
 
-  @ViewChild(ParcelasComponent, {static: false})
+  @ViewChild(ParcelasComponent, { static: false })
   parcelas: ParcelasComponent;
 
   //tables
@@ -81,7 +81,7 @@ export class ParceladoPreComponent implements OnInit {
   pagas: any;
 
   dtOptions: DataTables.Settings = {};
-  last_data_table: Object;
+  minParcela: number;
   min_data: string;
   ultima_atualizacao: String;
 
@@ -515,7 +515,7 @@ export class ParceladoPreComponent implements OnInit {
           this.falhaIndice()
         })
     })
-    if (!temIndice.every(tem=> !!tem)) {
+    if (!temIndice.every(tem => !!tem)) {
       this.falhaIndice()
     }
 
@@ -543,21 +543,24 @@ export class ParceladoPreComponent implements OnInit {
       this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === infoContrato.contractRef && row["tipoParcela"] === this.modulo).map((parcela, key) => {
         parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
         parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
-        const ultimaAtualizacao = [...parceladoPreList].pop();
-        this.ultima_atualizacao = formatDate(ultimaAtualizacao.ultimaAtualizacao, 'YYYY-MM-DD')
 
         Object.keys(parcela.infoParaCalculo).filter(value => {
           this.formDefaultValues[value] = parcela.infoParaCalculo[value];
         });
-
-        setTimeout(() => {
-          this.simularCalc(true, null, true);
-        }, 1000);
-
         return parcela;
       });
 
-      if (!this.tableData.dataRows.length) {
+      if (this.tableData.dataRows.length) {
+        this.tableLoading = false;
+        const ultimaAtualizacao = [...this.tableData.dataRows].pop();
+
+        setTimeout(() => {
+          this.minParcela = ultimaAtualizacao['nparcelas'] + 1;
+          this.simularCalc(true, null, true);
+        }, 1000);
+
+      } else {
+        this.minParcela = 1;
         this.tableLoading = false;
         this.alertType = {
           mensagem: 'Nenhuma parcela encontrada!',
@@ -566,8 +569,6 @@ export class ParceladoPreComponent implements OnInit {
         this.toggleUpdateLoading()
         return;
       }
-
-      this.tableLoading = false;
     }, err => {
 
       this.tableLoading = false;

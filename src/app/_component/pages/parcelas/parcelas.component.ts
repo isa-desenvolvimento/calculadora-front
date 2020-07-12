@@ -20,6 +20,8 @@ export class ParcelasComponent implements OnInit {
 
   @Input() pesquisaFormValid: boolean;
   @Input() newParcelasTableClear: boolean;
+  @Input() minParcela: number;
+
   @Output() incluirParcelas = new EventEmitter();
 
   status_field = LISTA_STATUS;
@@ -46,7 +48,7 @@ export class ParcelasComponent implements OnInit {
 
     this.preFormCadastroParcelas = this.formBuilder.group({
       nparcelas: ['', Validators.required],
-      parcelaInicial: ['', Validators.required],
+      parcelaInicial: [[], Validators.required],
       dataVencimento: ['', Validators.required],
       valorNoVencimento: ['', Validators.required],
       status: ['', Validators.required]
@@ -69,6 +71,15 @@ export class ParcelasComponent implements OnInit {
 
   formatDate(value, format = 'DD/MM/YYYY') {
     return formatDate(value, format)
+  }
+
+  verifyNumberInitial(e) {
+    e.preventDefault();
+    if (this.minParcela > e.target.value) {
+      e.target.style.borderColor = '#ef8157'
+    }else {
+      e.target.style.borderColor = '#DDDDDD'
+    }
   }
 
   adicionarParcelas() {
