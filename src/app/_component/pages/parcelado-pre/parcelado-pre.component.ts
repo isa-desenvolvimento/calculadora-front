@@ -790,7 +790,8 @@ export class ParceladoPreComponent implements OnInit {
     const rowAmortizacao = tableData[0];
     const tableAmortizacao = tableData[1];
 
-    const saldo = parseFloat(tableData.saldo_devedor)
+    const saldo = parseFloat(rowAmortizacao.saldo_devedor)
+    
     switch (rowAmortizacao.tipo) {
       case AMORTIZACAO_DATA_ATUAL:
         this.tableData.dataRows.map(row => {
