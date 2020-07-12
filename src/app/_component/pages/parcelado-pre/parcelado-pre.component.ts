@@ -343,47 +343,168 @@ export class ParceladoPreComponent implements OnInit {
       })
     }
 
-    const final = FINAL.length ? FINAL.reduce((final, amortizacao) => final['saldo_devedor'] + amortizacao['saldo_devedor']) : 0;
-    this.amortizacaoGeral = typeof (final) === 'number' ? final : final['saldo_devedor'];
+    if (FINAL.length) {
+      const final = FINAL.reduce((final, amortizacao) => (final['saldo_devedor'] || final) + amortizacao['saldo_devedor']);
+      this.amortizacaoGeral = typeof (final) === 'number' ? final : final['saldo_devedor'];
+    }
 
-    DIFERENCIADA.map(amortizacao => {
-      const valorPago = amortizacao.saldo_devedor;
+    if (DIFERENCIADA.length) {
 
+      let valor = DIFERENCIADA.reduce((valor, amortizacao) => (valor['saldo_devedor'] || valor) + amortizacao['saldo_devedor']);
+      valor = typeof (valor) === 'number' ? valor : valor['saldo_devedor'];
+      let indexNewParcela = 0;
       TABLEDATA.map((row, key) => {
-        switch (true) {
-          case row['totalDevedor'] == valorPago:
-            row['status'] = PARCELA_PAGA;
-            this.pagas.push(row);
-            TABLEDATA.splice(0, 1);
-            break;
-          case row['totalDevedor'] < valorPago:
-            const sobra = valorPago - row['totalDevedor'];
-            row['status'] = PARCELA_PAGA;
-            this.pagas.push(row);
-            TABLEDATA.splice(key, 1);
-            TABLEDATA[key]['amortizacao'] = parseFloat(row['amortizacao']) + sobra;
-            break;
-          default:
-            const qtdDias = getQtdDias(row['dataCalcAmor'], amortizacao['data_vencimento']);
-            const newParcela = {
-              ...row,
-              nparcelas: `${row['nparcelas']}.1`,
-              amortizacao: "0.00",
-              dataCalcAmor: amortizacao['data_vencimento'],
-              dataVencimento: row['dataCalcAmor'],
-              valorNoVencimento: row['totalDevedor'] - valorPago,
-              encargosMonetarios: { ...row['encargosMonetarios'], jurosAm: { ...row['encargosMonetarios']['jurosAm'], dias: qtdDias } },
-              amortizacaoDataDiferenciada: true
-            };
+        row['isAmortizado'] = false;
 
-            //this.tableData.dataRows.splice(key + 1, 0, newParcela);
-            row['amortizacao'] = valorPago;
+        if (row['status'] === PARCELA_ABERTA && !row['amortizacaoDataDiferenciada']) {
+          DIFERENCIADA.map((amortizacao, index) => {
+            if (valor <= 0) {
+              return;
+            }
 
-            break;
+            const subtotal = row['subtotal'];
+            //let valorPago = parseFloat(amortizacao.saldo_devedor);
+            const qtdDias = getQtdDias(formatDate(row['dataCalcAmor']), formatDate(amortizacao['data_vencimento']));
+            let add = false;
+
+            switch (true) {
+              case (row['totalDevedor'] == valor):
+                row['amortizacao'] = subtotal;
+                row['status'] = PARCELA_PAGA;
+                row['isAmortizado'] = true;
+
+                valor = 0;
+                add = false;
+                break;
+              case (row['totalDevedor'] < valor):
+                row['status'] = PARCELA_PAGA;
+                row['totalDevedor'] = subtotal;
+                row['amortizacao'] = subtotal;
+                row['isAmortizado'] = true;
+
+                //valorPago -= subtotal;
+                valor -= subtotal;
+                add = false;
+                indexNewParcela += key;
+
+                break;
+              case (row['totalDevedor'] > valor && valor > 0):
+                row['status'] = PARCELA_ABERTA;
+                row['amortizacao'] = valor;
+                row['totalDevedor'] = 0;
+                row['isAmortizado'] = true;
+
+                valor -= subtotal
+                add = true;
+                break;
+            }
+
+
+            if (add) {
+              const newParcela = {
+                ...row,
+                nparcelas: `${TABLEDATA[indexNewParcela]['nparcelas']}.${index + 1}`,
+                amortizacao: 0,
+                dataCalcAmor: amortizacao['data_vencimento'],
+                dataVencimento: TABLEDATA[indexNewParcela]['dataCalcAmor'],
+                valorNoVencimento: TABLEDATA[indexNewParcela]['totalDevedor'] - valor,
+                encargosMonetarios: { ...TABLEDATA[indexNewParcela]['encargosMonetarios'], jurosAm: { ...TABLEDATA[indexNewParcela]['encargosMonetarios']['jurosAm'], dias: qtdDias } },
+                amortizacaoDataDiferenciada: true,
+                status: PARCELA_ABERTA
+              };
+
+              TABLEDATA.splice(++indexNewParcela, 0, newParcela);
+
+            }
+
+          })
         }
       })
 
-    });
+
+      // DIFERENCIADA.map((amortizacao, index) => {
+      //   let  valorPago = amortizacao.saldo_devedor;
+
+      //   TABLEDATA.map((row, key) => {
+      //     const subtotal = row['subtotal'];
+
+      //     const qtdDias = getQtdDias(row['dataCalcAmor'], amortizacao['data_vencimento']);
+      //     const newParcela = {
+      //       ...row,
+      //       nparcelas: `${row['nparcelas']}.${index}`,
+      //       amortizacao: "0.00",
+      //       dataCalcAmor: amortizacao['data_vencimento'],
+      //       dataVencimento: row['dataCalcAmor'],
+      //       valorNoVencimento: row['totalDevedor'] - valorPago,
+      //       encargosMonetarios: { ...row['encargosMonetarios'], jurosAm: { ...row['encargosMonetarios']['jurosAm'], dias: qtdDias } },
+      //       amortizacaoDataDiferenciada: true
+      //     };
+
+      //     this.tableData.dataRows.splice(key + 1, 0, newParcela);
+
+      //     switch (true) {
+      //       case (row['totalDevedor'] == valorPago):
+      //         row['totalDevedor'] = subtotal;
+      //         row['amortizacao'] = row['totalDevedor'];
+      //         row['status'] = PARCELA_PAGA;
+      //         valorPago = 0;
+      //         break;
+      //       case (row['totalDevedor'] < valorPago):
+      //         row['status'] = PARCELA_PAGA;
+      //         row['totalDevedor'] = subtotal;
+      //         row['amortizacao'] = subtotal;
+      //         valorPago -= subtotal
+
+
+
+
+      //         break;
+      //       case (row['totalDevedor'] > valorPago && valorPago > 0):
+      //         row['status'] = PARCELA_ABERTA;
+      //         row['amortizacao'] = valorPago;
+      //         row['totalDevedor'] -= valorPago;
+      //         valorPago -= subtotal
+      //         break;
+      //     }
+
+
+      //     switch (true) {
+      //       case row['totalDevedor'] == valorPago:
+      //         row['status'] = PARCELA_PAGA;
+      //         this.pagas.push(row);
+      //         TABLEDATA.splice(0, 1);
+      //         break;
+      //       case row['totalDevedor'] < valorPago:
+      //         const sobra = valorPago - row['totalDevedor'];
+      //         row['status'] = PARCELA_PAGA;
+      //         this.pagas.push(row);
+      //         TABLEDATA.splice(key, 1);
+      //         TABLEDATA[key]['amortizacao'] = parseFloat(row['amortizacao']) + sobra;
+      //         break;
+      //       default:
+      //         const qtdDias = getQtdDias(row['dataCalcAmor'], amortizacao['data_vencimento']);
+      //         const newParcela = {
+      //           ...row,
+      //           nparcelas: `${row['nparcelas']}.1`,
+      //           amortizacao: "0.00",
+      //           dataCalcAmor: amortizacao['data_vencimento'],
+      //           dataVencimento: row['dataCalcAmor'],
+      //           valorNoVencimento: row['totalDevedor'] - valorPago,
+      //           encargosMonetarios: { ...row['encargosMonetarios'], jurosAm: { ...row['encargosMonetarios']['jurosAm'], dias: qtdDias } },
+      //           amortizacaoDataDiferenciada: true
+      //         };
+
+      //       //this.tableData.dataRows.splice(key + 1, 0, newParcela);
+      //       row['amortizacao'] = valorPago;
+
+      //       break;
+      //   }
+      // })
+
+      //  });
+    }
+
+
 
     setTimeout(() => {
       this.alertType = {
@@ -682,7 +803,14 @@ export class ParceladoPreComponent implements OnInit {
           const valor = (valorNoVencimento + correcaoPeloIndice) * porcentagem;
           const multa = row['amortizacaoDataDiferenciada'] ? 0 : (valorNoVencimento + correcaoPeloIndice + valor) * (this.formDefaultValues.formMulta / 100);
           const subtotal = valorNoVencimento + correcaoPeloIndice + valor + multa;
-          const totalDevedor = subtotal - amortizacao;
+
+          let tmpTotalDevedor = subtotal - amortizacao;
+          if (row['isAmortizado'] && row['status'] === PARCELA_ABERTA) {
+            row['totalDevedor'] = this.setCampoSemAlteracao();
+            tmpTotalDevedor = 0;
+          }
+
+          const totalDevedor = tmpTotalDevedor;
           const desagio = this.isDesagio ? Math.pow(((this.formDefaultValues.formIndiceDesagio / 100) + 1), (-qtdDias / 30)) : 1;
           const valorPMTVincenda = valorNoVencimento * desagio;
 
@@ -699,9 +827,10 @@ export class ParceladoPreComponent implements OnInit {
             row['totalDevedor'] = valorPMTVincenda.toFixed(2);
             row['vincenda'] = true;
 
-            valorPMTVincendaTotalVincendas += valorPMTVincenda;
-            totalDevedorTotalVincendas += valorPMTVincenda;
-
+            if (!row['isAmortizado'] ) {
+              valorPMTVincendaTotalVincendas += valorPMTVincenda;
+              totalDevedorTotalVincendas += valorPMTVincenda;
+            }
           } else {
             row['encargosMonetarios']['correcaoPeloIndice'] = correcaoPeloIndice.toFixed(2);
             row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
@@ -714,14 +843,16 @@ export class ParceladoPreComponent implements OnInit {
             row['totalDevedor'] = totalDevedor.toFixed(2);
             row['vincenda'] = false;
             row['desagio'] = desagio;
-
-            moneyValueTotal += valor;
-            multaTotal += multa;
-            subtotalTotal += subtotal;
-            amortizacaoTotal += amortizacao;
-            totalDevedorTotal += totalDevedor;
-            correcaoPeloIndiceTotal += correcaoPeloIndice;
-            valorNoVencimentoTotal += valorNoVencimento;
+        
+            if (!row['isAmortizado'] ) {
+              moneyValueTotal += valor;
+              multaTotal += multa;
+              subtotalTotal += subtotal;
+              amortizacaoTotal += amortizacao;
+              totalDevedorTotal += totalDevedor;
+              correcaoPeloIndiceTotal += correcaoPeloIndice;
+              valorNoVencimentoTotal += valorNoVencimento;
+            }
           }
 
           if (this.tableData.dataRows.length - 1 === key) {
@@ -796,8 +927,8 @@ export class ParceladoPreComponent implements OnInit {
       case AMORTIZACAO_DATA_ATUAL:
         this.tableData.dataRows.map(row => {
           row['amortizacao'] = 0;
-          row['totalDevedor'] =  row['subtotal'];
-          row['status'] =  PARCELA_ABERTA;
+          row['totalDevedor'] = row['subtotal'];
+          row['status'] = PARCELA_ABERTA;
         })
 
         setTimeout(() => {
