@@ -19,6 +19,7 @@ import {
   AMORTIZACAO_DATA_DIFERENCIADA,
   AMORTIZACAO_DATA_FINAL,
   PARCELA_PAGA,
+  PARCELA_ABERTA,
   PARCELADO_PRE_URL,
   PARCELADO_PRE,
   PARCELADO_POS
@@ -304,38 +305,43 @@ export class ParceladoPreComponent implements OnInit {
     const FINAL = amortizacaoTable.filter(amortizacao => amortizacao.tipo === AMORTIZACAO_DATA_FINAL);
     const TABLEDATA = this.tableData.dataRows;
 
-    let valor = DATA_CALCULO.length ? DATA_CALCULO.reduce((valor, amortizacao) => valor['saldo_devedor'] + amortizacao['saldo_devedor']) : 0;
-    valor = typeof (valor) === 'number' ? valor : valor['saldo_devedor'];
 
-    let index = 0;
-    DATA_CALCULO.map(amortizacao => {
-      const primeiraParcela = TABLEDATA[index];
-      const valorPago = amortizacao.saldo_devedor;
+    if (DATA_CALCULO.length) {
+      let valor = DATA_CALCULO.reduce((valor, amortizacao) => (valor['saldo_devedor'] || valor) + amortizacao['saldo_devedor']);
+      valor = typeof (valor) === 'number' ? valor : valor['saldo_devedor'];
 
-      const totalDevedor = parseFloat(primeiraParcela['totalDevedor']);
+      TABLEDATA.map(row => {
+        const totalDevedor = parseFloat(row['totalDevedor']);
+        const amortizacao = parseFloat(row['amortizacao']);
+        const subtotal = parseFloat(row['subtotal']);
 
-      switch (true) {
-        case (totalDevedor == valor):
-          primeiraParcela['amortizacao'] = valor;
-          primeiraParcela['status'] = PARCELA_PAGA;
-          this.pagas.push(primeiraParcela);
-          //TABLEDATA.splice(0, 1);
-          valor -= totalDevedor;
-          break;
-        case (totalDevedor < valor):
-          primeiraParcela['status'] = PARCELA_PAGA;
-          primeiraParcela['amortizacao'] = totalDevedor;
-          valor -= totalDevedor
+        if (amortizacao === subtotal) {
+          valor -= amortizacao;
+          return;
+        }
 
-          this.pagas.push(primeiraParcela);
-          index++;
-          break;
-      }
-
-      if (TABLEDATA.length - 1 >= index) {
-        TABLEDATA[index]['amortizacao'] = valor;
-      }
-    });
+        switch (true) {
+          case (totalDevedor == valor):
+            row['totalDevedor'] = subtotal;
+            row['amortizacao'] = totalDevedor;
+            row['status'] = PARCELA_PAGA;
+            valor = 0;
+            break;
+          case (totalDevedor < valor):
+            row['status'] = PARCELA_PAGA;
+            row['totalDevedor'] = subtotal;
+            row['amortizacao'] = subtotal;
+            valor -= subtotal
+            break;
+          case (totalDevedor > valor && valor > 0):
+            row['status'] = PARCELA_ABERTA;
+            row['amortizacao'] = valor;
+            row['totalDevedor'] -= valor;
+            valor -= subtotal
+            break;
+        }
+      })
+    }
 
     const final = FINAL.length ? FINAL.reduce((final, amortizacao) => final['saldo_devedor'] + amortizacao['saldo_devedor']) : 0;
     this.amortizacaoGeral = typeof (final) === 'number' ? final : final['saldo_devedor'];
@@ -780,13 +786,23 @@ export class ParceladoPreComponent implements OnInit {
     }
   }
 
-  deleteRowAmortizacao(row) {
-    const saldo = parseFloat(row.saldo_devedor)
-    switch (row.tipo) {
+  deleteRowAmortizacao(tableData) {
+    const rowAmortizacao = tableData[0];
+    const tableAmortizacao = tableData[1];
+
+    const saldo = parseFloat(tableData.saldo_devedor)
+    switch (rowAmortizacao.tipo) {
       case AMORTIZACAO_DATA_ATUAL:
-        const tableData = this.tableData.dataRows[0];
-        tableData['amortizacao'] = parseFloat(tableData['amortizacao']) - saldo;
-        tableData['totalDevedor'] = parseFloat(tableData['totalDevedor']) + saldo;
+        this.tableData.dataRows.map(row => {
+          row['amortizacao'] = 0;
+          row['totalDevedor'] =  row['subtotal'];
+          row['status'] =  PARCELA_ABERTA;
+        })
+
+        setTimeout(() => {
+          this.adicionarAmortizacao(tableAmortizacao);
+        }, 0);
+
         break;
       case AMORTIZACAO_DATA_DIFERENCIADA:
 

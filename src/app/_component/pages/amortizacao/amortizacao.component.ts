@@ -75,7 +75,6 @@ export class AmortizacaoComponent implements OnInit {
     return formatDate(value, format)
   }
 
-
   adicionarAmortizacao() {
     const preFATipo = this.pre_form_amortizacao.tipo.value;
 
@@ -87,7 +86,7 @@ export class AmortizacaoComponent implements OnInit {
       default:
         break;
     }
-    
+
     this.tableDataAmortizacao.dataRows.push(this.preFormAmortizacao.value);
 
     this.incluirAmortizacao.emit(this.tableDataAmortizacao.dataRows)
@@ -184,7 +183,7 @@ export class AmortizacaoComponent implements OnInit {
     this.tableDataAmortizacao.dataRows.splice(index, 1);
 
     setTimeout(() => {
-      this.deleteAmortizacao.emit(row)
+      this.deleteAmortizacao.emit({0: row, 1:this.tableDataAmortizacao.dataRows})
     }, 0);
 
     // if (amortizacao.hasOwnProperty('pagoIndex')) {
