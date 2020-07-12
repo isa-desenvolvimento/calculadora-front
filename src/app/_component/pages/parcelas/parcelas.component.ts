@@ -19,6 +19,7 @@ declare interface TableData {
 export class ParcelasComponent implements OnInit {
 
   @Input() pesquisaFormValid: boolean;
+  @Input() newParcelasTableClear: boolean;
   @Output() incluirParcelas = new EventEmitter();
 
   status_field = LISTA_STATUS;
@@ -56,7 +57,6 @@ export class ParcelasComponent implements OnInit {
       searching: false,
       language: LANGUAGEM_TABLE
     }
-
   }
 
   verifyNumber(value) {
@@ -93,9 +93,6 @@ export class ParcelasComponent implements OnInit {
 
   incluir() {
     this.incluirParcelas.emit(this.tableDataParcelas.dataRows);
-    setTimeout(() => {
-      this.tableDataParcelas.dataRows = [];
-    }, 100);
   }
 
 

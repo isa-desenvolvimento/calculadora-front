@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 
 import { Parcela, InfoParaCalculo } from '../../../_models/ParceladoPre';
 import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
@@ -6,6 +6,7 @@ import { ParceladoPreService } from '../../../_services/parcelado-pre.service';
 import { IndicesService } from '../../../_services/indices.service';
 import { LogService } from '../../../_services/log.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import {ParcelasComponent } from '../parcelas/parcelas.component'
 
 import 'datatables.net';
 import 'datatables.net-buttons';
@@ -38,7 +39,7 @@ export class ParceladoPreComponent implements OnInit {
   payloadLancamento: Parcela;
 
   url = window.location.pathname.split("/");
-  indexURL =  this.url.indexOf(PARCELADO_PRE_URL)
+  indexURL = this.url.indexOf(PARCELADO_PRE_URL)
   isDesagio = this.indexURL !== -1;
   modulo = this.url[this.indexURL];
 
@@ -58,6 +59,9 @@ export class ParceladoPreComponent implements OnInit {
   status_field = LISTA_STATUS;
   form_riscos: any = {};
   quitado = false;
+
+  @ViewChild(ParcelasComponent, {static: false})
+  parcelas: ParcelasComponent;
 
   //tables
   tableData: TableData;
@@ -395,6 +399,8 @@ export class ParceladoPreComponent implements OnInit {
 
   falhaIndice() {
     this.updateLoadingBtn = false;
+    this.tableLoading = false;
+
     this.alertType = {
       mensagem: 'Não existe índice para essa data',
       tipo: 'warning'
@@ -416,9 +422,9 @@ export class ParceladoPreComponent implements OnInit {
 
     this.setFormDefault()
     this.tableLoading = true;
+    let temIndice = [];
 
     tableDataParcelas.map(async (parcela, key) => {
-
       const indice = this.form_riscos.formIndice;
       const dataVencimento = parcela['dataVencimento'];
       const inputExternoDataCalculo = this.form_riscos.formDataCalculo
@@ -431,66 +437,89 @@ export class ParceladoPreComponent implements OnInit {
         this.tableDataAmortizacao[key] : { preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo };
 
       const getIndiceDataVencimento = new Promise((res, rej) => {
-        this.indicesService.getIndiceDataBase(indice, dataVencimento, this.formDefaultValues).then((data) => res(data)),
-          this.falhaIndice()
+        this.indicesService.getIndiceDataBase(indice, dataVencimento, this.formDefaultValues).then((data) => {
+          res(data)
+          rej(new Error('Não existe índice para essa data'))
+        })
       })
 
       const getIndiceDataCalcAmor = new Promise((res, rej) => {
-        this.indicesService.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento'], this.formDefaultValues).then((data) => res(data))
-        this.falhaIndice()
-      })
-
-      Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor]).then(resultado => {
-        const indiceValor = typeof (resultado[0]) === 'number' ? resultado[0] : 1;
-        const indiceDataCalcAmor = typeof (resultado[1]) === 'number' ? resultado[1] : 1;
-
-        this.tableData.dataRows.push({
-          nparcelas: parcela['nparcelas'],
-          parcelaInicial: parcela['parcelaInicial'],
-          dataVencimento: dataVencimento,
-          indiceDV: indice,
-          indiceDataVencimento: indiceValor,
-          indiceDCA: indice,
-          indiceDataCalcAmor: indiceDataCalcAmor,
-          dataCalcAmor: amortizacao['preFA_data_vencimento'],
-          valorNoVencimento: parcela['valorNoVencimento'],
-          encargosMonetarios: {
-            correcaoPeloIndice: null,
-            jurosAm: {
-              dias: null,
-              percentsJuros: null,
-              moneyValue: null,
-            },
-            multa: null,
-          },
-          subtotal: 0,
-          valorPMTVincenda: 0,
-          amortizacao: amortizacao['preFA_saldo_devedor'],
-          totalDevedor: 0,
-          status: parcela['status'],
-          contractRef: this.contractRef,
-          ultimaAtualizacao: 0,
-          totalParcelasVencidas: 0,
-          totalParcelasVincendas: 0,
-          vincenda: isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']),
-          tipoParcela: this.modulo
+        this.indicesService.getIndiceDataBase(indice, amortizacao['preFA_data_vencimento'], this.formDefaultValues).then((data) => {
+          res(data)
+          rej(new Error('Não existe índice para essa data'))
         })
-
-        this.updateLoadingBtn = false;
-
-        if (tableDataParcelas.length - 1 === key) {
-          setTimeout(() => {
-            this.tableLoading = false;
-            this.alertType = {
-              mensagem: 'Lançamento incluido',
-              tipo: 'success'
-            };
-            this.toggleUpdateLoading()
-            this.simularCalc(true, null, true)
-          }, 0)
-        }
       })
+
+      temIndice[key] = false;
+
+      Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor])
+        .then(resultado => {
+          temIndice[key] = true;
+
+          const indiceValor = typeof (resultado[0]) === 'number' ? resultado[0] : 1;
+          const indiceDataCalcAmor = typeof (resultado[1]) === 'number' ? resultado[1] : 1;
+
+          this.tableData.dataRows.push({
+            nparcelas: parcela['nparcelas'],
+            parcelaInicial: parcela['parcelaInicial'],
+            dataVencimento: dataVencimento,
+            indiceDV: indice,
+            indiceDataVencimento: indiceValor,
+            indiceDCA: indice,
+            indiceDataCalcAmor: indiceDataCalcAmor,
+            dataCalcAmor: amortizacao['preFA_data_vencimento'],
+            valorNoVencimento: parcela['valorNoVencimento'],
+            encargosMonetarios: {
+              correcaoPeloIndice: null,
+              jurosAm: {
+                dias: null,
+                percentsJuros: null,
+                moneyValue: null,
+              },
+              multa: null,
+            },
+            subtotal: 0,
+            valorPMTVincenda: 0,
+            amortizacao: amortizacao['preFA_saldo_devedor'],
+            totalDevedor: 0,
+            status: parcela['status'],
+            contractRef: this.contractRef,
+            ultimaAtualizacao: 0,
+            totalParcelasVencidas: 0,
+            totalParcelasVincendas: 0,
+            vincenda: isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']),
+            tipoParcela: this.modulo
+          })
+
+          this.updateLoadingBtn = false;
+
+          if (tableDataParcelas.length - 1 === key) {
+            setTimeout(() => {
+              this.parcelas.tableDataParcelas.dataRows = [];
+              this.tableData.dataRows.sort(function (a, b) {
+                return a['nparcelas'] < b['nparcelas'] ? -1 : a['nparcelas'] > b['nparcelas'] ? 1 : 0;
+              });
+
+              this.tableLoading = false;
+              this.alertType = {
+                mensagem: 'Lançamento incluido',
+                tipo: 'success'
+              };
+              this.toggleUpdateLoading()
+              this.simularCalc(true, null, true)
+            }, 0)
+          }
+        })
+        .catch(erro => {
+          console.log(erro);
+          this.falhaIndice()
+        })
     })
+    if (!temIndice.every(tem=> !!tem)) {
+      this.falhaIndice()
+    }
+
+    this.tableLoading = false;
   }
 
   setCampoSemAlteracao(semFormat = false) {
@@ -506,6 +535,11 @@ export class ParceladoPreComponent implements OnInit {
     this.infoContrato = infoContrato;
 
     this.parceladoPreService.getAll().subscribe(parceladoPreList => {
+
+      parceladoPreList.sort(function (a, b) {
+        return a.nparcelas < b.nparcelas ? -1 : a.nparcelas > b.nparcelas ? 1 : 0;
+      });
+
       this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === infoContrato.contractRef && row["tipoParcela"] === this.modulo).map((parcela, key) => {
         parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
         parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
