@@ -420,91 +420,7 @@ export class ParceladoPreComponent implements OnInit {
           })
         }
       })
-
-
-      // DIFERENCIADA.map((amortizacao, index) => {
-      //   let  valorPago = amortizacao.saldo_devedor;
-
-      //   TABLEDATA.map((row, key) => {
-      //     const subtotal = row['subtotal'];
-
-      //     const qtdDias = getQtdDias(row['dataCalcAmor'], amortizacao['data_vencimento']);
-      //     const newParcela = {
-      //       ...row,
-      //       nparcelas: `${row['nparcelas']}.${index}`,
-      //       amortizacao: "0.00",
-      //       dataCalcAmor: amortizacao['data_vencimento'],
-      //       dataVencimento: row['dataCalcAmor'],
-      //       valorNoVencimento: row['totalDevedor'] - valorPago,
-      //       encargosMonetarios: { ...row['encargosMonetarios'], jurosAm: { ...row['encargosMonetarios']['jurosAm'], dias: qtdDias } },
-      //       amortizacaoDataDiferenciada: true
-      //     };
-
-      //     this.tableData.dataRows.splice(key + 1, 0, newParcela);
-
-      //     switch (true) {
-      //       case (row['totalDevedor'] == valorPago):
-      //         row['totalDevedor'] = subtotal;
-      //         row['amortizacao'] = row['totalDevedor'];
-      //         row['status'] = PARCELA_PAGA;
-      //         valorPago = 0;
-      //         break;
-      //       case (row['totalDevedor'] < valorPago):
-      //         row['status'] = PARCELA_PAGA;
-      //         row['totalDevedor'] = subtotal;
-      //         row['amortizacao'] = subtotal;
-      //         valorPago -= subtotal
-
-
-
-
-      //         break;
-      //       case (row['totalDevedor'] > valorPago && valorPago > 0):
-      //         row['status'] = PARCELA_ABERTA;
-      //         row['amortizacao'] = valorPago;
-      //         row['totalDevedor'] -= valorPago;
-      //         valorPago -= subtotal
-      //         break;
-      //     }
-
-
-      //     switch (true) {
-      //       case row['totalDevedor'] == valorPago:
-      //         row['status'] = PARCELA_PAGA;
-      //         this.pagas.push(row);
-      //         TABLEDATA.splice(0, 1);
-      //         break;
-      //       case row['totalDevedor'] < valorPago:
-      //         const sobra = valorPago - row['totalDevedor'];
-      //         row['status'] = PARCELA_PAGA;
-      //         this.pagas.push(row);
-      //         TABLEDATA.splice(key, 1);
-      //         TABLEDATA[key]['amortizacao'] = parseFloat(row['amortizacao']) + sobra;
-      //         break;
-      //       default:
-      //         const qtdDias = getQtdDias(row['dataCalcAmor'], amortizacao['data_vencimento']);
-      //         const newParcela = {
-      //           ...row,
-      //           nparcelas: `${row['nparcelas']}.1`,
-      //           amortizacao: "0.00",
-      //           dataCalcAmor: amortizacao['data_vencimento'],
-      //           dataVencimento: row['dataCalcAmor'],
-      //           valorNoVencimento: row['totalDevedor'] - valorPago,
-      //           encargosMonetarios: { ...row['encargosMonetarios'], jurosAm: { ...row['encargosMonetarios']['jurosAm'], dias: qtdDias } },
-      //           amortizacaoDataDiferenciada: true
-      //         };
-
-      //       //this.tableData.dataRows.splice(key + 1, 0, newParcela);
-      //       row['amortizacao'] = valorPago;
-
-      //       break;
-      //   }
-      // })
-
-      //  });
     }
-
-
 
     setTimeout(() => {
       this.alertType = {
@@ -937,6 +853,17 @@ export class ParceladoPreComponent implements OnInit {
 
         break;
       case AMORTIZACAO_DATA_DIFERENCIADA:
+        this.tableData.dataRows = this.tableData.dataRows.filter(row=> !row['amortizacaoDataDiferenciada']).map(row => {
+          row['amortizacao'] = 0;
+          row['totalDevedor'] = row['subtotal'];
+          row['isAmortizado'] = false;
+          row['status'] = PARCELA_ABERTA;
+          return row;
+        })
+
+        setTimeout(() => {
+          this.adicionarAmortizacao(tableAmortizacao);
+        }, 0);
 
         break;
       case AMORTIZACAO_DATA_FINAL:
