@@ -15,7 +15,7 @@ declare interface TableData {
 export class AmortizacaoComponent implements OnInit {
   @Input() pesquisaFormValid: boolean;
   @Input() dataCalculo: string;
-
+  @Input() tableDataAmortizacao: TableData;
 
   @Output() incluirAmortizacao = new EventEmitter();
   @Output() deleteAmortizacao = new EventEmitter();
@@ -27,7 +27,6 @@ export class AmortizacaoComponent implements OnInit {
     tipo: ''
   };
 
-  tableDataAmortizacao: TableData;
   preFormAmortizacao: FormGroup;
   dtOptionsAmortizacao: DataTables.Settings = {};
   amortizacao_field = LISTA_AMORTIZACAO;
@@ -37,6 +36,7 @@ export class AmortizacaoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    
     this.tableDataAmortizacao = {
       dataRows: []
     }

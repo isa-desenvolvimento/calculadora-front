@@ -66,7 +66,7 @@ export class ParceladoPreComponent implements OnInit {
 
   //tables
   tableData: TableData;
-  tableDataAmortizacao = [];
+  tableDataAmortizacao: TableData;
 
   // total
   totalParcelasVencidas: any;
@@ -107,6 +107,10 @@ export class ParceladoPreComponent implements OnInit {
 
   ngOnInit() {
     this.tableData = {
+      dataRows: []
+    }
+
+    this.tableDataAmortizacao = {
       dataRows: []
     }
 
@@ -256,6 +260,7 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['contractRef'] = this.contractRef;
       parcelaLocal['tipoParcela'] = this.modulo;
       parcelaLocal['ultimaAtualizacao'] = getCurrentDate('YYYY-MM-DD');
+      parcelaLocal['infoParaAmortizacao'] = this.tableDataAmortizacao;
 
       return parcelaLocal;
     });
@@ -300,11 +305,12 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   adicionarAmortizacao(amortizacaoTable) {
+    this.tableDataAmortizacao.dataRows = amortizacaoTable;
+
     const DIFERENCIADA = amortizacaoTable.filter(amortizacao => amortizacao.tipo === AMORTIZACAO_DATA_DIFERENCIADA);
     const DATA_CALCULO = amortizacaoTable.filter(amortizacao => amortizacao.tipo === AMORTIZACAO_DATA_ATUAL);
     const FINAL = amortizacaoTable.filter(amortizacao => amortizacao.tipo === AMORTIZACAO_DATA_FINAL);
     const TABLEDATA = this.tableData.dataRows;
-
 
     if (DATA_CALCULO.length) {
       let valor = DATA_CALCULO.reduce((valor, amortizacao) => (valor['saldo_devedor'] || valor) + amortizacao['saldo_devedor']);
@@ -476,8 +482,9 @@ export class ParceladoPreComponent implements OnInit {
       this.total_data_calculo = formatDate(this.form_riscos.formDataCalculo) || getCurrentDate();
       this.subtotal_data_calculo = this.total_date_now;
 
-      const amortizacao = this.tableDataAmortizacao.length && this.tableDataAmortizacao[key] ?
-        this.tableDataAmortizacao[key] : { preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo };
+      const tableDataAmortizacao = this.tableDataAmortizacao.dataRows;
+      const amortizacao = tableDataAmortizacao.length && tableDataAmortizacao[key] ?
+        tableDataAmortizacao[key] : { preFA_saldo_devedor: 0, preFA_data_vencimento: inputExternoDataCalculo };
 
       const getIndiceDataVencimento = new Promise((res, rej) => {
         this.indicesService.getIndiceDataBase(indice, dataVencimento, this.formDefaultValues).then((data) => {
@@ -586,6 +593,7 @@ export class ParceladoPreComponent implements OnInit {
       this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === infoContrato.contractRef && row["tipoParcela"] === this.modulo).map((parcela, key) => {
         parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
         parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
+        this.tableDataAmortizacao.dataRows = parcela.infoParaAmortizacao ? JSON.parse(parcela.infoParaAmortizacao) : []
 
         Object.keys(parcela.infoParaCalculo).filter(value => {
           this.formDefaultValues[value] = parcela.infoParaCalculo[value];
@@ -836,7 +844,6 @@ export class ParceladoPreComponent implements OnInit {
   deleteRowAmortizacao(tableData) {
     const rowAmortizacao = tableData[0];
     const tableAmortizacao = tableData[1];
-
     const saldo = parseFloat(rowAmortizacao.saldo_devedor)
 
     switch (rowAmortizacao.tipo) {
@@ -868,10 +875,8 @@ export class ParceladoPreComponent implements OnInit {
         break;
       case AMORTIZACAO_DATA_FINAL:
         this.amortizacaoGeral -= saldo;
-
         this.simularCalc()
         break;
-
       default:
         break;
     }
