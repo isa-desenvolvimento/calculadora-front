@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import 'datatables.net';
 import 'datatables.net-buttons';
+import * as moment from 'moment'; // add this 1 of 4
 
 import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
 import { LANGUAGEM_TABLE, LISTA_STATUS } from '../../util/constants'
@@ -73,10 +74,13 @@ export class ParcelasComponent implements OnInit {
   adicionarParcelas() {
     const nParcelas = this.pre_form_cadastro_parcelas.nparcelas.value;
     const parcelaInicial = this.pre_form_cadastro_parcelas.parcelaInicial.value;
+    let dataVencimento = this.pre_form_cadastro_parcelas.dataVencimento.value;
     this.tableDataParcelas.dataRows = [];
 
+    let mes = 1;
     for (let index = parcelaInicial; index < (nParcelas + parcelaInicial); index++) {
-      this.tableDataParcelas.dataRows.push({ ...this.preFormCadastroParcelas.value, nparcelas: index });
+      this.tableDataParcelas.dataRows.push({ ...this.preFormCadastroParcelas.value, nparcelas: index, dataVencimento: dataVencimento });
+      dataVencimento = moment(dataVencimento).add(mes, 'months').format('YYYY-MM-DD');
     }
 
     this.preFormCadastroParcelas.reset();
