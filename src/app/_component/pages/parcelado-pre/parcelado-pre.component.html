@@ -77,16 +77,16 @@
 							</thead>
 							<tbody>
 								<tr *ngFor="let row of tableData.dataRows | callback: filterPago" class="parcelado-font-size" align="center">
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.nparcelas}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<input type="date" [ngClass]="{'parcelas-vincendas': row.vincenda} "
+									<td [vincendas]="row"> {{row.nparcelas}} </td>
+									<td [vincendas]="row">
+										<input type="date" [vincendas]="row"
 											class=" parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataVencimento" id="pre_dataCalcAmor" [value]="row.dataVencimento"
 											(blur)="changeDate($event, row, 'dataVencimento', 'indiceDV', 'indiceDataVencimento')">
 										<span class="log-visible-false">{{formatDate(row.dataVencimento)}}</span>
 									</td>
-									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<select [ngClass]="{'parcelas-vincendas': row.vincenda}"
+									<td width="80" [vincendas]="row">
+										<select [vincendas]="row"
 											class="parcelado-font-size form-control custom-select log-hidden-false"
 											name="pre_indiceDV" id="pre_indiceDV"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataVencimento', 'indiceDV', 'dataVencimento')">
@@ -96,11 +96,11 @@
 										<span class="log-visible-false">{{row.indiceDV}}</span>
 
 									</td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{row.indiceDataVencimento || "---"}}
 									</td>
-									<td width="120" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<input [ngClass]="{'parcelas-vincendas': row.vincenda}" type="date"
+									<td width="120" [vincendas]="row">
+										<input [vincendas]="row" type="date"
 											class="parcelado-font-size form-control col-md-11 col-sm-12 log-hidden-false"
 											name="pre_dataCalcAmor" id="pre_dataCalcAmor" max="3000-12-31"
 											[value]="row.dataCalcAmor"
@@ -108,8 +108,8 @@
 										<span class="log-visible-false">{{formatDate(row.dataCalcAmor)}}</span>
 
 									</td>
-									<td width="80" [ngClass]="{'parcelas-vincendas': row.vincenda}">
-										<select [ngClass]="{'parcelas-vincendas': row.vincenda}"
+									<td width="80" [vincendas]="row">
+										<select [vincendas]="row"
 											class="parcelado-font-size form-control custom-select log-hidden-false"
 											name="pre_indice" id="pre_indice"
 											(change)="updateInlineIndice($event.target.value, row, 'indiceDataCalcAmor', 'indiceDCA', 'dataCalcAmor')">
@@ -119,31 +119,31 @@
 										<span class="log-visible-false">{{row.indiceDCA}}</span>
 
 									</td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{row.indiceDataCalcAmor || "---"}}
 									</td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrency(row.valorNoVencimento)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrency(row.encargosMonetarios.correcaoPeloIndice)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{row.encargosMonetarios.jurosAm.dias || 0}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{row.encargosMonetarios.jurosAm.percentsJuros || 0}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrency(row.encargosMonetarios.jurosAm.moneyValue)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrency(row.encargosMonetarios.multa)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrency(row.subtotal)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrency(row.valorPMTVincenda)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrencyAmortizacao(row.amortizacao)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}">
+									<td [vincendas]="row">
 										{{formatCurrency(row.totalDevedor)}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}"> {{row.status}} </td>
-									<td [ngClass]="{'parcelas-vincendas': row.vincenda}" class="log-hidden-false"
+									<td [vincendas]="row"> {{row.status}} </td>
+									<td [vincendas]="row" class="log-hidden-false"
 										(click)="deleteRow(row)"><i style="color: red; cursor: pointer;"
 											class="nc-icon nc-simple-remove"></i>
 									</td>
@@ -151,46 +151,46 @@
 							</tbody>
 							<tfoot>
 								<tr class="parcelado-font-size">
-									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS
+									<th [footer]="'left'" colspan="7">TOTAL DE PARCELAS
 										VENCIDAS
 									</th>
-									<th class="footer-table" width="100" colspan="1">
+									<th footer width="100" colspan="1">
 										{{formatCurrency(totalParcelasVencidas.valorNoVencimento)}}</th>
-									<th class="footer-table" width="100" colspan="1">
+									<th footer width="100" colspan="1">
 										{{formatCurrency(totalParcelasVencidas.correcaoPeloIndice)}}</th>
-									<th class="footer-table"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.moneyValue)}}
+									<th footer></th>
+									<th footer></th>
+									<th footer>{{formatCurrency(totalParcelasVencidas.moneyValue)}}
 									</th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.multa)}}</th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
-									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.amortizacao)}}
+									<th footer>{{formatCurrency(totalParcelasVencidas.multa)}}</th>
+									<th footer>{{formatCurrency(totalParcelasVencidas.subtotal)}}</th>
+									<th footer></th>
+									<th footer>{{formatCurrency(totalParcelasVencidas.amortizacao)}}
 									</th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVencidas.totalDevedor)}}
+									<th footer>{{formatCurrency(totalParcelasVencidas.totalDevedor)}}
 									</th>
-									<th class="footer-table"></th>
-									<th class="footer-table log-hidden-false"></th>
+									<th footer></th>
+									<th footer class="log-hidden-false"></th>
 								</tr>
 								<tr align="left" class="parcelado-font-size">
-									<th class="footer-table footer-title-table" colspan="7">TOTAL DE PARCELAS
+									<th [footer]="'left'" colspan="7">TOTAL DE PARCELAS
 										VINCENDAS
 									</th>
-									<th class="footer-table" width="100" colspan="1"></th>
-									<th class="footer-table" width="100" colspan="1"></th>
-									<th class="footer-table" colspan="1"></th>
-									<th class="footer-table" colspan="1"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table"></th>
-									<th class="footer-table">
+									<th footer width="100" colspan="1"></th>
+									<th footer width="100" colspan="1"></th>
+									<th footer colspan="1"></th>
+									<th footer colspan="1"></th>
+									<th footer></th>
+									<th footer></th>
+									<th footer></th>
+									<th footer>
 										{{formatCurrency(totalParcelasVincendas.valorPMTVincenda)}}
 									</th>
-									<th class="footer-table"></th>
-									<th class="footer-table">{{formatCurrency(totalParcelasVincendas.totalDevedor)}}
+									<th footer></th>
+									<th footer>{{formatCurrency(totalParcelasVincendas.totalDevedor)}}
 									</th>
-									<th class="footer-table"></th>
-									<th class="footer-table log-hidden-false"></th>
+									<th footer></th>
+									<th footer class="log-hidden-false"></th>
 								</tr>
 							</tfoot>
 						</table>

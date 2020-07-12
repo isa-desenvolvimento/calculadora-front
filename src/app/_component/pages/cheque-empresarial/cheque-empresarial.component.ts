@@ -5,7 +5,7 @@ import { ChequeEmpresarialService } from '../../../_services/cheque-empresarial.
 
 import { IndicesService } from '../../../_services/indices.service';
 
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { LogService } from '../../../_services/log.service';
 
 import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
@@ -89,9 +89,10 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.ceFormAmortizacao = this.formBuilder.group({
       ceFA_data_vencimento: [],
       ceFa_saldo_devedor: [],
+      ceFA_tipo: new FormControl({value:'lancamento', disabled: false}, Validators.required),
       ceFA_data_base_atual: ['', Validators.required],
-      ceFA_valor_lancamento: ['', Validators.required],
-      ceFA_tipo_lancamento: ['', Validators.required],
+      ceFA_valor_lancamento: [],
+      ceFA_tipo_lancamento: []
     });
 
     this.dtOptions = {
@@ -224,6 +225,7 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.controleLancamentos = 0;
 
     const payload = this.tableData.dataRows.map(lancamento => {
+      if (!lancamento['isTipoLancamento']) return;
 
       this.updateLoadingBtn = true;
       let lancamentoLocal = { ...lancamento };
@@ -263,9 +265,18 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   get ce_form_amortizacao() { return this.ceFormAmortizacao.controls; }
 
+  lancamentoInfo() {
+     const lanca = this.tableData.dataRows.filter(row=> !row['isTipoLancamento']);
+    return !!lanca.length;
+  }
+
   incluirLancamentos() {
 
-    if (!this.form_riscos.formIndice) {
+    const lastLine = getLastLine(this.tableData.dataRows);
+
+    const isTipoLancamento = this.ce_form_amortizacao.ceFA_tipo.value === 'lancamento';
+
+    if (!this.form_riscos.formIndice && (!lastLine && !isTipoLancamento)) {
       this.updateLoadingBtn = true;
       this.alertType = {
         mensagem: 'É necessário informar o índice.',
@@ -275,13 +286,17 @@ export class ChequeEmpresarialComponent implements OnInit {
       return;
     }
 
+    const veirifcarLancamento = this.lancamentoInfo();
+    if (veirifcarLancamento) {
+      this.tableData.dataRows.pop();
+    }
+
     this.setFormDefault()
 
     this.updateLoadingBtn = false;
     this.tableLoading = true;
 
     const lancamento = this.ce_form_amortizacao;
-    const lastLine = getLastLine(this.tableData.dataRows);
 
     const localDataBase = this.tableData.dataRows.length === 0 ? lancamento.ceFA_data_vencimento.value : lastLine["dataBaseAtual"];
     const localValorDevedor = this.tableData.dataRows.length === 0 ? lancamento.ceFa_saldo_devedor.value : lastLine["valorDevedorAtualizado"];
@@ -290,13 +305,12 @@ export class ChequeEmpresarialComponent implements OnInit {
     this.total_data_calculo = formatDate(this.form_riscos.formDataCalculo) || getCurrentDate();
     this.subtotal_data_calculo = this.total_date_now;
 
-    const localLancamentos = lancamento.ceFA_valor_lancamento.value;
-    const localTipoLancamento = lancamento.ceFA_tipo_lancamento.value;
+    const localLancamentos = isTipoLancamento ? lancamento.ceFA_valor_lancamento.value : "NaN";
+    const localTipoLancamento = isTipoLancamento ? lancamento.ceFA_tipo_lancamento.value : 'debit';
     const localDataBaseAtual = lancamento.ceFA_data_base_atual.value;
 
-    const localTypeIndice = this.form_riscos.formIndice;
+    const localTypeIndice = isTipoLancamento ? this.form_riscos.formIndice : lastLine.indiceBA ;
     const localInfoParaCalculo: InfoParaCalculo = this.form_riscos;
-
 
     const getIndiceDataBase = new Promise((res, rej) => {
       this.indicesService.getIndiceDataBase(localTypeIndice, localDataBase, this.formDefaultValues).then((data) => res(data))
@@ -332,13 +346,19 @@ export class ChequeEmpresarialComponent implements OnInit {
         valorDevedorAtualizado: null,
         contractRef: this.contractRef,
         ultimaAtualizacao: '',
-        infoParaCalculo: { ...localInfoParaCalculo }
+        infoParaCalculo: { ...localInfoParaCalculo },
+        isTipoLancamento: isTipoLancamento,
+        modulo: CHEQUE_EMPRESARIAL
       });
       this.tableData.dataRows.push(this.payloadLancamento)
       this.tableLoading = false;
 
+      if (!this.lancamentoInfo() && isTipoLancamento) {
+        this.tableData.dataRows.push(lastLine);
+      }
+
       setTimeout(() => {
-        this.ceFormAmortizacao.reset();
+        this.ceFormAmortizacao.reset({ceFA_tipo: 'lancamento'});
 
         this.simularCalc(true, null, true)
         this.alertType = {
@@ -362,6 +382,9 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableData.dataRows = chequeEmpresarialList.filter((row) => row["contractRef"] === infoContrato.contractRef).map(cheque => {
         cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios)
         cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo)
+        cheque.isTipoLancamento = true;
+        cheque.modulo = CHEQUE_EMPRESARIAL;
+
         const ultimaAtualizacao = [...chequeEmpresarialList].pop();
         this.ultima_atualizacao = formatDate(ultimaAtualizacao.ultimaAtualizacao, 'YYYY-MM-DD');
 
@@ -418,7 +441,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   setFormRiscos(form) {
     Object.keys(form).filter((value, key) => {
-      if (form[value] && form[value] !== 'undefined') {
+      if (form[value] !== null && form[value] !== 'undefined') {
         this.form_riscos[value] = form[value];
       }
     });
@@ -426,7 +449,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
   setFormDefault() {
     Object.keys(this.form_riscos).filter((value, key) => {
-      if (this.form_riscos[value] && this.form_riscos[value] !== 'undefined') {
+      if (this.form_riscos[value] !== null && this.form_riscos[value] !== 'undefined') {
         this.formDefaultValues[value] = this.form_riscos[value];
       }
     });
@@ -485,7 +508,8 @@ export class ChequeEmpresarialComponent implements OnInit {
           }
 
           const correcaoPeloIndice = row['encargosMonetarios']['correcaoPeloIndice'] = parseFloat(correcao);
-          const lancamento = row['tipoLancamento'] === 'credit' ? (row['lancamentos'] * (-1)) : row['lancamentos'];
+          const valorLancado = row['isTipoLancamento'] ? row['lancamentos'] : 0;
+          const lancamento = row['tipoLancamento'] === 'credit' ? (valorLancado * (-1)) : valorLancado;
 
           // -- dias
           row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
@@ -505,31 +529,35 @@ export class ChequeEmpresarialComponent implements OnInit {
 
           const valorDevedorAtualizado = row['valorDevedorAtualizado'] = valorDevedor + correcaoPeloIndice + moneyValue + multa + lancamento;
 
-          // Forms Total
-          this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
-          const honorarios = this.total_honorarios = valorDevedorAtualizado * this.formDefaultValues.formHonorarios / 100;
+          if (this.tableData.dataRows.length - 1 === index) {
+            // Forms Total
 
-          this.last_data_table = getLastLine(this.tableData.dataRows)
-          let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
-          let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
+            this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo);
+            const honorarios = this.total_honorarios = valorDevedorAtualizado * (this.formDefaultValues.formHonorarios / 100);
 
-          this.subtotal_data_calculo = formatDate(last_date_base);
-          this.total_data_calculo = formatDate(last_date_base_atual);
-          this.min_data = last_date_base_atual;
+            this.last_data_table = getLastLine(this.tableData.dataRows)
+            let last_date_base_atual = Object.keys(this.last_data_table).length ? this.last_data_table['dataBaseAtual'] : this.total_date_now;
+            let last_date_base = Object.keys(this.last_data_table).length ? this.last_data_table['dataBase'] : this.total_date_now;
 
-          this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
-          const valorDevedorAtualizadoLast = parseFloat(this.last_data_table['valorDevedorAtualizado']);
+            this.subtotal_data_calculo = formatDate(last_date_base);
+            this.total_data_calculo = formatDate(last_date_base_atual);
+            this.min_data = last_date_base_atual;
 
-          this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
-          this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
+            this.total_subtotal = this.last_data_table['valorDevedorAtualizado'];
+            const valorDevedorAtualizadoLast = parseFloat(this.last_data_table['valorDevedorAtualizado']);
 
-          if (origin === 'btn' && this.tableData.dataRows.length - 1 === index) {
-            this.alertType = {
-              mensagem: 'Cálculo Simulado!',
-              tipo: 'success'
-            };
-            this.formartTable('Simulação');
-            this.toggleUpdateLoading()
+            this.total_multa_sob_contrato = (valorDevedorAtualizadoLast + honorarios) * this.formDefaultValues.formMultaSobContrato / 100 || 0;
+            this.total_grandtotal = this.total_multa_sob_contrato + honorarios + valorDevedorAtualizadoLast;
+
+            if (origin === 'btn') {
+              this.alertType = {
+                mensagem: 'Cálculo Simulado!',
+                tipo: 'success'
+              };
+
+              this.formartTable('Simulação');
+              this.toggleUpdateLoading()
+            }
           }
 
           this.tableLoading = false;

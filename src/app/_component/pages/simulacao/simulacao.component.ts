@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { getCurrentDate, verifyNumber } from '../../util/util';
-import { LISTA_INDICES } from '../../util/constants'
+import { getCurrentDate, verifyNumber, formatDate } from '../../util/util';
+import { LISTA_INDICES, ENCARGOS, PARCELADO_PRE_URL } from '../../util/constants'
 
 @Component({
   selector: 'app-simulacao',
@@ -13,12 +13,14 @@ export class SimulacaoComponent implements OnInit {
   @Input() updateLoadingBtn: boolean;
   @Input() tableDataLength: boolean;
   @Input() isDesagio: boolean; 
-
+  @Input() ultimaAtualizacao: string; 
+  
   @Output() formValue = new EventEmitter();
   @Output() simularCalculo = new EventEmitter();
   @Output() salvar = new EventEmitter();
 
   indice_field = LISTA_INDICES;
+  isEncargo: boolean;
 
   constructor(
     private formBuilder: FormBuilder
@@ -38,7 +40,11 @@ export class SimulacaoComponent implements OnInit {
       formDesagio: []
     });
 
-    this.changeInput()
+    this.isEncargo = this.form_riscos.formIndice.value === ENCARGOS;
+  }
+
+  ngAfterViewInit() {
+    this.formRiscos.value.formUltimaAtualizacao = formatDate(this.ultimaAtualizacao, 'YYYY-MM-DD') ;
   }
 
   simular() {
@@ -63,6 +69,7 @@ export class SimulacaoComponent implements OnInit {
   }
 
   changeInput(e = null) {
+    this.isEncargo = this.form_riscos.formIndice.value === ENCARGOS;
     this.formValue.emit(this.formRiscos.value);
   }
 

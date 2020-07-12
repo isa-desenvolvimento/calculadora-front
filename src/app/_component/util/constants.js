@@ -29,13 +29,17 @@ export const AMORTIZACAO_DATA_FINAL = "Final";
 export const PARCELA_PAGA = "Pago";
 export const PARCELA_ABERTA = "Aberto";
 
-export const LISTA_INDICES = ["INPC/IBGE", "CDI", "IGPM", "Encargos Contratuais %"];
+export const ENCARGOS = "Encargos Contratuais %";
+export const LISTA_INDICES = ["INPC/IBGE", "CDI", "IGPM", ENCARGOS];
 export const LISTA_STATUS = [PARCELA_PAGA, PARCELA_ABERTA];
 export const LISTA_AMORTIZACAO = ["Data do Cálculo", "Data Diferenciada", "Final"];
 
 export const CHEQUE_EMPRESARIAL = "Cheque Empresarial";
 export const PARCELADO_PRE = "Parcelado Pré";
 export const PARCELADO_POS = "Parcelado Pós";
+
+export const PARCELADO_PRE_URL = "parcelado-pre";
+
 
 
 

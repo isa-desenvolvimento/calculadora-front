@@ -12,10 +12,16 @@ export const getQtdDias = (fistDate, secondDate) => {
 export const formatDate = (date, format = "DD/MM/YYYY") => moment(date).format(format);
 
 
-export const verifyNumber = value => value = Math.abs(value);
+export const verifyNumber = value =>{ value = Math.abs(value)};
 
 export const formatCurrency = value => {
     return value === "NaN" ? "---" : `R$ ${(parseFloat(value)).toFixed(2).replace('.', ',').replace(/(\d)(?=(\d{3})+(?!\d))/g, '$1.')}` || 0;
 }
 
 export const getLastLine = table => [...table].pop();
+
+export const isVincenda = (vencimento, calcAmor) => {
+    const dtVencimento = moment(vencimento);
+    const dtCalcAmor = moment(calcAmor);
+    return dtVencimento > dtCalcAmor;
+}

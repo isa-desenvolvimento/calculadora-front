@@ -15,7 +15,7 @@
 
                     <div class="col-md-12 col-sm-12">
                         <app-simulacao #simulacao [updateLoadingBtn]="updateLoadingBtn"
-                            [tableDataLength]="tableData.dataRows.length > 0" (salvar)="atualizarRisco()"
+                            [tableDataLength]="tableData.dataRows.length > 0" (salvar)="atualizarRisco()" [ultimaAtualizacao]="ultima_atualizacao"
                             (simularCalculo)="simularCalc(false, 'btn')" (formValue)="setFormRiscos($event)">
                         </app-simulacao>
                     </div>
@@ -24,79 +24,123 @@
                     </div>
                     <div class="col-lg-12 col-sm-12">
                         <form class="row" [formGroup]="ceFormAmortizacao">
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Data Vencimento</label>
-                                <input *ngIf="(tableData.dataRows.length === 0)" type="date"
-                                    class="form-control col-md-12 col-sm-12" name="ceFA_data_vencimento"
-                                    id="ceFA_data_vencimento" formControlName="ceFA_data_vencimento" max="3000-12-31"
-                                    min="1000-01-01">
-                                <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    {{formatDate(tableData.dataRows[0]['dataBase'])}}
-                                </p>
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Saldo Devedor</label>
-                                <input *ngIf="(tableData.dataRows.length === 0)" type="number"
-                                    (change)="verifyNumber($event)" min="0" class="form-control col-md-12 col-sm-12"
-                                    name="ceFa_saldo_devedor" style="height: 35px" id="ceFa_saldo_devedor"
-                                    formControlName="ceFa_saldo_devedor">
-                                <p *ngIf="!(tableData.dataRows.length === 0)">
-                                    {{formatCurrency(tableData.dataRows[0]["valorDevedor"])}}
-                                </p>
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Data Base Atual</label>
-                                <input type="date" class="form-control col-md-12 col-sm-12" name="ceFA_data_base_atual"
-                                    id="ceFA_data_base_atual" formControlName="ceFA_data_base_atual" min="{{min_data}}">
-                            </div>
-                            <div class="col-md-4 col-sm-12">
-                                <label for="nome" class="col-form-label">Valor Lançamento</label>
-                                <input type="number" (change)="verifyNumber($event)" min="0"
-                                    class="form-control col-md-12 col-sm-12" name="ceFA_valor_lancamento"
-                                    style="height: 35px" id="ceFA_valor_lancamento"
-                                    formControlName="ceFA_valor_lancamento">
-                            </div>
-                            <div class="col-md-2 col-sm-12">
-                                <fieldset class="form-group ml-sm-3">
-                                    <div class="form-group row">
-                                        <legend class="col-form-label">
-                                            <label class="form-check-label" for="profile2">Tipo de Lançamento</label>
-                                        </legend>
-                                        <div class="col-sm-7 ml-2">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="radio" name="ceFA_tipo_lancamento"
-                                                    formControlName="ceFA_tipo_lancamento" id="status1"
-                                                    [value]="'credit'">
-                                                <label class="form-check-label" for="status1" style="margin: -30px">
-                                                    Crédito
-                                                </label>
-                                            </div>
-                                            <div class="form-check ">
-                                                <input class="form-check-input" type="radio" name="ceFA_tipo_lancamento"
-                                                    formControlName="ceFA_tipo_lancamento" id="status2"
-                                                    [value]="'debit'">
-                                                <label class="form-check-label" for="status2" style="margin: -30px">
-                                                    Débito
-                                                </label>
-                                            </div>
-                                        </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="row">
+
+                                    <div class="col-md-3 col-sm-12">
+                                        <label for="nome" class="col-form-label">Data Vencimento</label>
+                                        <input *ngIf="(tableData.dataRows.length === 0)" type="date"
+                                            class="form-control col-md-12 col-sm-12" name="ceFA_data_vencimento"
+                                            id="ceFA_data_vencimento" formControlName="ceFA_data_vencimento"
+                                            max="3000-12-31" min="1000-01-01">
+                                        <p *ngIf="!(tableData.dataRows.length === 0)">
+                                            {{formatDate(tableData.dataRows[0]['dataBase'])}}
+                                        </p>
                                     </div>
-                                </fieldset>
+                                    <div class="col-md-3 col-sm-12">
+                                        <label for="nome" class="col-form-label">Saldo Devedor</label>
+                                        <input *ngIf="(tableData.dataRows.length === 0)" type="number"
+                                            (change)="verifyNumber($event)" min="0"
+                                            class="form-control col-md-12 col-sm-12" name="ceFa_saldo_devedor"
+                                            style="height: 35px" id="ceFa_saldo_devedor"
+                                            formControlName="ceFa_saldo_devedor">
+                                        <p *ngIf="!(tableData.dataRows.length === 0)">
+                                            {{formatCurrency(tableData.dataRows[0]["valorDevedor"])}}
+                                        </p>
+                                    </div>
+                                    <div class="col-md-6 col-sm-12">
+                                        <fieldset class="form-group ml-3">
+                                            <div class="form-group row">
+                                                <legend class="col-form-label">
+                                                    <label class="form-check-label" for="profile2">Tipo</label>
+                                                </legend>
+                                                <div >
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio" name="ceFA_tipo"
+                                                            formControlName="ceFA_tipo" id="ceFA_tipo1"
+                                                            [value]="'lancamento'">
+                                                        <label class="form-check-label" for="ceFA_tipo1"
+                                                            style="margin: -30px">
+                                                            Incluir Novo Lançamento
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline ml-5" title="{{tableData.dataRows.length === 0 ? 'Para habilitar essa opção é necessário ter ao menos um  lançamento' : null}}">
+                                                        <input class="form-check-input" type="radio" name="ceFA_tipo"
+                                                            formControlName="ceFA_tipo" id="ceFA_tipo2"
+                                                            [value]="'atualizacao'" [attr.disabled]="tableData.dataRows.length === 0 ? true : null" >
+                                                        <label class="form-check-label" for="ceFA_tipo2"
+                                                            style="margin: -30px">
+                                                            Atualizar Cálculo
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-12 col-sm-12">
+                                <div class="row">
+                                    <div class="col-md-3 col-sm-12">
+                                        <label for="nome" class="col-form-label">Data Base Atual</label>
+                                        <input type="date" class="form-control col-md-12 col-sm-12"
+                                            name="ceFA_data_base_atual" id="ceFA_data_base_atual"
+                                            formControlName="ceFA_data_base_atual" min="{{min_data}}">
+                                    </div>
+                                    <div class="col-md-3 col-sm-12"
+                                        [hidden]="ce_form_amortizacao.ceFA_tipo.value !== 'lancamento'">
+                                        <label for="nome" class="col-form-label">Valor Lançamento</label>
+                                        <input type="number" (change)="verifyNumber($event)" min="0"
+                                            class="form-control col-md-12 col-sm-12" name="ceFA_valor_lancamento"
+                                            style="height: 35px" id="ceFA_valor_lancamento"
+                                            formControlName="ceFA_valor_lancamento">
+                                    </div>
+                                    <div class="col-md-6 col-sm-12"
+                                        [hidden]="ce_form_amortizacao.ceFA_tipo.value !== 'lancamento'">
+                                        <fieldset class="form-group ml-3">
+                                            <div class="form-group row">
+                                                <legend class="col-form-label">
+                                                    <label class="form-check-label" for="profile2">Tipo de
+                                                        Lançamento</label>
+                                                </legend>
+                                                <div>
+                                                    <div class="form-check form-check-inline">
+                                                        <input class="form-check-input" type="radio"
+                                                            name="ceFA_tipo_lancamento"
+                                                            formControlName="ceFA_tipo_lancamento" id="status1"
+                                                            [value]="'credit'">
+                                                        <label class="form-check-label" for="status1"
+                                                            style="margin: -30px">
+                                                            Crédito
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check form-check-inline ml-5">
+                                                        <input class="form-check-input" type="radio"
+                                                            name="ceFA_tipo_lancamento"
+                                                            formControlName="ceFA_tipo_lancamento" id="status2"
+                                                            [value]="'debit'">
+                                                        <label class="form-check-label" for="status2"
+                                                            style="margin: -30px">
+                                                            Débito
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </fieldset>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 mt-2">
+                                <div class="col-lg-12" style="padding: 0">
+                                    <div class="stats" >
+                                        <button type="button" (click)="incluirLancamentos()" class="btn btn-info btn-round"
+                                            [disabled]="!ceFormAmortizacao.valid">Incluir
+                                            Lançamentos</button>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
-                    <div class="col-lg-12 mt-4">
-                        <div class="col-lg-12" style="padding: 0">
-                            <div class="stats" style="margin-top: -50px">
-                                <button type="button" (click)="incluirLancamentos()" class="btn btn-info btn-round"
-                                    [disabled]="!ceFormAmortizacao.valid">Incluir
-                                    Lançamentos</button>
-                            </div>
-                        </div>
-                    </div>
-
                 </div>
                 <br>
                 <div class="d-flex justify-content-center" *ngIf="tableLoading && (tableData.dataRows.length === 0)">
@@ -157,8 +201,8 @@
                                     <th>R$</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center">
+                            <tbody >
+                                <tr *ngFor="let row of tableData.dataRows" style="font-size: 11px;" align="center" [vincendas]="row" title="{{!row.isTipoLancamento ? 'Linha para fins informativo' : null}}">
                                     <td>
                                         <input type="date" style="font-size: 11px"
                                             class="form-control col-md-11 col-sm-12 log-hidden-false"
@@ -233,16 +277,16 @@
                             </tbody>
                             <tfoot>
                                 <tr class="parcelado-font-size">
-                                    <th class="footer-table footer-title-table" colspan="7"> SUBTOTAL APURADO EM
-                                        {{subtotal_data_calculo || "---------"}}</th>
-                                    <th class="footer-table" width="100" colspan="1"></th>
-                                    <th class="footer-table" width="100" colspan="1"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table"></th>
-                                    <th class="footer-table">{{formatCurrency(total_subtotal || 0)}}</th>
-                                    <th class="footer-table log-hidden-false"></th>
+                                    <th [footer]="'left'" class="footer-title-table" colspan="7"> SUBTOTAL APURADO EM
+                                        {{total_data_calculo || "---------"}}</th>
+                                    <th footer width="100" colspan="1"></th>
+                                    <th footer width="100" colspan="1"></th>
+                                    <th footer></th>
+                                    <th footer></th>
+                                    <th footer></th>
+                                    <th footer></th>
+                                    <th footer>{{formatCurrency(total_subtotal || 0)}}</th>
+                                    <th footer class="log-hidden-false"></th>
                                 </tr>
                             </tfoot>
                         </table>

@@ -29,7 +29,8 @@ export class PesquisaComponent implements OnInit {
     this.peForm = this.formBuilder.group({
       pasta: ['', Validators.required],
       contrato: ['', Validators.required],
-      tipo_contrato: ['', Validators.required]
+      tipo_contrato: ['', Validators.required],
+      recuperacaoJudicial: [false, Validators.required]
     });
   }
 
@@ -37,14 +38,16 @@ export class PesquisaComponent implements OnInit {
     const pasta = this.form.pasta.value;
     const contrato = this.form.contrato.value;
     const tipo_contrato = this.form.tipo_contrato.value;
+    const recuperacaoJudicial = this.form.recuperacaoJudicial.value;
 
-    this.txtContractRef = pasta + contrato + tipo_contrato;
+    this.txtContractRef = pasta + contrato + tipo_contrato + recuperacaoJudicial;
     this.resetForm.emit(true);
     const info = {
       pasta,
       contrato,
       tipo_contrato,
-      contractRef: this.txtContractRef
+      contractRef: this.txtContractRef,
+      recuperacaoJudicial 
     };
 
     this.contractRef.emit(info);
@@ -63,6 +66,10 @@ export class PesquisaComponent implements OnInit {
   setContrato() {
     this.contractList_field = [];
     this.typeContractList_field = [];
+    
+    this.peForm.value.contrato = '';
+    this.peForm.value.tipo_contrato = '';
+
     this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.form.pasta.value) {
         this.contractList_field.push(pasta.CONTRATO);
@@ -75,6 +82,8 @@ export class PesquisaComponent implements OnInit {
 
   setTypeContract() {
     this.typeContractList_field = [];
+    this.peForm.value.tipo_contrato = '';
+
     this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.form.pasta.value && pasta.CONTRATO === this.form.contrato.value) {
         this.typeContractList_field.push(pasta.DESCRICAO);
