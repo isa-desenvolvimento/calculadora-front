@@ -391,7 +391,7 @@ export class ParceladoPreComponent implements OnInit {
                 //valorPago -= subtotal;
                 valor -= subtotal;
                 add = false;
-                indexNewParcela += key;
+                indexNewParcela++;
 
                 break;
               case (row['totalDevedor'] > valor && valor > 0):
