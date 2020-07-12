@@ -791,7 +791,7 @@ export class ParceladoPreComponent implements OnInit {
     const tableAmortizacao = tableData[1];
 
     const saldo = parseFloat(rowAmortizacao.saldo_devedor)
-    
+
     switch (rowAmortizacao.tipo) {
       case AMORTIZACAO_DATA_ATUAL:
         this.tableData.dataRows.map(row => {
@@ -810,6 +810,8 @@ export class ParceladoPreComponent implements OnInit {
         break;
       case AMORTIZACAO_DATA_FINAL:
         this.amortizacaoGeral -= saldo;
+
+        this.simularCalc()
         break;
 
       default:
