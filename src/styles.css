@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
-.form-control[disabled], .form-control[readonly], fieldset[disabled] .form-control {
+
+.form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
     background-color: #e3e3e347 !important;
 }
 
@@ -10,28 +13,36 @@ td:focus {
 
 [contenteditable="true"].single-line {
     white-space: nowrap;
-    width:200px;
+    width: 200px;
     overflow: hidden;
-} 
-[contenteditable="true"].single-line br {
-    display:none;
+}
 
+[contenteditable="true"].single-line br {
+    display: none;
 }
+
 [contenteditable="true"].single-line * {
-    display:inline;
-    white-space:nowrap;
+    display: inline;
+    white-space: nowrap;
 }
-table, th, td {
+
+table,
+th,
+td {
     border: 1px solid #dee2e6 !important;
 }
+
 .align-title-top {
-    vertical-align:top
+    vertical-align: top
 }
 
+
 /* override table controls */
+
 table.dataTable {
     border-collapse: collapse !important;
 }
+
 .dataTables_wrapper .dataTables_filter input {
     background-color: #FFFFFF;
     border: 1px solid #DDDDDD;
@@ -50,7 +61,13 @@ table.dataTable thead .sorting_desc {
     font-weight: bold;
 }
 
-.log-visible-false{
+table .form-control[disabled],
+.form-control[readonly],
+fieldset[disabled] .form-control {
+    background-color: transparent !important;
+}
+
+.log-visible-false {
     display: none;
 }
 
@@ -70,11 +87,11 @@ table.dataTable thead .sorting_desc {
     .select-indice {
         width: 100% !important;
     }
-  }
+}
 
 .dt-button {
     background-color: #51bcda !important;
-    color: #FFFFFF !important ;
+    color: #FFFFFF !important;
     border-width: 1px !important;
     border-radius: 30px !important;
     padding-right: 35px !important;
@@ -86,10 +103,9 @@ table.dataTable thead .sorting_desc {
     border: none !important;
     margin: 10px 1px !important;
     background-image: none !important;
-    
 }
 
-.dt-button:hover{
+.dt-button:hover {
     background-color: #2ba9cd !important;
     color: #FFFFFF !important;
     box-shadow: none !important;
@@ -100,24 +116,32 @@ div.dt-buttons {
     float: right !important;
 }
 
+
 /* width */
+
 ::-webkit-scrollbar {
     width: 6px;
     height: 6px;
-  }
-  
-  /* Track */
-  ::-webkit-scrollbar-track {
+}
+
+
+/* Track */
+
+ ::-webkit-scrollbar-track {
     background: #f4f3ef;
-  }
-  
-  /* Handle */
-  ::-webkit-scrollbar-thumb {
+}
+
+
+/* Handle */
+
+ ::-webkit-scrollbar-thumb {
     background: #9a9a9a;
     border-radius: 6px;
-  }
-  
-  /* Handle on hover */
-  ::-webkit-scrollbar-thumb:hover {
+}
+
+
+/* Handle on hover */
+
+ ::-webkit-scrollbar-thumb:hover {
     background: #9a9a9a;
-  }
+}

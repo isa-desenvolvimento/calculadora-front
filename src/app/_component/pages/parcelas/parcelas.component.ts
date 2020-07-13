@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import 'datatables.net';
 import 'datatables.net-buttons';
+import * as moment from 'moment'; // add this 1 of 4
 
 import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
 import { LANGUAGEM_TABLE, LISTA_STATUS } from '../../util/constants'
@@ -18,6 +19,9 @@ declare interface TableData {
 export class ParcelasComponent implements OnInit {
 
   @Input() pesquisaFormValid: boolean;
+  @Input() newParcelasTableClear: boolean;
+  @Input() minParcela: number;
+
   @Output() incluirParcelas = new EventEmitter();
 
   status_field = LISTA_STATUS;
@@ -44,7 +48,7 @@ export class ParcelasComponent implements OnInit {
 
     this.preFormCadastroParcelas = this.formBuilder.group({
       nparcelas: ['', Validators.required],
-      parcelaInicial: ['', Validators.required],
+      parcelaInicial: [[], Validators.required],
       dataVencimento: ['', Validators.required],
       valorNoVencimento: ['', Validators.required],
       status: ['', Validators.required]
@@ -55,7 +59,6 @@ export class ParcelasComponent implements OnInit {
       searching: false,
       language: LANGUAGEM_TABLE
     }
-
   }
 
   verifyNumber(value) {
@@ -70,13 +73,25 @@ export class ParcelasComponent implements OnInit {
     return formatDate(value, format)
   }
 
+  verifyNumberInitial(e) {
+    e.preventDefault();
+    if (this.minParcela > e.target.value) {
+      e.target.style.borderColor = '#ef8157'
+    }else {
+      e.target.style.borderColor = '#DDDDDD'
+    }
+  }
+
   adicionarParcelas() {
     const nParcelas = this.pre_form_cadastro_parcelas.nparcelas.value;
     const parcelaInicial = this.pre_form_cadastro_parcelas.parcelaInicial.value;
+    let dataVencimento = this.pre_form_cadastro_parcelas.dataVencimento.value;
     this.tableDataParcelas.dataRows = [];
 
+    let mes = 1;
     for (let index = parcelaInicial; index < (nParcelas + parcelaInicial); index++) {
-      this.tableDataParcelas.dataRows.push({ ...this.preFormCadastroParcelas.value, nparcelas: index });
+      this.tableDataParcelas.dataRows.push({ ...this.preFormCadastroParcelas.value, nparcelas: index, dataVencimento: dataVencimento });
+      dataVencimento = moment(dataVencimento).add(mes, 'months').format('YYYY-MM-DD');
     }
 
     this.preFormCadastroParcelas.reset();
@@ -89,9 +104,6 @@ export class ParcelasComponent implements OnInit {
 
   incluir() {
     this.incluirParcelas.emit(this.tableDataParcelas.dataRows);
-    setTimeout(() => {
-      this.tableDataParcelas.dataRows = [];
-    }, 100);
   }
 
 

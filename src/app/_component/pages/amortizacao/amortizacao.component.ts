@@ -2,7 +2,7 @@ import { Component, OnInit, Input, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 
 import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
-import { LANGUAGEM_TABLE, LISTA_AMORTIZACAO } from '../../util/constants'
+import { LANGUAGEM_TABLE, LISTA_AMORTIZACAO, AMORTIZACAO_DATA_ATUAL } from '../../util/constants'
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -15,8 +15,8 @@ declare interface TableData {
 export class AmortizacaoComponent implements OnInit {
   @Input() pesquisaFormValid: boolean;
   @Input() dataCalculo: string;
+  @Input() tableDataAmortizacao: TableData;
 
-  
   @Output() incluirAmortizacao = new EventEmitter();
   @Output() deleteAmortizacao = new EventEmitter();
 
@@ -27,7 +27,6 @@ export class AmortizacaoComponent implements OnInit {
     tipo: ''
   };
 
-  tableDataAmortizacao: TableData;
   preFormAmortizacao: FormGroup;
   dtOptionsAmortizacao: DataTables.Settings = {};
   amortizacao_field = LISTA_AMORTIZACAO;
@@ -37,6 +36,7 @@ export class AmortizacaoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    
     this.tableDataAmortizacao = {
       dataRows: []
     }
@@ -75,8 +75,18 @@ export class AmortizacaoComponent implements OnInit {
     return formatDate(value, format)
   }
 
-
   adicionarAmortizacao() {
+    const preFATipo = this.pre_form_amortizacao.tipo.value;
+
+    switch (preFATipo) {
+      case AMORTIZACAO_DATA_ATUAL:
+        this.preFormAmortizacao.value.data_vencimento = this.formatDate(this.dataCalculo, 'YYYY-MM-DD')
+        break;
+
+      default:
+        break;
+    }
+
     this.tableDataAmortizacao.dataRows.push(this.preFormAmortizacao.value);
 
     this.incluirAmortizacao.emit(this.tableDataAmortizacao.dataRows)
@@ -173,7 +183,7 @@ export class AmortizacaoComponent implements OnInit {
     this.tableDataAmortizacao.dataRows.splice(index, 1);
 
     setTimeout(() => {
-      this.deleteAmortizacao.emit(row)
+      this.deleteAmortizacao.emit({0: row, 1:this.tableDataAmortizacao.dataRows})
     }, 0);
 
     // if (amortizacao.hasOwnProperty('pagoIndex')) {

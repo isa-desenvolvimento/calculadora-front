@@ -30,6 +30,7 @@ import { CallbackPipe } from './_pipe/callback.pipe';
 import { VincendasDirective } from './_directive/vincendas.directive';
 import { FooterDirective } from './_directive/footer.directive';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { ParcelaPagaDirective } from './_directive/parcela-paga.directive';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
     AmortizacaoComponent,
     CallbackPipe,
     VincendasDirective,
-    FooterDirective
+    FooterDirective,
+    ParcelaPagaDirective
   ],
   imports: [
     BrowserModule,
