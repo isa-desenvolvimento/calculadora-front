@@ -26,8 +26,13 @@ export class LogComponent implements OnInit {
     mensagem: '',
     tipo: ''
   };
-  row: {};
-  infoContrato = {};
+  row: [];
+  infoContrato = {
+    pasta: '',
+    contrato: '',
+    tipo_contrato: '',
+    recuperacaoJudicial: false
+  };
 
   tableData: TableData;
   dtOptions: DataTables.Settings = {};
@@ -57,9 +62,15 @@ export class LogComponent implements OnInit {
       paging: true,
       scrollCollapse: true,
       language: LANGUAGEM_TABLE,
+      serverSide: true,
+      drawCallback: (settings) => {
+        var tr = $(this).closest('tr');
+
+      },
       rowCallback: (row: Node, data: any[] | Object, index: number) => {
         // Unbind first in order to avoid any duplicate handler
         // (see https://github.com/l-lin/angular-datatables/issues/87)
+
         $('.details-control', row).unbind('click');
         $('.details-control', row).bind('click', (el) => {
           this.datatableElement.dtInstance.then((dtInstance: DataTables.Api) => {
@@ -77,7 +88,32 @@ export class LogComponent implements OnInit {
           });
         });
         return row;
-      }
+      },
+      ajax: (dataTablesParameters: any, callback) => {
+        const info = $('#tableLog').DataTable().page.info();
+        const length = dataTablesParameters.length || 10;
+        const page = info.page || 0;
+        const draw = dataTablesParameters.draw || 1;
+
+        this.logService.getLogPage(
+          this.infoContrato.pasta,
+          this.infoContrato.contrato,
+          this.infoContrato.tipo_contrato,
+          length,
+          page,
+          draw,
+          this.infoContrato.recuperacaoJudicial
+        ).subscribe(logs => {
+          this.tableData.dataRows = logs['data'];
+
+          callback({
+            recordsTotal: logs['recordsTotal'],
+            recordsFiltered: logs['recordsFiltered'],
+            pages: logs['recordsTotal'] / logs['length'],
+            data: []
+          });
+        });
+      },
     };
   }
 
@@ -114,18 +150,27 @@ export class LogComponent implements OnInit {
     this.infoContrato = infoContrato;
     this.tableData.dataRows = [];
 
-    this.logService.getLog(infoContrato.pasta, infoContrato.contrato, infoContrato.tipo_contrato).subscribe(logs => {
-      if (!logs.length) {
+    this.logService.getLogPage(
+      this.infoContrato.pasta,
+      this.infoContrato.contrato,
+      this.infoContrato.tipo_contrato,
+      10,
+      1,
+      1,
+      this.infoContrato.recuperacaoJudicial
+    ).subscribe(logs => {
+      if (!logs['data'].length) {
         this.alertType = {
           mensagem: 'Nenhuma registro encontrado!',
           tipo: 'warning'
         };
+
         this.tableLoading = false;
         this.toggleUpdateLoading()
         return;
       }
 
-      this.tableData.dataRows = logs;
+      this.tableData.dataRows = logs['data'];
       this.tableLoading = false;
 
     }, err => {

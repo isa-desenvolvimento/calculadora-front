@@ -26,8 +26,7 @@
             <div class="card-body ">
                 <div class="row">
                     <div class="col-md-12">
-                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%"
-                            id="tableLog">
+                        <table [dtOptions]="dtOptions" datatable class="table table-hover" style="width:100%" id="tableLog">
                             <thead>
                                 <tr align="center">
                                     <th></th>
@@ -43,8 +42,7 @@
                             </thead>
                             <tbody>
                                 <tr *ngFor="let row of tableData.dataRows" align="center">
-                                    <td class="details-control" (click)="toggleDetails(row)"><i
-                                            style="color: green; cursor: pointer;" class="nc-icon nc-minimal-right"></i>
+                                    <td class="details-control" (click)="toggleDetails(row)"><i style="color: green; cursor: pointer;" class="nc-icon nc-minimal-right"></i>
                                     </td>
                                     <td>{{formatDate(row.data, "DD/MM/YYYY hh:ss")}}</td>
                                     <td>{{row.usuario}}</td>
@@ -53,7 +51,7 @@
                                     <td>{{row.tipoContrato}}</td>
                                     <td>{{row.acao}}</td>
                                     <td>{{formatDate(row.dataSimulacao)}}</td>
-                                    <td>{{formatDate(row.modulo)}}</td>
+                                    <td>{{row.modulo}}</td>
                                 </tr>
                             </tbody>
                         </table>
