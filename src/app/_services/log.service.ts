@@ -17,4 +17,8 @@ export class LogService {
   getLog(pasta: string, contrato: string, tipoContrato: string) {   
     return this.http.get<Log[]>(`${environment.API_PATH}/log?pasta=${pasta}&contrato=${contrato}&tipoContrato=${tipoContrato}`);
   }
+
+  getLogPage(pasta: string, contrato: string, tipoContrato: string, pageSize: number, pageNumber: number, draw: number, recuperacaoJudicial: boolean) {
+    return this.http.get<Log[]>(`${environment.API_PATH}/log?pasta=${pasta}&contrato=${contrato}&tipoContrato=${tipoContrato}&pageSize=${pageSize}&pageNumber=${pageNumber}&recuperacaoJudicial=${recuperacaoJudicial}&getAll=${false}&draw=${draw}`);
+  }
 }

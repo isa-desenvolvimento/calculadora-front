@@ -36,11 +36,6 @@ export class AmortizacaoComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    
-    this.tableDataAmortizacao = {
-      dataRows: []
-    }
-
     this.preFormAmortizacao = this.formBuilder.group({
       data_vencimento: [''],
       saldo_devedor: ['', Validators.required],
@@ -183,7 +178,7 @@ export class AmortizacaoComponent implements OnInit {
     this.tableDataAmortizacao.dataRows.splice(index, 1);
 
     setTimeout(() => {
-      this.deleteAmortizacao.emit({0: row, 1:this.tableDataAmortizacao.dataRows})
+      this.deleteAmortizacao.emit({ 0: row, 1: this.tableDataAmortizacao.dataRows })
     }, 0);
 
     // if (amortizacao.hasOwnProperty('pagoIndex')) {

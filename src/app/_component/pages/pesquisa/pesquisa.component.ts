@@ -47,7 +47,7 @@ export class PesquisaComponent implements OnInit {
       contrato,
       tipo_contrato,
       contractRef: this.txtContractRef,
-      recuperacaoJudicial 
+      recuperacaoJudicial
     };
 
     this.contractRef.emit(info);
@@ -66,9 +66,10 @@ export class PesquisaComponent implements OnInit {
   setContrato() {
     this.contractList_field = [];
     this.typeContractList_field = [];
-    
-    this.peForm.value.contrato = '';
-    this.peForm.value.tipo_contrato = '';
+
+    if (this.form.contrato.value || this.form.tipo_contrato.value) {
+      this.peForm.reset({ pasta: this.form.pasta.value, recuperacaoJudicial: false })
+    }
 
     this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.form.pasta.value) {
@@ -83,6 +84,10 @@ export class PesquisaComponent implements OnInit {
   setTypeContract() {
     this.typeContractList_field = [];
     this.peForm.value.tipo_contrato = '';
+
+    if (this.form.tipo_contrato.value) {
+      this.peForm.reset({ pasta: this.form.pasta.value, contrato: this.form.contrato.value, recuperacaoJudicial: false })
+    }
 
     this.pastas['data'].map(pasta => {
       if (pasta.PASTA === this.form.pasta.value && pasta.CONTRATO === this.form.contrato.value) {

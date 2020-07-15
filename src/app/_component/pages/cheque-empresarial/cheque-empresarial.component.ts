@@ -8,7 +8,7 @@ import { IndicesService } from '../../../_services/indices.service';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { LogService } from '../../../_services/log.service';
 
-import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
+import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias,isVincenda, setCampoSemAlteracao } from '../../util/util';
 import { LISTA_INDICES, LANGUAGEM_TABLE, CHEQUE_EMPRESARIAL } from '../../util/constants'
 
 import 'datatables.net';
@@ -141,21 +141,21 @@ export class ChequeEmpresarialComponent implements OnInit {
             style: { fontSize: 10 },
             alignment: 'left',
             margin: [0, 20, 10, 0],
-            text: `Honorários ${this.formDefaultValues.formHonorarios || 0}% : ${this.formatCurrency(this.total_honorarios)}`
+            text: `Honorários ${this.formDefaultValues.formHonorarios || 0}% : ${formatCurrency(this.total_honorarios)}`
           })
 
           doc['content'].push({
             style: { fontSize: 10 },
             alignment: 'left',
             margin: [0, 0, 10, 0],
-            text: `Multa sob contrato ${this.formDefaultValues.formMultaSobContrato || 0}% : ${this.formatCurrency(this.total_multa_sob_contrato)}`
+            text: `Multa sob contrato ${this.formDefaultValues.formMultaSobContrato || 0}% : ${formatCurrency(this.total_multa_sob_contrato)}`
           })
 
           doc['content'].push({
             style: { fontSize: 10 },
             alignment: 'left',
             margin: [0, 0, 10, 0],
-            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${this.formatCurrency(this.total_multa_sob_contrato)}`
+            text: `TOTAL APURADO EM ${this.total_data_calculo || "---------"} : ${formatCurrency(this.total_grandtotal)}`
           })
 
         }
@@ -239,14 +239,14 @@ export class ChequeEmpresarialComponent implements OnInit {
       return lancamentoLocal;
     });
 
-    const payloadPut = payload.filter((lancamento => lancamento['id']));
+    const payloadPut = payload.filter((lancamento =>  lancamento && lancamento['id']));
     payloadPut.length > 0 && this.chequeEmpresarialService.updateLancamento(payloadPut).subscribe(chequeEmpresarialList => {
       this.atualizarRiscoConcluido()
     }, err => {
       this.atualizarRiscoFalha()
     });
 
-    const payloadPost = payload.filter((lancamento => !lancamento['id']));
+    const payloadPost = payload.filter((lancamento => lancamento && !lancamento['id']));
     payloadPost.length > 0 && this.chequeEmpresarialService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
       this.atualizarRiscoConcluido()
 
@@ -276,7 +276,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     const isTipoLancamento = this.ce_form_amortizacao.ceFA_tipo.value === 'lancamento';
 
-    if (!this.form_riscos.formIndice && (!lastLine && !isTipoLancamento)) {
+    if ((!this.form_riscos.formIndice && isTipoLancamento) || !Object.keys(lastLine).length) {
       this.updateLoadingBtn = true;
       this.alertType = {
         mensagem: 'É necessário informar o índice.',
@@ -353,7 +353,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       this.tableData.dataRows.push(this.payloadLancamento)
       this.tableLoading = false;
 
-      if (!this.lancamentoInfo() && isTipoLancamento) {
+      if (!this.lancamentoInfo() && isTipoLancamento && !lastLine['isTipoLancamento']) {
         this.tableData.dataRows.push(lastLine);
       }
 
@@ -361,6 +361,8 @@ export class ChequeEmpresarialComponent implements OnInit {
         this.ceFormAmortizacao.reset({ceFA_tipo: 'lancamento'});
 
         this.simularCalc(true, null, true)
+        this.simularCalc(true, null, true)
+
         this.alertType = {
           mensagem: 'Registro incluido!',
           tipo: 'success'
@@ -494,7 +496,9 @@ export class ChequeEmpresarialComponent implements OnInit {
             row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual'];
           }
 
-          const qtdDias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
+          let dias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
+          const qtdDias = isVincenda(formatDate(row["dataBase"], 'YYYY-MM-DD'), formatDate(row["dataBaseAtual"], 'YYYY-MM-DD')) ? - dias : dias;
+
           const valorDevedor = parseFloat(row['valorDevedor']);
 
           const indiceDataBaseAtual = row['indiceDataBaseAtual'];
