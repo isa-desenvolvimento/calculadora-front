@@ -517,6 +517,7 @@ export class ParceladoPreComponent implements OnInit {
 
           const indiceValor = typeof (resultado[0]) === 'number' ? resultado[0] : 1;
           const indiceDataCalcAmor = typeof (resultado[1]) === 'number' ? resultado[1] : 1;
+          const isVincenda_ = isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']);
 
           this.tableData.dataRows.push({
             nparcelas: parcela['nparcelas'],
@@ -546,10 +547,11 @@ export class ParceladoPreComponent implements OnInit {
             ultimaAtualizacao: 0,
             totalParcelasVencidas: 0,
             totalParcelasVincendas: 0,
-            vincenda: isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']),
+            vincenda: isVincenda_,
             tipoParcela: this.modulo,
             isAmortizado: false,
-            infoParaAmortizacao: this.tableDataAmortizacao
+            infoParaAmortizacao: this.tableDataAmortizacao,
+            modulo: isVincenda_ ? PARCELADO_PRE : PARCELADO_POS
           })
 
           this.updateLoadingBtn = false;
