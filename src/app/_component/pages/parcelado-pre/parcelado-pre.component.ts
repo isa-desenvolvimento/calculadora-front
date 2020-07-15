@@ -261,7 +261,6 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['tipoParcela'] = this.modulo;
       parcelaLocal['ultimaAtualizacao'] = getCurrentDate('YYYY-MM-DD');
       parcelaLocal['infoParaAmortizacao'] = JSON.stringify(this.tableDataAmortizacao);
-      parcelaLocal['nparcelas'] = parseFloat(parcelaLocal['nparcelas']);
 
       return parcelaLocal;
     });
@@ -520,7 +519,7 @@ export class ParceladoPreComponent implements OnInit {
           const isVincenda_ = isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']);
 
           this.tableData.dataRows.push({
-            nparcelas: parcela['nparcelas'],
+            nparcelas: parcela['nparcelas'].toString(),
             parcelaInicial: parcela['parcelaInicial'],
             dataVencimento: dataVencimento,
             indiceDV: indice,
@@ -627,7 +626,7 @@ export class ParceladoPreComponent implements OnInit {
         const ultimaAtualizacao = [...this.tableData.dataRows].pop();
 
         setTimeout(() => {
-          this.minParcela = ultimaAtualizacao['nparcelas'] + 1;
+          this.minParcela = parseFloat(ultimaAtualizacao['nparcelas']) + 1;
           this.simularCalc(true, null, true);
         }, 1000);
 
