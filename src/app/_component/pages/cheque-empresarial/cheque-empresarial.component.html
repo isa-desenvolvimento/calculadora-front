@@ -174,7 +174,7 @@
                                         <span class="log-visible-false">{{formatDate(row.dataBase)}}</span>
                                     </td>
                                     <td width="80">
-                                        <select style="width: 80px; font-size: 11px" class="form-control custom-select log-hidden-false" name="ce_indiceDB" id="ce_indiceDB" (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase', 'dataBase')">
+                                        <select [disabled]="!row.isTipoLancamento ? 'Linha para fins informativo' : null" style="width: 80px; font-size: 11px" class="form-control custom-select log-hidden-false" name="ce_indiceDB" id="ce_indiceDB" (change)="updateInlineIndice($event, row, 'indiceDB', 'indiceDataBase', 'dataBase')">
                                             <option *ngFor="let indice of indice_field" [value]="indice"
                                                 [selected]="indice === row.indiceDB" >
                                                 {{indice}}</option>
@@ -185,11 +185,12 @@
                                         {{row.indiceDataBase || "---"}}
                                     </td>
                                     <td width="120">
-                                        <input type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12 log-hidden-false" name="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}" [value]="row.dataBaseAtual" (blur)="changeDate($event, row)">
+                                        <input [disabled]="!row.isTipoLancamento ? 'Linha para fins informativo' : null" type="date" style="font-size: 11px" class="form-control col-md-11 col-sm-12 log-hidden-false" name="ce_data_calculo" max="3000-12-31" min="{{row.dataBase}}" [value]="row.dataBaseAtual"
+                                            (blur)="changeDate($event, row)">
                                         <span class="log-visible-false">{{formatDate(row.dataBaseAtual)}}</span>
                                     </td>
                                     <td width="80">
-                                        <select style="width: 80px; font-size: 11px" class="form-control custom-select log-hidden-false" name="ce_indice" id="ce_indice" (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual', 'dataBaseAtual')">
+                                        <select [disabled]="!row.isTipoLancamento ? 'Linha para fins informativo' : null" style="width: 80px; font-size: 11px" class="form-control custom-select log-hidden-false" name="ce_indice" id="ce_indice" (change)="updateInlineIndice($event, row, 'indiceBA', 'indiceDataBaseAtual', 'dataBaseAtual')">
                                             <option *ngFor="let indice of indice_field" [value]="indice"
                                                 [selected]="indice === row.indiceBA">
                                                 {{indice}}</option>
