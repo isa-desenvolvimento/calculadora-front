@@ -253,7 +253,7 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['encargosMonetarios'] = JSON.stringify(parcelaLocal['encargosMonetarios']);
       parcelaLocal['infoParaCalculo'] = JSON.stringify(this.formDefaultValues);
 
-      parcelaLocal['valorPMTVincenda'] = parseFloat(parcelaLocal['valorPMTVincenda']);
+      parcelaLocal['valorPMTVincenda'] = parseFloat(parcelaLocal['valorPMTVincenda']) || 0;
       parcelaLocal['amortizacao'] = parseFloat(parcelaLocal['amortizacao']);
       parcelaLocal['totalDevedor'] = parseFloat(parcelaLocal['totalDevedor']);
       parcelaLocal['subtotal'] = parseFloat(parcelaLocal['subtotal']);
@@ -262,7 +262,6 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['ultimaAtualizacao'] = getCurrentDate('YYYY-MM-DD');
       parcelaLocal['infoParaAmortizacao'] = JSON.stringify(this.tableDataAmortizacao);
       parcelaLocal['nparcelas'] = parseFloat(parcelaLocal['nparcelas']);
-
 
       return parcelaLocal;
     });
@@ -540,10 +539,15 @@ export class ParceladoPreComponent implements OnInit {
             totalParcelasVencidas: 0,
             totalParcelasVincendas: 0,
             vincenda: isVincenda(dataVencimento, amortizacao['preFA_data_vencimento']),
-            tipoParcela: this.modulo
+            tipoParcela: this.modulo,
+            isAmortizado: false,
+            infoParaAmortizacao: this.tableDataAmortizacao
           })
 
           this.updateLoadingBtn = false;
+          this.tableData.dataRows.sort(function (a, b) {
+            return a['nparcelas'] < b['nparcelas'] ? -1 : a['nparcelas'] > b['nparcelas'] ? 1 : 0;
+          });
 
           if (tableDataParcelas.length - 1 === key) {
             setTimeout(() => {
@@ -552,13 +556,13 @@ export class ParceladoPreComponent implements OnInit {
                 return a['nparcelas'] < b['nparcelas'] ? -1 : a['nparcelas'] > b['nparcelas'] ? 1 : 0;
               });
 
-              this.tableLoading = false;
               this.alertType = {
                 mensagem: 'Lançamento incluido',
                 tipo: 'success'
               };
               this.toggleUpdateLoading()
               this.simularCalc(true, null, true)
+              this.tableLoading = false;
             }, 0)
           }
         })
@@ -567,11 +571,13 @@ export class ParceladoPreComponent implements OnInit {
           this.falhaIndice()
         })
     })
-    if (!temIndice.every(tem => !!tem)) {
-      this.falhaIndice()
-    }
 
-    this.tableLoading = false;
+    setTimeout(() => {
+      if (!temIndice.every(tem => !!tem)) {
+        this.falhaIndice()
+      }
+      this.tableLoading = false;
+    }, 3000);
   }
 
   setCampoSemAlteracao(semFormat = false) {
@@ -597,7 +603,7 @@ export class ParceladoPreComponent implements OnInit {
         parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
         parcela.infoParaAmortizacao = JSON.parse(parcela.infoParaAmortizacao)
         setTimeout(() => {
-          this.tableDataAmortizacao =  parcela.infoParaAmortizacao ?  parcela.infoParaAmortizacao : this.tableDataAmortizacao
+          this.tableDataAmortizacao = parcela.infoParaAmortizacao ? parcela.infoParaAmortizacao : this.tableDataAmortizacao
         }, 100);
 
         Object.keys(parcela.infoParaCalculo).filter(value => {
@@ -762,7 +768,7 @@ export class ParceladoPreComponent implements OnInit {
             }
           } else {
             row['encargosMonetarios']['correcaoPeloIndice'] = correcaoPeloIndice.toFixed(2);
-            row['encargosMonetarios']['jurosAm']['dias'] =  qtdDias;
+            row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
             row['encargosMonetarios']['jurosAm']['percentsJuros'] = porcentagem ? (porcentagem * 100).toFixed(2) : 0;
             row['encargosMonetarios']['jurosAm']['moneyValue'] = valor.toFixed(2);
             row['encargosMonetarios']['multa'] = row['amortizacaoDataDiferenciada'] ? this.setCampoSemAlteracao() : multa.toFixed(2);
@@ -857,12 +863,12 @@ export class ParceladoPreComponent implements OnInit {
           row['amortizacao'] = 0;
           row['totalDevedor'] = row['subtotal'];
           row['status'] = PARCELA_ABERTA;
-          row['infoParaAmortizacao']['dataRows'] = JSON.stringify(tableAmortizacao[1]);
+          row['infoParaAmortizacao']['dataRows'] = tableAmortizacao;
         })
 
         setTimeout(() => {
           this.adicionarAmortizacao(tableAmortizacao);
-        }, 0);
+        }, 100);
 
         break;
       case AMORTIZACAO_DATA_DIFERENCIADA:

@@ -1,5 +1,5 @@
 export interface Parcela {
-    id?: number;
+    id?: string;
     nparcelas: number;
     parcelaInicial:number; 
     dataVencimento: string;
