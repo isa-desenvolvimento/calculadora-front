@@ -312,9 +312,10 @@ export class ParceladoPreComponent implements OnInit {
     const DATA_CALCULO = amortizacaoTable.filter(amortizacao => amortizacao.tipo === AMORTIZACAO_DATA_ATUAL);
     const FINAL = amortizacaoTable.filter(amortizacao => amortizacao.tipo === AMORTIZACAO_DATA_FINAL);
     const TABLEDATA = this.tableData.dataRows;
+    let valor = 0;
 
     if (DATA_CALCULO.length) {
-      let valor = DATA_CALCULO.reduce((valor, amortizacao) => (valor['saldo_devedor'] || valor) + amortizacao['saldo_devedor']);
+      valor = DATA_CALCULO.reduce((valor, amortizacao) => (valor['saldo_devedor'] || valor) + amortizacao['saldo_devedor']);
       valor = typeof (valor) === 'number' ? valor : valor['saldo_devedor'];
 
       TABLEDATA.map(row => {
@@ -346,18 +347,16 @@ export class ParceladoPreComponent implements OnInit {
             row['totalDevedor'] -= valor;
             valor -= subtotal
             break;
+          default:
+            this.amortizacaoGeral += valor
+            break;
         }
       })
     }
 
-    if (FINAL.length) {
-      const final = FINAL.reduce((final, amortizacao) => (final['saldo_devedor'] || final) + amortizacao['saldo_devedor']);
-      this.amortizacaoGeral = typeof (final) === 'number' ? final : final['saldo_devedor'];
-    }
-
     if (DIFERENCIADA.length) {
 
-      let valor = DIFERENCIADA.reduce((valor, amortizacao) => (valor['saldo_devedor'] || valor) + amortizacao['saldo_devedor']);
+      valor = DIFERENCIADA.reduce((valor, amortizacao) => (valor['saldo_devedor'] || valor) + amortizacao['saldo_devedor']);
       valor = typeof (valor) === 'number' ? valor : valor['saldo_devedor'];
       let indexNewParcela = 0;
       TABLEDATA.map((row, key) => {
@@ -425,6 +424,15 @@ export class ParceladoPreComponent implements OnInit {
             }
 
           })
+        }
+
+        if (FINAL.length) {
+          const final = FINAL.reduce((final, amortizacao) => (final['saldo_devedor'] || final) + amortizacao['saldo_devedor']);
+          this.amortizacaoGeral = typeof(final) === 'number' ? final : final['saldo_devedor'];
+        }
+
+        if (valor > 0) {
+          this.amortizacaoGeral += valor
         }
       })
     }
@@ -686,15 +694,6 @@ export class ParceladoPreComponent implements OnInit {
     let valorPMTVincendaTotalVincendas = 0, totalDevedorTotalVincendas = 0;
 
     this.tableData.dataRows.map(async (row, key) => {
-      if (row['status'] === PARCELA_PAGA) {
-        const quit = this.tableData.dataRows.filter(valor => valor['status'] === PARCELA_PAGA)
-        if (quit.length === this.tableData.dataRows.length) {
-          this.tableLoading = false;
-          this.quitado = true
-        }
-        return;
-      }
-
       if (!isInlineChange) {
         const indice = this.formDefaultValues.formIndice;
         row['indiceDV'] = indice;
@@ -807,6 +806,12 @@ export class ParceladoPreComponent implements OnInit {
             }
 
             this.subtotal_data_calculo = this.total_data_calculo = formatDate(this.formDefaultValues.formDataCalculo)
+
+            // const tmpSubTotal = this.tableData.dataRows.reduce((total = 0, row2) => {
+            //   const val1 = typeof(total) === 'number' ? total : parseFloat(total['subtotal']);
+            //   const val2 =  parseFloat(row2['subtotal'])
+            //   return val1 + val2;
+            // });
             this.total_subtotal = totalDevedorTotalVincendas + totalDevedorTotal;
             this.total_honorarios = (this.total_subtotal + this.amortizacaoGeral) * (this.formDefaultValues["formHonorarios"] / 100)
             this.total_multa_sob_contrato = (this.total_subtotal + this.amortizacaoGeral + this.total_honorarios) * (this.formDefaultValues["formMultaSobContrato"] / 100)
