@@ -8,7 +8,7 @@ import { IndicesService } from '../../../_services/indices.service';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { LogService } from '../../../_services/log.service';
 
-import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias } from '../../util/util';
+import { getCurrentDate, formatDate, formatCurrency, getLastLine, verifyNumber, getQtdDias,isVincenda } from '../../util/util';
 import { LISTA_INDICES, LANGUAGEM_TABLE, CHEQUE_EMPRESARIAL } from '../../util/constants'
 
 import 'datatables.net';
@@ -494,7 +494,9 @@ export class ChequeEmpresarialComponent implements OnInit {
             row['dataBase'] = this.tableData.dataRows[index - 1]['dataBaseAtual'];
           }
 
-          const qtdDias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
+          let dias = getQtdDias(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"]));
+          const qtdDias = isVincenda(formatDate(row["dataBase"]), formatDate(row["dataBaseAtual"])) ? - dias : dias;
+
           const valorDevedor = parseFloat(row['valorDevedor']);
 
           const indiceDataBaseAtual = row['indiceDataBaseAtual'];

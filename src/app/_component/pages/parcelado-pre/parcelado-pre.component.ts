@@ -260,7 +260,9 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['contractRef'] = this.contractRef;
       parcelaLocal['tipoParcela'] = this.modulo;
       parcelaLocal['ultimaAtualizacao'] = getCurrentDate('YYYY-MM-DD');
-      parcelaLocal['infoParaAmortizacao'] = this.tableDataAmortizacao;
+      parcelaLocal['infoParaAmortizacao'] = JSON.stringify(this.tableDataAmortizacao);
+      parcelaLocal['nparcelas'] = parseFloat(parcelaLocal['nparcelas']);
+
 
       return parcelaLocal;
     });
@@ -580,7 +582,7 @@ export class ParceladoPreComponent implements OnInit {
     this.tableLoading = true;
     this.ultima_atualizacao = '';
     this.tableData.dataRows = [];
-
+    this.tableDataAmortizacao.dataRows = [];
     this.contractRef = infoContrato.contractRef;
     this.infoContrato = infoContrato;
 
@@ -593,7 +595,10 @@ export class ParceladoPreComponent implements OnInit {
       this.tableData.dataRows = parceladoPreList.filter((row) => row["contractRef"] === infoContrato.contractRef && row["tipoParcela"] === this.modulo).map((parcela, key) => {
         parcela.encargosMonetarios = JSON.parse(parcela.encargosMonetarios)
         parcela.infoParaCalculo = JSON.parse(parcela.infoParaCalculo)
-        this.tableDataAmortizacao.dataRows = parcela.infoParaAmortizacao ? JSON.parse(parcela.infoParaAmortizacao) : []
+        parcela.infoParaAmortizacao = JSON.parse(parcela.infoParaAmortizacao)
+        setTimeout(() => {
+          this.tableDataAmortizacao =  parcela.infoParaAmortizacao ?  parcela.infoParaAmortizacao : this.tableDataAmortizacao
+        }, 100);
 
         Object.keys(parcela.infoParaCalculo).filter(value => {
           this.formDefaultValues[value] = parcela.infoParaCalculo[value];
@@ -722,7 +727,7 @@ export class ParceladoPreComponent implements OnInit {
 
           // Calculos 
           const correcaoPeloIndice = (valorNoVencimento / indiceDataVencimento * indiceDataCalcAmor) - valorNoVencimento;
-          const qtdDias = getQtdDias(dataVencimento, dataCalcAmor);
+          const qtdDias = isVincenda(dataVencimento, dataCalcAmor) ? - getQtdDias(dataVencimento, dataCalcAmor) : getQtdDias(dataVencimento, dataCalcAmor);
           porcentagem = porcentagem / 30 * qtdDias;
           const valor = (valorNoVencimento + correcaoPeloIndice) * porcentagem;
           const multa = row['amortizacaoDataDiferenciada'] ? 0 : (valorNoVencimento + correcaoPeloIndice + valor) * (this.formDefaultValues.formMulta / 100);
@@ -751,13 +756,13 @@ export class ParceladoPreComponent implements OnInit {
             row['totalDevedor'] = valorPMTVincenda.toFixed(2);
             row['vincenda'] = true;
 
-            if (!row['isAmortizado'] ) {
+            if (!row['isAmortizado']) {
               valorPMTVincendaTotalVincendas += valorPMTVincenda;
               totalDevedorTotalVincendas += valorPMTVincenda;
             }
           } else {
             row['encargosMonetarios']['correcaoPeloIndice'] = correcaoPeloIndice.toFixed(2);
-            row['encargosMonetarios']['jurosAm']['dias'] = qtdDias;
+            row['encargosMonetarios']['jurosAm']['dias'] =  qtdDias;
             row['encargosMonetarios']['jurosAm']['percentsJuros'] = porcentagem ? (porcentagem * 100).toFixed(2) : 0;
             row['encargosMonetarios']['jurosAm']['moneyValue'] = valor.toFixed(2);
             row['encargosMonetarios']['multa'] = row['amortizacaoDataDiferenciada'] ? this.setCampoSemAlteracao() : multa.toFixed(2);
@@ -767,8 +772,8 @@ export class ParceladoPreComponent implements OnInit {
             row['totalDevedor'] = totalDevedor.toFixed(2);
             row['vincenda'] = false;
             row['desagio'] = desagio;
-        
-            if (!row['isAmortizado'] ) {
+
+            if (!row['isAmortizado']) {
               moneyValueTotal += valor;
               multaTotal += multa;
               subtotalTotal += subtotal;
@@ -852,6 +857,7 @@ export class ParceladoPreComponent implements OnInit {
           row['amortizacao'] = 0;
           row['totalDevedor'] = row['subtotal'];
           row['status'] = PARCELA_ABERTA;
+          row['infoParaAmortizacao']['dataRows'] = JSON.stringify(tableAmortizacao[1]);
         })
 
         setTimeout(() => {
@@ -860,7 +866,7 @@ export class ParceladoPreComponent implements OnInit {
 
         break;
       case AMORTIZACAO_DATA_DIFERENCIADA:
-        this.tableData.dataRows = this.tableData.dataRows.filter(row=> !row['amortizacaoDataDiferenciada']).map(row => {
+        this.tableData.dataRows = this.tableData.dataRows.filter(row => !row['amortizacaoDataDiferenciada']).map(row => {
           row['amortizacao'] = 0;
           row['totalDevedor'] = row['subtotal'];
           row['isAmortizado'] = false;
