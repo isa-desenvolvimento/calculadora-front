@@ -248,6 +248,8 @@ export class ParceladoPreComponent implements OnInit {
     this.controleLancamentos = 0;
 
     const payload = this.tableData.dataRows.map(parcela => {
+      if (parcela['amortizacaoDataDiferenciada']) return;
+
       this.updateLoadingBtn = true;
       let parcelaLocal = { ...parcela };
       parcelaLocal['encargosMonetarios'] = JSON.stringify(parcelaLocal['encargosMonetarios']);
@@ -256,7 +258,7 @@ export class ParceladoPreComponent implements OnInit {
       parcelaLocal['valorPMTVincenda'] = parseFloat(parcelaLocal['valorPMTVincenda']) || 0;
       parcelaLocal['amortizacao'] = parseFloat(parcelaLocal['amortizacao']);
       parcelaLocal['totalDevedor'] = parseFloat(parcelaLocal['totalDevedor']);
-      parcelaLocal['subtotal'] = parseFloat(parcelaLocal['subtotal']);
+      parcelaLocal['subtotal'] = parseFloat(parcelaLocal['subtotal']) || 0;
       parcelaLocal['contractRef'] = this.contractRef;
       parcelaLocal['tipoParcela'] = this.modulo;
       parcelaLocal['ultimaAtualizacao'] = getCurrentDate('YYYY-MM-DD');
@@ -265,14 +267,14 @@ export class ParceladoPreComponent implements OnInit {
       return parcelaLocal;
     });
 
-    const payloadPut = payload.filter((parcela => parcela['id']));
+    const payloadPut = payload.filter((parcela => parcela && parcela['id']));
     payloadPut.length > 0 && this.parceladoPreService.updateLancamento(payloadPut).subscribe(parceladoPreList => {
       this.atualizarRiscoConcluido()
     }, err => {
       this.atualizarRiscoFalha()
     });
 
-    const payloadPost = payload.filter((parcela => !parcela['id']));
+    const payloadPost = payload.filter((parcela => parcela && !parcela['id']));
     payloadPost.length > 0 && this.parceladoPreService.addLancamento(payloadPost).subscribe(chequeEmpresarialListUpdated => {
       this.atualizarRiscoConcluido()
     }, err => {
@@ -360,7 +362,7 @@ export class ParceladoPreComponent implements OnInit {
       let indexNewParcela = 0;
       TABLEDATA.map((row, key) => {
         row['isAmortizado'] = false;
-
+        
         if (row['status'] === PARCELA_ABERTA && !row['amortizacaoDataDiferenciada']) {
           DIFERENCIADA.map((amortizacao, index) => {
             if (valor <= 0) {
@@ -381,7 +383,7 @@ export class ParceladoPreComponent implements OnInit {
                 valor = 0;
                 add = false;
                 break;
-              case (row['totalDevedor'] < valor):
+              case (subtotal < valor):
                 row['status'] = PARCELA_PAGA;
                 row['totalDevedor'] = subtotal;
                 row['amortizacao'] = subtotal;
@@ -393,7 +395,7 @@ export class ParceladoPreComponent implements OnInit {
                 indexNewParcela++;
 
                 break;
-              case (row['totalDevedor'] > valor && valor > 0):
+              case (subtotal> valor && valor > 0):
                 row['status'] = PARCELA_ABERTA;
                 row['amortizacao'] = valor;
                 row['totalDevedor'] = 0;
@@ -403,7 +405,6 @@ export class ParceladoPreComponent implements OnInit {
                 add = true;
                 break;
             }
-
 
             if (add) {
               const newParcela = {
@@ -419,15 +420,13 @@ export class ParceladoPreComponent implements OnInit {
               };
 
               TABLEDATA.splice(++indexNewParcela, 0, newParcela);
-
             }
-
           })
         }
 
         if (FINAL.length) {
           const final = FINAL.reduce((final, amortizacao) => (final['saldo_devedor'] || final) + amortizacao['saldo_devedor']);
-          this.amortizacaoGeral = typeof(final) === 'number' ? final : final['saldo_devedor'];
+          this.amortizacaoGeral = typeof (final) === 'number' ? final : final['saldo_devedor'];
         }
 
         if (valor > 0) {
@@ -626,6 +625,7 @@ export class ParceladoPreComponent implements OnInit {
         const ultimaAtualizacao = [...this.tableData.dataRows].pop();
 
         setTimeout(() => {
+          if (this.tableDataAmortizacao.dataRows.length) this.adicionarAmortizacao(this.tableDataAmortizacao.dataRows);
           this.minParcela = parseFloat(ultimaAtualizacao['nparcelas']) + 1;
           this.simularCalc(true, null, true);
         }, 1000);
