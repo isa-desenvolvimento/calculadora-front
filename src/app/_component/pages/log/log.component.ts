@@ -62,7 +62,7 @@ export class LogComponent implements OnInit {
       paging: true,
       scrollCollapse: true,
       language: LANGUAGEM_TABLE,
-      serverSide: true,
+      processing: true,
       drawCallback: (settings) => {
         var tr = $(this).closest('tr');
 
@@ -89,31 +89,31 @@ export class LogComponent implements OnInit {
         });
         return row;
       },
-      ajax: (dataTablesParameters: any, callback) => {
-        const info = $('#tableLog').DataTable().page.info();
-        const length = dataTablesParameters.length || 10;
-        const page = info.page || 0;
-        const draw = dataTablesParameters.draw || 1;
+      // ajax: (dataTablesParameters: any, callback) => {
+      //   const info = $('#tableLog').DataTable().page.info();
+      //   const length = dataTablesParameters.length || 10;
+      //   const page = info.page || 0;
+      //   const draw = dataTablesParameters.draw || 1;
 
-        this.logService.getLogPage(
-          this.infoContrato.pasta,
-          this.infoContrato.contrato,
-          this.infoContrato.tipo_contrato,
-          length,
-          page,
-          draw,
-          this.infoContrato.recuperacaoJudicial
-        ).subscribe(logs => {
-          this.tableData.dataRows = logs['data'];
+      //   this.logService.getLogPage(
+      //     this.infoContrato.pasta,
+      //     this.infoContrato.contrato,
+      //     this.infoContrato.tipo_contrato,
+      //     length,
+      //     page,
+      //     draw,
+      //     this.infoContrato.recuperacaoJudicial
+      //   ).subscribe(logs => {
+      //     this.tableData.dataRows = logs['data'];
 
-          callback({
-            recordsTotal: logs['recordsTotal'],
-            recordsFiltered: logs['recordsFiltered'],
-            pages: logs['recordsTotal'] / logs['length'],
-            data: []
-          });
-        });
-      },
+      //     callback({
+      //       recordsTotal: logs['recordsTotal'],
+      //       recordsFiltered: logs['recordsFiltered'],
+      //       pages: logs['recordsTotal'] / logs['length'],
+      //       data: []
+      //     });
+      //   });
+      // },
     };
   }
 
@@ -150,13 +150,10 @@ export class LogComponent implements OnInit {
     this.infoContrato = infoContrato;
     this.tableData.dataRows = [];
 
-    this.logService.getLogPage(
+    this.logService.getLog(
       this.infoContrato.pasta,
       this.infoContrato.contrato,
       this.infoContrato.tipo_contrato,
-      10,
-      1,
-      1,
       this.infoContrato.recuperacaoJudicial
     ).subscribe(logs => {
       if (!logs['data'].length) {

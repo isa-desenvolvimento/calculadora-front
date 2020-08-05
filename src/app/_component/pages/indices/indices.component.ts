@@ -58,26 +58,25 @@ export class IndicesComponent implements OnInit {
 
     this.dtOptions = {
       paging: true,
-      searching: false,
-      serverSide: true,
-      ajax: (dataTablesParameters: any, callback) => {
-        const info = $('#tableIndice').DataTable().page.info();
-        const indiceType = this.indice_form.indice.value;
-        const length = dataTablesParameters.length || 10;
-        const page = info.page || 0;
-        const draw = dataTablesParameters.draw || 1;
+      serverSide: false,
+      // ajax: (dataTablesParameters: any, callback) => {
+      //   const info = $('#tableIndice').DataTable().page.info();
+      //   const indiceType = this.indice_form.indice.value;
+      //   const length = dataTablesParameters.length || 10;
+      //   const page = info.page || 0;
+      //   const draw = dataTablesParameters.draw || 1;
 
-        this.indicesService.getIndicePage(indiceType, length, page, draw).subscribe(resp => {
-          this.tableData.dataRows = resp['data'];
+      //   this.indicesService.getIndicePage(indiceType, length, page, draw).subscribe(resp => {
+      //     this.tableData.dataRows = resp['data'];
 
-          callback({
-            recordsTotal: resp['recordsTotal'],
-            recordsFiltered: resp['recordsFiltered'],
-            pages: resp['recordsTotal'] / resp['length'],
-            data: []
-          });
-        });
-      },
+      //     callback({
+      //       recordsTotal: resp['recordsTotal'],
+      //       recordsFiltered: resp['recordsFiltered'],
+      //       pages: resp['recordsTotal'] / resp['length'],
+      //       data: []
+      //     });
+      //   });
+      // },
       language: LANGUAGEM_TABLE
     }
   }
@@ -136,7 +135,7 @@ export class IndicesComponent implements OnInit {
       this.tableLoading = true;
       const DATAINPUT = this.indice_form.data.value ? formatDate(this.indice_form.data.value, "YYYY-MM-DD") : false;
 
-      this.indicesService.getIndicePage(this.indice_form.indice.value, 10, 1, 1).subscribe(indices => {
+      this.indicesService.getIndice(this.indice_form.indice.value).subscribe(indices => {
         this.tableData.dataRows = indices['data'];
         this.infoTable = indices;
 
