@@ -136,17 +136,17 @@ export class PesquisaComponent implements OnInit {
       this.folderData_field = [];
       this.contractList_field = [];
       this.typeContractList_field = [];
+
+      if (this.form.contrato.value || this.form.tipo_contrato.value) {
+        this.peForm.reset({
+          pasta: this.form.pasta.value,
+          recuperacaoJudicial: false,
+        });
+      }
     }
 
     if (!this.form.cnpj.value) {
       this.cnpjList_field = [];
-    }
-
-    if (this.form.contrato.value || this.form.tipo_contrato.value) {
-      this.peForm.reset({
-        pasta: this.form.pasta.value,
-        recuperacaoJudicial: false,
-      });
     }
 
     this.pastas["data"].map((pasta) => {
@@ -168,28 +168,33 @@ export class PesquisaComponent implements OnInit {
   }
 
   setCnpj() {
-    if (!this.form.pasta.value) {
+    if (this.form.pasta.value === "") {
       this.folderData_field = [];
       this.contractList_field = [];
       this.typeContractList_field = [];
+
+      if (this.form.contrato.value || this.form.tipo_contrato.value) {
+        this.peForm.reset({
+          pasta: this.form.pasta.value,
+          recuperacaoJudicial: false,
+        });
+      }
     }
 
-    if (!this.form.cliente.value) {
+    if (this.form.cliente.value === "") {
       this.clienteList_field = [];
-    }
-
-    if (this.form.contrato.value || this.form.tipo_contrato.value) {
-      this.peForm.reset({
-        pasta: this.form.pasta.value,
-        recuperacaoJudicial: false,
-      });
     }
 
     this.pastas["data"].map((pasta) => {
       if (pasta.CNPJ === this.form.cnpj.value) {
-        this.contractList_field.push(pasta.CONTRATO);
-        this.clienteList_field.push(pasta.CLIENTE);
-        this.folderData_field.push(pasta.PASTA);
+        if (!this.form.cliente.value) {
+          this.clienteList_field.push(pasta.CLIENTE);
+        }
+
+        if (!this.form.pasta.value) {
+          this.contractList_field.push(pasta.CONTRATO);
+          this.folderData_field.push(pasta.PASTA);
+        }
       }
     });
 
