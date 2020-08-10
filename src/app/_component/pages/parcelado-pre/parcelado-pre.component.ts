@@ -499,7 +499,8 @@ export class ParceladoPreComponent implements OnInit {
           if (
             amortizacaoKey > rowKey ||
             amortizacao.hasOwnProperty("incluida") ||
-            amortizacaoMesmaParcela
+            amortizacaoMesmaParcela ||
+            row["status"] === PARCELA_PAGA
           )
             return;
 
@@ -510,13 +511,37 @@ export class ParceladoPreComponent implements OnInit {
             ? parseFloat(row["valorPMTVincenda"])
             : parseFloat(row["totalDevedor"]);
 
+          const incialNumero = row["nparcelas"].split(".")[0];
+
           switch (true) {
             case saldoDevedor === totalDevedor:
               row["status"] = PARCELA_PAGA;
               row["totalDevedor"] = 0;
               row["amortizacao"] = saldoDevedor;
+
               amortizacao["incluida"] = true;
               amortizacaoMesmaParcela = false;
+
+              const newParcelaP = {
+                ...row,
+                status: PARCELA_PAGA,
+                nparcelas: `${incialNumero}.1`,
+                amortizacao: 0,
+                vincenda: amortizacaoVincenda,
+                isAmortizado: false,
+                dataCalcAmor: amortizacao["data_vencimento"],
+                dataVencimento: row["dataCalcAmor"],
+                encargosMonetarios: {
+                  ...row["encargosMonetarios"],
+                  jurosAm: {
+                    ...row["encargosMonetarios"]["jurosAm"],
+                    dias: qtdDias,
+                  },
+                },
+                amortizacaoDataDiferenciada: true,
+              };
+
+              this.tableData.dataRows.splice(rowKey + 1, 0, newParcelaP);
 
               break;
             case saldoDevedor < totalDevedor:
@@ -524,7 +549,6 @@ export class ParceladoPreComponent implements OnInit {
               row["isAmortizado"] = true;
               row["amortizacao"] = saldoDevedor;
 
-              let incialNumero = row["nparcelas"].split(".")[0];
               //const rowAnterior = this.tableData.dataRows[rowKey - 1];
               const newParcela = {
                 ...row,
@@ -548,6 +572,35 @@ export class ParceladoPreComponent implements OnInit {
               this.tableData.dataRows.splice(rowKey + 1, 0, newParcela);
               indexParcelaAdd++;
               amortizacaoMesmaParcela = true;
+
+              break;
+            case saldoDevedor > totalDevedor:
+              row["status"] = PARCELA_PAGA;
+              row["totalDevedor"] = 0;
+              row["amortizacao"] = totalDevedor;
+              amortizacao["saldo_devedor"] = saldoDevedor - totalDevedor;
+
+              //const rowAnterior = this.tableData.dataRows[rowKey - 1];
+              const newParcelat = {
+                ...row,
+                nparcelas: `${incialNumero}.1`,
+                amortizacao: 0,
+                vincenda: amortizacaoVincenda,
+                isAmortizado: false,
+                dataCalcAmor: amortizacao["data_vencimento"],
+                dataVencimento: row["dataCalcAmor"],
+                encargosMonetarios: {
+                  ...row["encargosMonetarios"],
+                  jurosAm: {
+                    ...row["encargosMonetarios"]["jurosAm"],
+                    dias: qtdDias,
+                  },
+                },
+                amortizacaoDataDiferenciada: true,
+              };
+
+              this.tableData.dataRows.splice(rowKey + 1, 0, newParcelat);
+              amortizacaoMesmaParcela = false;
 
               break;
             default:
@@ -1102,6 +1155,7 @@ export class ParceladoPreComponent implements OnInit {
         }
       );
     });
+    return true;
   }
 
   delete(row, table) {
