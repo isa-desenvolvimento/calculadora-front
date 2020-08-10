@@ -1189,6 +1189,7 @@ export class ParceladoPreComponent implements OnInit {
 
     switch (rowAmortizacao.tipo) {
       case AMORTIZACAO_DATA_ATUAL:
+        this.tableDataAmortizacao.dataRows = [];
         this.tableData.dataRows.map((row) => {
           row["amortizacao"] = 0;
           row["totalDevedor"] = row["subtotal"];
@@ -1202,6 +1203,7 @@ export class ParceladoPreComponent implements OnInit {
 
         break;
       case AMORTIZACAO_DATA_DIFERENCIADA:
+        this.tableDataAmortizacao.dataRows = [];
         this.tableData.dataRows = this.tableData.dataRows
           .filter((row) => !row["amortizacaoDataDiferenciada"])
           .map((row) => {
@@ -1214,7 +1216,7 @@ export class ParceladoPreComponent implements OnInit {
 
         setTimeout(() => {
           this.adicionarAmortizacao(tableAmortizacao);
-        }, 0);
+        }, 500);
 
         break;
       case AMORTIZACAO_DATA_FINAL:
