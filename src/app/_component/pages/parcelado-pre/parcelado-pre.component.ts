@@ -543,20 +543,20 @@ export class ParceladoPreComponent implements OnInit {
             }
           });
         }
-
-        if (FINAL.length) {
-          const final = FINAL.reduce(
-            (final, amortizacao) =>
-              (final["saldo_devedor"] || final) + amortizacao["saldo_devedor"]
-          );
-          this.amortizacaoGeral =
-            typeof final === "number" ? final : final["saldo_devedor"];
-        }
-
-        if (valor > 0) {
-          this.amortizacaoGeral += valor;
-        }
       });
+    }
+
+    if (FINAL.length) {
+      const final = FINAL.reduce(
+        (final, amortizacao) =>
+          (final["saldo_devedor"] || final) + amortizacao["saldo_devedor"]
+      );
+      this.amortizacaoGeral =
+        typeof final === "number" ? final : final["saldo_devedor"];
+    }
+
+    if (valor > 0) {
+      this.amortizacaoGeral += valor;
     }
 
     setTimeout(() => {
