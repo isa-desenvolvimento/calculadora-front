@@ -438,6 +438,8 @@ export class ParceladoPreComponent implements OnInit {
         const amortizacao = parseFloat(row["amortizacao"]);
         const subtotal = parseFloat(row["subtotal"]);
 
+        if (row["status"] === PARCELA_PAGA) return;
+
         if (amortizacao === subtotal) {
           valor -= amortizacao;
           return;
@@ -481,6 +483,8 @@ export class ParceladoPreComponent implements OnInit {
 
       DIFERENCIADA.map((amortizacao, amortizacaoKey) => {
         this.tableData.dataRows.map((row, rowKey) => {
+          if (row["status"] === PARCELA_PAGA) return;
+
           const qtdDias = getQtdDias(
             formatDate(row["dataCalcAmor"]),
             formatDate(amortizacao["data_vencimento"])
@@ -499,8 +503,7 @@ export class ParceladoPreComponent implements OnInit {
           if (
             amortizacaoKey > rowKey ||
             amortizacao.hasOwnProperty("incluida") ||
-            amortizacaoMesmaParcela ||
-            row["status"] === PARCELA_PAGA
+            amortizacaoMesmaParcela
           )
             return;
 
