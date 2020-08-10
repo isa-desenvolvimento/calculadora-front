@@ -324,6 +324,10 @@ export class ParceladoPreComponent implements OnInit {
         : 0;
     });
 
+    this.tableDataAmortizacao.dataRows.map((armotizacao) => {
+      delete armotizacao["incluida"];
+    });
+
     const payload = this.tableData.dataRows.map((parcela) => {
       if (parcela["amortizacaoDataDiferenciada"]) return;
 
@@ -336,9 +340,18 @@ export class ParceladoPreComponent implements OnInit {
 
       parcelaLocal["valorPMTVincenda"] =
         parseFloat(parcelaLocal["valorPMTVincenda"]) || 0;
-      parcelaLocal["amortizacao"] = parseFloat(parcelaLocal["amortizacao"]);
-      parcelaLocal["totalDevedor"] = parseFloat(parcelaLocal["totalDevedor"]);
       parcelaLocal["subtotal"] = parseFloat(parcelaLocal["subtotal"]) || 0;
+
+      parcelaLocal["amortizacao"] = 0;
+      parcelaLocal["status"] = PARCELA_ABERTA;
+
+      parcelaLocal["totalDevedor"] = isVincenda(
+        parcelaLocal["dataVencimento"],
+        parcelaLocal["dataCalcAmor"]
+      )
+        ? parcelaLocal["valorPMTVincenda"]
+        : parcelaLocal["subtotal"];
+
       parcelaLocal["contractRef"] = this.contractRef;
       parcelaLocal["tipoParcela"] = this.modulo;
       parcelaLocal["ultimaAtualizacao"] = getCurrentDate("YYYY-MM-DD");
@@ -463,6 +476,9 @@ export class ParceladoPreComponent implements OnInit {
       );
       valor = typeof valor === "number" ? valor : valor["saldo_devedor"];
 
+      let indexParcelaAdd = 1;
+      let amortizacaoMesmaParcela = false;
+
       DIFERENCIADA.map((amortizacao, amortizacaoKey) => {
         this.tableData.dataRows.map((row, rowKey) => {
           const qtdDias = getQtdDias(
@@ -470,23 +486,75 @@ export class ParceladoPreComponent implements OnInit {
             formatDate(amortizacao["data_vencimento"])
           );
 
-          if (amortizacaoKey <= rowKey) {
-            const saldoDevedor = parseFloat(amortizacao["saldo_devedor"]);
-            const totalDevedor = parseFloat(row["totalDevedor"]);
+          const amortizacaoVincenda = isVincenda(
+            row["dataCalcAmor"],
+            amortizacao["data_vencimento"]
+          );
 
-            switch (true) {
-              case saldoDevedor === totalDevedor:
-                row["status"] = PARCELA_PAGA;
-                row["totalDevedor"] = 0;
-                row["amortizacao"] = saldoDevedor;
+          const rowVincenda = isVincenda(
+            row["data_vencimento"],
+            row["dataCalcAmor"]
+          );
 
-                break;
+          if (
+            amortizacaoKey > rowKey ||
+            amortizacao.hasOwnProperty("incluida") ||
+            amortizacaoMesmaParcela
+          )
+            return;
 
-              default:
-                break;
-            }
+          const saldoDevedor = parseFloat(amortizacao["saldo_devedor"]);
+          const totalDevedor = row["amortizacaoDataDiferenciada"]
+            ? parseFloat(row["valorPMTVincenda"])
+            : rowVincenda
+            ? parseFloat(row["valorPMTVincenda"])
+            : parseFloat(row["totalDevedor"]);
+
+          switch (true) {
+            case saldoDevedor === totalDevedor:
+              row["status"] = PARCELA_PAGA;
+              row["totalDevedor"] = 0;
+              row["amortizacao"] = saldoDevedor;
+              amortizacao["incluida"] = true;
+              amortizacaoMesmaParcela = false;
+
+              break;
+            case saldoDevedor < totalDevedor:
+              // row["status"] = PARCELA_AMORTIZADA;
+              row["isAmortizado"] = true;
+              row["amortizacao"] = saldoDevedor;
+
+              let incialNumero = row["nparcelas"].split(".")[0];
+              //const rowAnterior = this.tableData.dataRows[rowKey - 1];
+              const newParcela = {
+                ...row,
+                nparcelas: `${incialNumero}.${indexParcelaAdd}`,
+                amortizacao: 0,
+                vincenda: amortizacaoVincenda,
+                isAmortizado: false,
+                dataCalcAmor: amortizacao["data_vencimento"],
+                dataVencimento: row["dataCalcAmor"],
+                encargosMonetarios: {
+                  ...row["encargosMonetarios"],
+                  jurosAm: {
+                    ...row["encargosMonetarios"]["jurosAm"],
+                    dias: qtdDias,
+                  },
+                },
+                amortizacaoDataDiferenciada: true,
+              };
+
+              amortizacao["incluida"] = true;
+              this.tableData.dataRows.splice(rowKey + 1, 0, newParcela);
+              indexParcelaAdd++;
+              amortizacaoMesmaParcela = true;
+
+              break;
+            default:
+              break;
           }
         });
+        amortizacaoMesmaParcela = false;
       });
     }
 
@@ -729,7 +797,6 @@ export class ParceladoPreComponent implements OnInit {
             if (this.tableDataAmortizacao.dataRows.length)
               this.adicionarAmortizacao(this.tableDataAmortizacao.dataRows);
             this.minParcela = parseFloat(ultimaAtualizacao["nparcelas"]) + 1;
-            this.simularCalc(true, null, true);
           }, 1000);
         } else {
           this.minParcela = 1;
@@ -852,20 +919,28 @@ export class ParceladoPreComponent implements OnInit {
             const indiceDataVencimento = row["indiceDataVencimento"] / 100;
             const indiceDataCalcAmor = row["indiceDataCalcAmor"] / 100;
 
-            const valorNoVencimento = parseFloat(row["valorNoVencimento"]);
+            if (row["amortizacaoDataDiferenciada"]) {
+              const rowAnterior = this.tableData.dataRows[key - 1];
+              row["valorNoVencimento"] = rowAnterior["totalBackup"];
+            }
+
+            const valorNoVencimento =
+              typeof row["valorNoVencimento"] === "string"
+                ? parseFloat(row["valorNoVencimento"])
+                : row["valorNoVencimento"];
             // const vincenda = isVincenda(
             //   row["dataVencimento"],
             //   this.formDefaultValues.formDataCalculo
             // );
 
+            const amortizacao = parseFloat(row["amortizacao"]);
             const vincenda = isVincenda(
               row["dataVencimento"],
               row["dataCalcAmor"]
             );
 
-            const amortizacao = parseFloat(row["amortizacao"]);
-            let porcentagem = vincenda;
-            this.formDefaultValues.formJuros / 100 ||
+            let porcentagem =
+              this.formDefaultValues.formJuros / 100 ||
               parseFloat(
                 row["encargosMonetarios"]["jurosAm"]["percentsJuros"]
               ) / 100;
@@ -906,6 +981,8 @@ export class ParceladoPreComponent implements OnInit {
 
             // Table Values
             if (vincenda) {
+              row["totalBackup"] = valorPMTVincenda - amortizacao;
+
               row["encargosMonetarios"][
                 "correcaoPeloIndice"
               ] = this.setCampoSemAlteracao();
@@ -932,6 +1009,8 @@ export class ParceladoPreComponent implements OnInit {
                 totalDevedorTotalVincendas += valorPMTVincenda;
               }
             } else {
+              row["totalBackup"] = subtotal - amortizacao;
+
               row["encargosMonetarios"][
                 "correcaoPeloIndice"
               ] = correcaoPeloIndice.toFixed(2);

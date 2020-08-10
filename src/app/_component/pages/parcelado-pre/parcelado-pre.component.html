@@ -290,7 +290,9 @@
                   <td class="log-hidden-false" (click)="deleteRow(row)">
                     <i
                       style="color: red; cursor: pointer;"
-                      [hidden]="row.status === 'Pago'"
+                      [hidden]="
+                        row.status === 'Pago' || row.amortizacaoDataDiferenciada
+                      "
                       class="nc-icon nc-simple-remove"
                     ></i>
                   </td>
