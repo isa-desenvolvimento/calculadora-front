@@ -189,7 +189,21 @@ export class ChequeEmpresarialComponent implements OnInit {
             doc["content"].push({
               style: { fontSize: 10 },
               alignment: "left",
-              margin: [0, 20, 10, 0],
+              margin: [0, 15, 10, 0],
+              text: `Cliente : ${this.infoContrato["cliente"]}`,
+            });
+
+            doc["content"].push({
+              style: { fontSize: 10 },
+              alignment: "left",
+              margin: [0, 0, 10, 0],
+              text: `CNPJ/CPF : ${this.infoContrato["cnpj"]}`,
+            });
+
+            doc["content"].push({
+              style: { fontSize: 10 },
+              alignment: "left",
+              margin: [0, 10, 10, 0],
               text: `Honorários ${
                 this.formDefaultValues.formHonorarios || 0
               }% : ${formatCurrency(this.total_honorarios)}`,
