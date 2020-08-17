@@ -517,7 +517,7 @@ export class ChequeEmpresarialComponent implements OnInit {
       (chequeEmpresarialList) => {
         this.tableData.dataRows = chequeEmpresarialList
           .filter((row) => row["contractRef"] === infoContrato.contractRef)
-          .map((cheque) => {
+          .map((cheque, index) => {
             cheque.encargosMonetarios = JSON.parse(cheque.encargosMonetarios);
             cheque.infoParaCalculo = JSON.parse(cheque.infoParaCalculo);
             cheque.isTipoLancamento = true;
@@ -534,7 +534,7 @@ export class ChequeEmpresarialComponent implements OnInit {
             });
 
             setTimeout(() => {
-              this.simularCalc(true, null, true);
+              (this.tableData.dataRows.length - 1) === index && this.simularCalc(true, null, true);
             }, 1000);
 
             return cheque;
@@ -550,7 +550,7 @@ export class ChequeEmpresarialComponent implements OnInit {
           return;
         }
 
-        this.tableLoading = false;
+        // this.tableLoading = false;
       },
       (err) => {
         this.alertType = {
