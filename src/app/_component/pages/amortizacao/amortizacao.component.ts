@@ -104,20 +104,6 @@ export class AmortizacaoComponent implements OnInit {
       return;
     }
 
-    const preFATipo = this.pre_form_amortizacao.tipo.value;
-
-    switch (preFATipo) {
-      case AMORTIZACAO_DATA_ATUAL:
-        this.preFormAmortizacao.value.data_vencimento = this.formatDate(
-          this.dataCalculo,
-          "YYYY-MM-DD"
-        );
-        break;
-
-      default:
-        break;
-    }
-
     this.tableDataAmortizacao.dataRows.push(this.preFormAmortizacao.value);
 
     this.incluirAmortizacao.emit(this.tableDataAmortizacao.dataRows);
