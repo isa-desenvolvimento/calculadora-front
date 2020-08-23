@@ -28,6 +28,7 @@ import {
   AMORTIZACAO_DATA_FINAL,
   PARCELA_PAGA,
   PARCELA_ABERTA,
+  PARCELA_AMORTIZADA,
   PARCELADO_PRE_URL,
   PARCELADO_PRE,
   PARCELADO_POS,
@@ -487,11 +488,9 @@ export class ParceladoPreComponent implements OnInit {
       //   typeof valorAmortizacao === "number"
       //     ? valorAmortizacao
       //     : valorAmortizacao.saldo_devedor;
-
       TABLE.map((row, keyRow) => {
         if (row["status"] === PARCELA_PAGA) return;
 
-        let RISIDUAL = 0;
         const NPARCELAS = row["nparcelas"].split(".")[0];
         const SUBNPARCELAS = row["nparcelas"].split(".")[1]
           ? parseInt(row["nparcelas"].split(".")[1]) + 1
@@ -499,33 +498,43 @@ export class ParceladoPreComponent implements OnInit {
         let nextRow = false;
         DIFERENCIADA.map((amor) => {
           if (nextRow) return;
-          if (amor.hasOwnProperty("wasUsed") && RISIDUAL === 0) return;
+          if (
+            amor.hasOwnProperty("wasUsed") &&
+            !amor.hasOwnProperty("residual")
+          )
+            return;
 
           const subtotal = parseFloat(row["subtotal"]);
-          const saldoDevedor = parseFloat(amor["saldo_devedor"]) + RISIDUAL;
+          const saldoPgo = amor.hasOwnProperty("residual")
+            ? amor["residual"]
+            : parseFloat(amor["saldo_devedor"]);
           const amortizacao = parseFloat(row["amortizacao"]);
 
           switch (true) {
-            case subtotal === saldoDevedor:
+            case subtotal === saldoPgo:
               row["amortizacao"] = subtotal;
               row["status"] = PARCELA_PAGA;
               amor["wasUsed"] = true;
+              nextRow = true;
+              delete amor["residual"];
+
               break;
-            case subtotal < saldoDevedor:
+            case subtotal < saldoPgo:
               row["amortizacao"] = subtotal;
               row["status"] = PARCELA_PAGA;
               row["isAmortizado"] = true;
               amor["wasUsed"] = true;
-              RISIDUAL = saldoDevedor - subtotal;
+              amor["residual"] = saldoPgo - subtotal;
+
               break;
-            case subtotal > saldoDevedor:
-              row["amortizacao"] = saldoDevedor;
-              row["status"] = PARCELA_ABERTA;
+            case subtotal > saldoPgo:
+              row["amortizacao"] = saldoPgo;
+              row["status"] = PARCELA_AMORTIZADA;
               row["totalDevedor"] = 0;
               row["isAmortizado"] = true;
 
               amor["wasUsed"] = true;
-              RISIDUAL = 0;
+              delete amor["residual"];
 
               const qtdDias = getQtdDias(
                 formatDate(row["dataCalcAmor"]),
@@ -537,6 +546,7 @@ export class ParceladoPreComponent implements OnInit {
                 nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
                 dataVencimento: row["dataCalcAmor"],
                 dataCalcAmor: amor["data_vencimento"],
+                status: PARCELA_ABERTA,
                 amortizacao: 0,
                 isAmortizado: false,
                 encargosMonetarios: {
@@ -551,6 +561,8 @@ export class ParceladoPreComponent implements OnInit {
               };
 
               TABLE.splice(keyRow + 1, 0, NEWPARCELAS);
+              this.simularCalc(true);
+
               nextRow = true;
 
               break;
@@ -637,8 +649,8 @@ export class ParceladoPreComponent implements OnInit {
     return;
   }
 
-  incluirParcelas(tableDataParcelas) {
-    if (!this.form_riscos.formIndice) {
+  incluirParcelas(tableDataParcelas, isAmortizacao = false) {
+    if (!this.form_riscos.formIndice && !isAmortizacao) {
       this.updateLoadingBtn = false;
       this.alertType = {
         mensagem: "É necessário informar o índice.",
