@@ -133,7 +133,7 @@ export class ParceladoPreComponent implements OnInit {
     private parceladoPreService: ParceladoPreService,
     private indicesService: IndicesService,
     private logService: LogService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.tableData = {
@@ -248,7 +248,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 20, 10, 0],
               text: `SUBTOTAL APURADO EM ${
                 this.subtotal_data_calculo || "---------"
-              } : ${this.formatCurrency(this.total_subtotal)}`,
+                } : ${this.formatCurrency(this.total_subtotal)}`,
             });
 
             doc["content"].push({
@@ -257,7 +257,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 1, 10, 0],
               text: `Honorários ${
                 this.formDefaultValues.formHonorarios || 0
-              }% : ${this.formatCurrency(this.total_honorarios)}`,
+                }% : ${this.formatCurrency(this.total_honorarios)}`,
             });
 
             doc["content"].push({
@@ -266,7 +266,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 1, 10, 0],
               text: `Multa sob contrato ${
                 this.formDefaultValues.formMultaSobContrato || 0
-              }% : ${this.formatCurrency(this.total_multa_sob_contrato)}`,
+                }% : ${this.formatCurrency(this.total_multa_sob_contrato)}`,
             });
 
             doc["content"].push({
@@ -275,7 +275,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 1, 10, 0],
               text: `TOTAL APURADO EM ${
                 this.total_data_calculo || "---------"
-              } : ${this.formatCurrency(this.total_grandtotal)}`,
+                } : ${this.formatCurrency(this.total_grandtotal)}`,
             });
           },
         },
@@ -310,7 +310,7 @@ export class ParceladoPreComponent implements OnInit {
               modulo: this.isDesagio ? PARCELADO_PRE : PARCELADO_POS,
             },
           ])
-          .subscribe((log) => {});
+          .subscribe((log) => { });
       }
     }, 500);
   }
@@ -344,8 +344,8 @@ export class ParceladoPreComponent implements OnInit {
       return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
         ? -1
         : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-        ? 1
-        : 0;
+          ? 1
+          : 0;
     });
 
     this.tableDataAmortizacao.dataRows.map((armotizacao) => {
@@ -458,6 +458,7 @@ export class ParceladoPreComponent implements OnInit {
     const DIFERENCIADA = amortizacaoTable.filter(
       (amortizacao) => amortizacao.tipo !== AMORTIZACAO_DATA_FINAL
     );
+    debugger;
 
     // Amortização final
     if (FINAL.length) {
@@ -477,6 +478,7 @@ export class ParceladoPreComponent implements OnInit {
         (row) => !row.hasOwnProperty("amortizacaoDataDiferenciada")
       ));
 
+
       // let valorAmortizacao =
       //   DIFERENCIADA.reduce(
       //     (curr, next) =>
@@ -488,142 +490,200 @@ export class ParceladoPreComponent implements OnInit {
       //   typeof valorAmortizacao === "number"
       //     ? valorAmortizacao
       //     : valorAmortizacao.saldo_devedor;
-      TABLE.map((row, keyRow) => {
-        if (row["status"] === PARCELA_PAGA) return;
 
-        const NPARCELAS = row["nparcelas"].split(".")[0];
-        const SUBNPARCELAS = row["nparcelas"].split(".")[1]
-          ? parseInt(row["nparcelas"].split(".")[1]) + 1
-          : 1;
-        let nextRow = false;
-        DIFERENCIADA.map((amor) => {
-          if (nextRow) return;
-          if (
-            amor.hasOwnProperty("wasUsed") &&
-            !amor.hasOwnProperty("residual")
-          )
-            return;
+      let size = TABLE.length;
+      let i = 0;
+      debugger;
+      while (size > i) {
+        if (TABLE[i]["status"] == PARCELA_PAGA) {
+          i++;
 
-          const subtotal = parseFloat(row["subtotal"]);
-          const saldoPgo = amor.hasOwnProperty("residual")
-            ? amor["residual"]
-            : parseFloat(amor["saldo_devedor"]);
-          const amortizacao = parseFloat(row["amortizacao"]);
+        }
+        else {
+          debugger;
+          const NPARCELAS = TABLE[i]["nparcelas"].split(".")[0];
+          const SUBNPARCELAS = TABLE[i]["nparcelas"].split(".")[1]
+            ? parseInt(TABLE[i]["nparcelas"].split(".")[1]) + 1
+            : 1;
+          let nextRow = false;
+          DIFERENCIADA.map((amor) => {
+            debugger;
+            // if (nextRow) return;
+            if (
+              amor.hasOwnProperty("wasUsed") &&
+              !amor.hasOwnProperty("residual")
+            )
+              return;
 
-          switch (true) {
-            case subtotal === saldoPgo:
-              row["amortizacao"] = subtotal;
-              row["status"] = PARCELA_PAGA;
-              amor["wasUsed"] = true;
-              nextRow = true;
-              delete amor["residual"];
+            const subtotal = parseFloat(TABLE[i]["subtotal"]);
+            const saldoPgo = amor.hasOwnProperty("residual")
+              ? amor["residual"]
+              : parseFloat(amor["saldo_devedor"]);
+            const amortizacao = parseFloat(TABLE[i]["amortizacao"]);
 
-              break;
-            case subtotal < saldoPgo:
-              row["amortizacao"] = subtotal;
-              row["status"] = PARCELA_PAGA;
-              row["isAmortizado"] = true;
-              amor["wasUsed"] = true;
-              amor["residual"] = saldoPgo - subtotal;
+            switch (true) {
+              case subtotal === saldoPgo:
+                TABLE[i]["amortizacao"] = subtotal;
+                TABLE[i]["status"] = PARCELA_PAGA;
+                amor["wasUsed"] = true;
+                nextRow = true;
+                delete amor["residual"];
 
-              break;
-            case subtotal > saldoPgo:
-              row["amortizacao"] = saldoPgo;
-              row["status"] = PARCELA_AMORTIZADA;
-              row["totalDevedor"] = 0;
-              row["isAmortizado"] = true;
+                break;
+              case subtotal < saldoPgo:
+                TABLE[i]["amortizacao"] = subtotal;
+                TABLE[i]["status"] = PARCELA_PAGA;
+                TABLE[i]["isAmortizado"] = true;
+                amor["wasUsed"] = true;
+                amor["residual"] = saldoPgo - subtotal;
 
-              amor["wasUsed"] = true;
-              delete amor["residual"];
+                break;
+              case subtotal > saldoPgo:
+                TABLE[i]["amortizacao"] = saldoPgo;
+                TABLE[i]["status"] = PARCELA_AMORTIZADA;
+                TABLE[i]["totalDevedor"] = 0;
+                TABLE[i]["isAmortizado"] = true;
 
-              const qtdDias = getQtdDias(
-                formatDate(row["dataCalcAmor"]),
-                formatDate(amor["data_vencimento"])
-              );
+                amor["wasUsed"] = true;
+                delete amor["residual"];
 
-              const NEWPARCELAS = {
-                ...row,
-                nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
-                dataVencimento: row["dataCalcAmor"],
-                dataCalcAmor: amor["data_vencimento"],
-                status: PARCELA_ABERTA,
-                amortizacao: 0,
-                isAmortizado: false,
-                encargosMonetarios: {
-                  ...row["encargosMonetarios"],
-                  jurosAm: {
-                    ...row["encargosMonetarios"]["jurosAm"],
-                    dias: qtdDias,
+                const qtdDias = getQtdDias(
+                  formatDate(TABLE[i]["dataCalcAmor"]),
+                  formatDate(amor["data_vencimento"])
+                );
+
+                const NEWPARCELAS = {
+                  ...TABLE[i],
+                  nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
+                  dataVencimento: TABLE[i]["dataCalcAmor"],
+                  dataCalcAmor: amor["data_vencimento"],
+                  status: PARCELA_ABERTA,
+                  amortizacao: 0,
+                  isAmortizado: false,
+                  encargosMonetarios: {
+                    ...TABLE[i]["encargosMonetarios"],
+                    jurosAm: {
+                      ...TABLE[i]["encargosMonetarios"]["jurosAm"],
+                      dias: qtdDias,
+                    },
                   },
-                },
 
-                amortizacaoDataDiferenciada: true,
-              };
+                  amortizacaoDataDiferenciada: true,
+                };
 
-              TABLE.splice(keyRow + 1, 0, NEWPARCELAS);
-              this.simularCalc(true);
+                TABLE.splice(i + 1, 0, NEWPARCELAS);
+                size++;
+                this.simularCalc(true);
+                i++;
 
-              nextRow = true;
+                nextRow = true;
 
-              break;
-            default:
-              break;
-          }
-        });
+                break;
+              default:
+                break;
+            }
+          });
 
-        setTimeout(() => {
-          this.simularCalc(true);
-        }, 0);
+          setTimeout(() => {
+            this.simularCalc(true);
+          }, 0);
 
-        // if (row["status"] === PARCELA_PAGA) return;
+          i++;
+        }
 
-        // valorAmortizacao += parseFloat(row["amortizacao"])
-        //   ? parseFloat(row["amortizacao"])
-        //   : 0;
-        // const subtotal = parseFloat(row["subtotal"]); // verificar se sempre tem
-        // if (valorAmortizacao <= 0) return;
+      }
 
-        // switch (true) {
-        //   case subtotal === valorAmortizacao:
-        //     row["amortizacao"] = subtotal;
-        //     row["status"] = PARCELA_PAGA;
-        //     valorAmortizacao = 0;
-        //     break;
-        //   case subtotal > valorAmortizacao:
-        //     const NEW_PARCELAS = [];
 
-        //     DIFERENCIADA.map((amor, key) => {
-        //       if (key - 1 >= 0) {
-        //         NEW_PARCELAS[key - 1]["amortizacao"] = amor["saldo_devedor"];
-        //       }
+      // TABLE.map((row, keyRow) => {
+      //   if (row["status"] === PARCELA_PAGA) return;
+      //   debugger;
+      //   const NPARCELAS = row["nparcelas"].split(".")[0];
+      //   const SUBNPARCELAS = row["nparcelas"].split(".")[1]
+      //     ? parseInt(row["nparcelas"].split(".")[1]) + 1
+      //     : 1;
+      //   let nextRow = false;
+      //   DIFERENCIADA.map((amor) => {
+      //     debugger;
+      //     if (nextRow) return;
+      //     if (
+      //       amor.hasOwnProperty("wasUsed") &&
+      //       !amor.hasOwnProperty("residual")
+      //     )
+      //       return;
 
-        //       const nparcelas = parseFloat(row["nparcelas"]);
+      //     const subtotal = parseFloat(row["subtotal"]);
+      //     const saldoPgo = amor.hasOwnProperty("residual")
+      //       ? amor["residual"]
+      //       : parseFloat(amor["saldo_devedor"]);
+      //     const amortizacao = parseFloat(row["amortizacao"]);
 
-        //       NEW_PARCELAS.push({
-        //         ...this.newParcela,
-        //         nparcelas: `${nparcelas}.${key + 1}`,
-        //         dataVencimento: row["dataVencimento"],
-        //         dataCalcAmor: amor["data_vencimento"],
-        //         amortizacaoDataDiferenciada: true,
-        //       });
-        //     });
+      //     switch (true) {
+      //       case subtotal === saldoPgo:
+      //         row["amortizacao"] = subtotal;
+      //         row["status"] = PARCELA_PAGA;
+      //         amor["wasUsed"] = true;
+      //         nextRow = true;
+      //         delete amor["residual"];
 
-        //     NEW_PARCELAS.map((newParcela) => {
-        //       TABLE.splice(keyRow + 1, 0, newParcela);
-        //     });
+      //         break;
+      //       case subtotal < saldoPgo:
+      //         row["amortizacao"] = subtotal;
+      //         row["status"] = PARCELA_PAGA;
+      //         row["isAmortizado"] = true;
+      //         amor["wasUsed"] = true;
+      //         amor["residual"] = saldoPgo - subtotal;
 
-        //     valorAmortizacao = 0;
-        //     break;
-        //   case subtotal < valorAmortizacao:
-        //     row["amortizacao"] = subtotal;
-        //     row["status"] = PARCELA_PAGA;
+      //         break;
+      //       case subtotal > saldoPgo:
+      //         row["amortizacao"] = saldoPgo;
+      //         row["status"] = PARCELA_AMORTIZADA;
+      //         row["totalDevedor"] = 0;
+      //         row["isAmortizado"] = true;
 
-        //     valorAmortizacao -= subtotal;
-        //     break;
-        //   default:
-        //     break;
-        // }
-      });
+      //         amor["wasUsed"] = true;
+      //         delete amor["residual"];
+
+      //         const qtdDias = getQtdDias(
+      //           formatDate(row["dataCalcAmor"]),
+      //           formatDate(amor["data_vencimento"])
+      //         );
+
+      //         const NEWPARCELAS = {
+      //           ...row,
+      //           nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
+      //           dataVencimento: row["dataCalcAmor"],
+      //           dataCalcAmor: amor["data_vencimento"],
+      //           status: PARCELA_ABERTA,
+      //           amortizacao: 0,
+      //           isAmortizado: false,
+      //           encargosMonetarios: {
+      //             ...row["encargosMonetarios"],
+      //             jurosAm: {
+      //               ...row["encargosMonetarios"]["jurosAm"],
+      //               dias: qtdDias,
+      //             },
+      //           },
+
+      //           amortizacaoDataDiferenciada: true,
+      //         };
+
+      //         TABLE.splice(keyRow + 1, 0, NEWPARCELAS);
+      //         this.simularCalc(true);
+
+      //         nextRow = true;
+
+      //         break;
+      //       default:
+      //         break;
+      //     }
+      //   });
+
+      //   setTimeout(() => {
+      //     this.simularCalc(true);
+      //   }, 0);
+
+
+      // });
     }
 
     debugger;
@@ -679,9 +739,9 @@ export class ParceladoPreComponent implements OnInit {
         tableDataAmortizacao.length && tableDataAmortizacao[key]
           ? tableDataAmortizacao[key]
           : {
-              preFA_saldo_devedor: 0,
-              preFA_data_vencimento: inputExternoDataCalculo,
-            };
+            preFA_saldo_devedor: 0,
+            preFA_data_vencimento: inputExternoDataCalculo,
+          };
 
       const getIndiceDataVencimento = new Promise((res, rej) => {
         this.indicesService
@@ -763,8 +823,8 @@ export class ParceladoPreComponent implements OnInit {
                 return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
                   ? -1
                   : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-                  ? 1
-                  : 0;
+                    ? 1
+                    : 0;
               });
 
               this.alertType = {
@@ -833,8 +893,8 @@ export class ParceladoPreComponent implements OnInit {
           return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
             ? -1
             : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-            ? 1
-            : 0;
+              ? 1
+              : 0;
         });
 
         if (this.tableData.dataRows.length) {
@@ -1006,7 +1066,7 @@ export class ParceladoPreComponent implements OnInit {
             const multa = row["amortizacaoDataDiferenciada"]
               ? 0
               : (valorNoVencimento + correcaoPeloIndice + valor) *
-                (this.formDefaultValues.formMulta / 100);
+              (this.formDefaultValues.formMulta / 100);
             const subtotal =
               valorNoVencimento + correcaoPeloIndice + valor + multa;
 
@@ -1021,9 +1081,9 @@ export class ParceladoPreComponent implements OnInit {
             const totalDevedor = subtotal - amortizacao;
             const desagio = vincenda
               ? Math.pow(
-                  this.formDefaultValues.formIndiceDesagio / 100 + 1,
-                  qtdDias / 30
-                )
+                this.formDefaultValues.formIndiceDesagio / 100 + 1,
+                qtdDias / 30
+              )
               : 1;
             const valorPMTVincenda = valorNoVencimento * desagio;
 
