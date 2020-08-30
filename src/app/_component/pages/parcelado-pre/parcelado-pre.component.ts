@@ -74,6 +74,7 @@ export class ParceladoPreComponent implements OnInit {
 
   //tables
   tableData: TableData;
+  auxtableData: TableData;
   tableDataAmortizacao: TableData;
 
   newParcela = {
@@ -137,6 +138,9 @@ export class ParceladoPreComponent implements OnInit {
 
   ngOnInit() {
     this.tableData = {
+      dataRows: [],
+    };
+    this.auxtableData = {
       dataRows: [],
     };
 
@@ -446,6 +450,7 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   adicionarAmortizacao(amortizacaoTable) {
+    let TABLE_AUX;
     amortizacaoTable.map((amor) => {
       delete amor["wasUsed"];
     });
@@ -458,7 +463,7 @@ export class ParceladoPreComponent implements OnInit {
     const DIFERENCIADA = amortizacaoTable.filter(
       (amortizacao) => amortizacao.tipo !== AMORTIZACAO_DATA_FINAL
     );
-    debugger;
+    //debugger
 
     // Amortização final
     if (FINAL.length) {
@@ -492,22 +497,28 @@ export class ParceladoPreComponent implements OnInit {
       //     : valorAmortizacao.saldo_devedor;
 
       let size = TABLE.length;
+      //debugger
+
+      // TABLE_AUX = TABLE;
+      // TABLE_AUX = TABLE.slice();
+      //  TABLE_AUX = angular.copy(TABLE);
+      TABLE_AUX = JSON.parse(JSON.stringify(TABLE));
       let i = 0;
-      debugger;
+      //debugger
       while (size > i) {
-        if (TABLE[i]["status"] == PARCELA_PAGA) {
+        if (TABLE_AUX[i]["status"] == PARCELA_PAGA) {
           i++;
 
         }
         else {
-          debugger;
-          const NPARCELAS = TABLE[i]["nparcelas"].split(".")[0];
-          const SUBNPARCELAS = TABLE[i]["nparcelas"].split(".")[1]
-            ? parseInt(TABLE[i]["nparcelas"].split(".")[1]) + 1
+          //debugger
+          const NPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[0];
+          const SUBNPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[1]
+            ? parseInt(TABLE_AUX[i]["nparcelas"].split(".")[1]) + 1
             : 1;
           let nextRow = false;
           DIFERENCIADA.map((amor) => {
-            debugger;
+            //debugger
             // if (nextRow) return;
             if (
               amor.hasOwnProperty("wasUsed") &&
@@ -515,55 +526,57 @@ export class ParceladoPreComponent implements OnInit {
             )
               return;
 
-            const subtotal = parseFloat(TABLE[i]["subtotal"]);
+            const subtotal = parseFloat(TABLE_AUX[i]["subtotal"]);
             const saldoPgo = amor.hasOwnProperty("residual")
               ? amor["residual"]
               : parseFloat(amor["saldo_devedor"]);
-            const amortizacao = parseFloat(TABLE[i]["amortizacao"]);
+            const amortizacao = parseFloat(TABLE_AUX[i]["amortizacao"]);
 
             switch (true) {
               case subtotal === saldoPgo:
-                TABLE[i]["amortizacao"] = subtotal;
-                TABLE[i]["status"] = PARCELA_PAGA;
+                TABLE_AUX[i]["amortizacao"] = subtotal;
+                TABLE_AUX[i]["status"] = PARCELA_PAGA;
                 amor["wasUsed"] = true;
                 nextRow = true;
                 delete amor["residual"];
 
                 break;
               case subtotal < saldoPgo:
-                TABLE[i]["amortizacao"] = subtotal;
-                TABLE[i]["status"] = PARCELA_PAGA;
-                TABLE[i]["isAmortizado"] = true;
+                TABLE_AUX[i]["amortizacao"] = subtotal;
+                TABLE_AUX[i]["status"] = PARCELA_PAGA;
+                TABLE_AUX[i]["isAmortizado"] = true;
                 amor["wasUsed"] = true;
                 amor["residual"] = saldoPgo - subtotal;
 
                 break;
               case subtotal > saldoPgo:
-                TABLE[i]["amortizacao"] = saldoPgo;
-                TABLE[i]["status"] = PARCELA_AMORTIZADA;
-                TABLE[i]["totalDevedor"] = 0;
-                TABLE[i]["isAmortizado"] = true;
+                TABLE_AUX[i]["amortizacao"] = saldoPgo;
+                TABLE_AUX[i]["subtotal"] = subtotal-saldoPgo;
+
+                TABLE_AUX[i]["status"] = PARCELA_AMORTIZADA;
+                TABLE_AUX[i]["totalDevedor"] = 0;
+                TABLE_AUX[i]["isAmortizado"] = true;
 
                 amor["wasUsed"] = true;
                 delete amor["residual"];
 
                 const qtdDias = getQtdDias(
-                  formatDate(TABLE[i]["dataCalcAmor"]),
+                  formatDate(TABLE_AUX[i]["dataCalcAmor"]),
                   formatDate(amor["data_vencimento"])
                 );
 
                 const NEWPARCELAS = {
-                  ...TABLE[i],
+                  ...TABLE_AUX[i],
                   nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
-                  dataVencimento: TABLE[i]["dataCalcAmor"],
+                  dataVencimento: TABLE_AUX[i]["dataCalcAmor"],
                   dataCalcAmor: amor["data_vencimento"],
                   status: PARCELA_ABERTA,
                   amortizacao: 0,
                   isAmortizado: false,
                   encargosMonetarios: {
-                    ...TABLE[i]["encargosMonetarios"],
+                    ...TABLE_AUX[i]["encargosMonetarios"],
                     jurosAm: {
-                      ...TABLE[i]["encargosMonetarios"]["jurosAm"],
+                      ...TABLE_AUX[i]["encargosMonetarios"]["jurosAm"],
                       dias: qtdDias,
                     },
                   },
@@ -571,7 +584,7 @@ export class ParceladoPreComponent implements OnInit {
                   amortizacaoDataDiferenciada: true,
                 };
 
-                TABLE.splice(i + 1, 0, NEWPARCELAS);
+                TABLE_AUX.splice(i + 1, 0, NEWPARCELAS);
                 size++;
                 this.simularCalc(true);
                 i++;
@@ -593,100 +606,12 @@ export class ParceladoPreComponent implements OnInit {
 
       }
 
+      console.log(TABLE);
 
-      // TABLE.map((row, keyRow) => {
-      //   if (row["status"] === PARCELA_PAGA) return;
-      //   debugger;
-      //   const NPARCELAS = row["nparcelas"].split(".")[0];
-      //   const SUBNPARCELAS = row["nparcelas"].split(".")[1]
-      //     ? parseInt(row["nparcelas"].split(".")[1]) + 1
-      //     : 1;
-      //   let nextRow = false;
-      //   DIFERENCIADA.map((amor) => {
-      //     debugger;
-      //     if (nextRow) return;
-      //     if (
-      //       amor.hasOwnProperty("wasUsed") &&
-      //       !amor.hasOwnProperty("residual")
-      //     )
-      //       return;
-
-      //     const subtotal = parseFloat(row["subtotal"]);
-      //     const saldoPgo = amor.hasOwnProperty("residual")
-      //       ? amor["residual"]
-      //       : parseFloat(amor["saldo_devedor"]);
-      //     const amortizacao = parseFloat(row["amortizacao"]);
-
-      //     switch (true) {
-      //       case subtotal === saldoPgo:
-      //         row["amortizacao"] = subtotal;
-      //         row["status"] = PARCELA_PAGA;
-      //         amor["wasUsed"] = true;
-      //         nextRow = true;
-      //         delete amor["residual"];
-
-      //         break;
-      //       case subtotal < saldoPgo:
-      //         row["amortizacao"] = subtotal;
-      //         row["status"] = PARCELA_PAGA;
-      //         row["isAmortizado"] = true;
-      //         amor["wasUsed"] = true;
-      //         amor["residual"] = saldoPgo - subtotal;
-
-      //         break;
-      //       case subtotal > saldoPgo:
-      //         row["amortizacao"] = saldoPgo;
-      //         row["status"] = PARCELA_AMORTIZADA;
-      //         row["totalDevedor"] = 0;
-      //         row["isAmortizado"] = true;
-
-      //         amor["wasUsed"] = true;
-      //         delete amor["residual"];
-
-      //         const qtdDias = getQtdDias(
-      //           formatDate(row["dataCalcAmor"]),
-      //           formatDate(amor["data_vencimento"])
-      //         );
-
-      //         const NEWPARCELAS = {
-      //           ...row,
-      //           nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
-      //           dataVencimento: row["dataCalcAmor"],
-      //           dataCalcAmor: amor["data_vencimento"],
-      //           status: PARCELA_ABERTA,
-      //           amortizacao: 0,
-      //           isAmortizado: false,
-      //           encargosMonetarios: {
-      //             ...row["encargosMonetarios"],
-      //             jurosAm: {
-      //               ...row["encargosMonetarios"]["jurosAm"],
-      //               dias: qtdDias,
-      //             },
-      //           },
-
-      //           amortizacaoDataDiferenciada: true,
-      //         };
-
-      //         TABLE.splice(keyRow + 1, 0, NEWPARCELAS);
-      //         this.simularCalc(true);
-
-      //         nextRow = true;
-
-      //         break;
-      //       default:
-      //         break;
-      //     }
-      //   });
-
-      //   setTimeout(() => {
-      //     this.simularCalc(true);
-      //   }, 0);
-
-
-      // });
     }
-
-    debugger;
+    this.auxtableData = TABLE_AUX;
+    //debugger
+    
   }
 
   setFormRiscos(form) {
