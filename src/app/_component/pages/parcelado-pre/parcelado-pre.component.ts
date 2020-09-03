@@ -134,7 +134,7 @@ export class ParceladoPreComponent implements OnInit {
     private parceladoPreService: ParceladoPreService,
     private indicesService: IndicesService,
     private logService: LogService
-  ) { }
+  ) {}
 
   ngOnInit() {
     this.tableData = {
@@ -252,7 +252,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 20, 10, 0],
               text: `SUBTOTAL APURADO EM ${
                 this.subtotal_data_calculo || "---------"
-                } : ${this.formatCurrency(this.total_subtotal)}`,
+              } : ${this.formatCurrency(this.total_subtotal)}`,
             });
 
             doc["content"].push({
@@ -261,7 +261,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 1, 10, 0],
               text: `Honorários ${
                 this.formDefaultValues.formHonorarios || 0
-                }% : ${this.formatCurrency(this.total_honorarios)}`,
+              }% : ${this.formatCurrency(this.total_honorarios)}`,
             });
 
             doc["content"].push({
@@ -270,7 +270,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 1, 10, 0],
               text: `Multa sob contrato ${
                 this.formDefaultValues.formMultaSobContrato || 0
-                }% : ${this.formatCurrency(this.total_multa_sob_contrato)}`,
+              }% : ${this.formatCurrency(this.total_multa_sob_contrato)}`,
             });
 
             doc["content"].push({
@@ -279,7 +279,7 @@ export class ParceladoPreComponent implements OnInit {
               margin: [0, 1, 10, 0],
               text: `TOTAL APURADO EM ${
                 this.total_data_calculo || "---------"
-                } : ${this.formatCurrency(this.total_grandtotal)}`,
+              } : ${this.formatCurrency(this.total_grandtotal)}`,
             });
           },
         },
@@ -314,7 +314,7 @@ export class ParceladoPreComponent implements OnInit {
               modulo: this.isDesagio ? PARCELADO_PRE : PARCELADO_POS,
             },
           ])
-          .subscribe((log) => { });
+          .subscribe((log) => {});
       }
     }, 500);
   }
@@ -348,8 +348,8 @@ export class ParceladoPreComponent implements OnInit {
       return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
         ? -1
         : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-          ? 1
-          : 0;
+        ? 1
+        : 0;
     });
 
     this.tableDataAmortizacao.dataRows.map((armotizacao) => {
@@ -483,7 +483,6 @@ export class ParceladoPreComponent implements OnInit {
         (row) => !row.hasOwnProperty("amortizacaoDataDiferenciada")
       ));
 
-
       // let valorAmortizacao =
       //   DIFERENCIADA.reduce(
       //     (curr, next) =>
@@ -508,9 +507,7 @@ export class ParceladoPreComponent implements OnInit {
       while (size > i) {
         if (TABLE_AUX[i]["status"] == PARCELA_PAGA) {
           i++;
-
-        }
-        else {
+        } else {
           //debugger
           const NPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[0];
           const SUBNPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[1]
@@ -551,7 +548,7 @@ export class ParceladoPreComponent implements OnInit {
                 break;
               case subtotal > saldoPgo:
                 TABLE_AUX[i]["amortizacao"] = saldoPgo;
-                TABLE_AUX[i]["subtotal"] = subtotal-saldoPgo;
+                TABLE_AUX[i]["subtotal"] = subtotal - saldoPgo;
 
                 TABLE_AUX[i]["status"] = PARCELA_AMORTIZADA;
                 TABLE_AUX[i]["totalDevedor"] = 0;
@@ -603,15 +600,9 @@ export class ParceladoPreComponent implements OnInit {
 
           i++;
         }
-
       }
-
-      console.log(TABLE);
-
     }
-    this.auxtableData = TABLE_AUX;
-    //debugger
-    
+    this.auxtableData.dataRows = TABLE_AUX;
   }
 
   setFormRiscos(form) {
@@ -664,9 +655,9 @@ export class ParceladoPreComponent implements OnInit {
         tableDataAmortizacao.length && tableDataAmortizacao[key]
           ? tableDataAmortizacao[key]
           : {
-            preFA_saldo_devedor: 0,
-            preFA_data_vencimento: inputExternoDataCalculo,
-          };
+              preFA_saldo_devedor: 0,
+              preFA_data_vencimento: inputExternoDataCalculo,
+            };
 
       const getIndiceDataVencimento = new Promise((res, rej) => {
         this.indicesService
@@ -748,8 +739,8 @@ export class ParceladoPreComponent implements OnInit {
                 return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
                   ? -1
                   : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-                    ? 1
-                    : 0;
+                  ? 1
+                  : 0;
               });
 
               this.alertType = {
@@ -802,11 +793,9 @@ export class ParceladoPreComponent implements OnInit {
             parcela.infoParaAmortizacao = JSON.parse(
               parcela.infoParaAmortizacao
             );
-            setTimeout(() => {
-              this.tableDataAmortizacao = parcela.infoParaAmortizacao
-                ? parcela.infoParaAmortizacao
-                : this.tableDataAmortizacao;
-            }, 100);
+            this.tableDataAmortizacao = parcela.infoParaAmortizacao
+              ? parcela.infoParaAmortizacao
+              : this.tableDataAmortizacao;
 
             Object.keys(parcela.infoParaCalculo).filter((value) => {
               this.formDefaultValues[value] = parcela.infoParaCalculo[value];
@@ -818,8 +807,8 @@ export class ParceladoPreComponent implements OnInit {
           return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
             ? -1
             : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-              ? 1
-              : 0;
+            ? 1
+            : 0;
         });
 
         if (this.tableData.dataRows.length) {
@@ -827,8 +816,12 @@ export class ParceladoPreComponent implements OnInit {
           const ultimaAtualizacao = [...this.tableData.dataRows].pop();
 
           setTimeout(() => {
-            if (this.tableDataAmortizacao.dataRows.length)
+            if (this.tableDataAmortizacao.dataRows.length) {
               this.adicionarAmortizacao(this.tableDataAmortizacao.dataRows);
+            } else {
+              this.auxtableData.dataRows = this.tableData.dataRows;
+              this.simularCalc(true);
+            }
             this.minParcela = parseFloat(ultimaAtualizacao["nparcelas"]) + 1;
           }, 1000);
         } else {
@@ -991,7 +984,7 @@ export class ParceladoPreComponent implements OnInit {
             const multa = row["amortizacaoDataDiferenciada"]
               ? 0
               : (valorNoVencimento + correcaoPeloIndice + valor) *
-              (this.formDefaultValues.formMulta / 100);
+                (this.formDefaultValues.formMulta / 100);
             const subtotal =
               valorNoVencimento + correcaoPeloIndice + valor + multa;
 
@@ -1006,9 +999,9 @@ export class ParceladoPreComponent implements OnInit {
             const totalDevedor = subtotal - amortizacao;
             const desagio = vincenda
               ? Math.pow(
-                this.formDefaultValues.formIndiceDesagio / 100 + 1,
-                qtdDias / 30
-              )
+                  this.formDefaultValues.formIndiceDesagio / 100 + 1,
+                  qtdDias / 30
+                )
               : 1;
             const valorPMTVincenda = valorNoVencimento * desagio;
 
