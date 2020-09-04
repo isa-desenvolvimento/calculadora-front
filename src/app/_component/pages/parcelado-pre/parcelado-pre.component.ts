@@ -602,7 +602,7 @@ export class ParceladoPreComponent implements OnInit {
         }
       }
     }
-    this.auxtableData.dataRows = TABLE_AUX;
+    this.auxtableData.dataRows = this.tableData.dataRows = TABLE_AUX;
   }
 
   setFormRiscos(form) {
