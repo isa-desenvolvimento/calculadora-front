@@ -735,22 +735,15 @@ export class ParceladoPreComponent implements OnInit {
           if (tableDataParcelas.length - 1 === key) {
             setTimeout(() => {
               this.parcelas.tableDataParcelas.dataRows = [];
-              this.tableData.dataRows.sort((a, b) => {
-                return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
-                  ? -1
-                  : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-                  ? 1
-                  : 0;
-              });
-
               this.alertType = {
                 mensagem: "Lançamento incluido",
                 tipo: "success",
               };
               this.toggleUpdateLoading();
               this.simularCalc(true, null, true);
+
               this.tableLoading = false;
-            }, 0);
+            }, 100);
           }
         })
         .catch((erro) => {
@@ -884,8 +877,16 @@ export class ParceladoPreComponent implements OnInit {
     });
   }
 
-  simularCalc(isInlineChange = false, origin = null, search = false) {
-    this.tableLoading = true;
+  simularCalc(isInlineChange = false, origin = null, ordenar = false) {
+    if (ordenar) {
+      this.tableData.dataRows.sort((a, b) => {
+        return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
+          ? -1
+          : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
+          ? 1
+          : 0;
+      });
+    }
 
     if (origin === "btn") {
       this.setFormDefault();
