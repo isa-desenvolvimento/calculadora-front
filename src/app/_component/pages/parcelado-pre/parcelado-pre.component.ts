@@ -77,6 +77,8 @@ export class ParceladoPreComponent implements OnInit {
   auxtableData: TableData;
   tableDataAmortizacao: TableData;
 
+  isSimular = false;
+
   newParcela = {
     amortizacao: null,
     contractRef: null,
@@ -735,21 +737,30 @@ export class ParceladoPreComponent implements OnInit {
           if (tableDataParcelas.length - 1 === key) {
             setTimeout(() => {
               this.parcelas.tableDataParcelas.dataRows = [];
+              this.isSimular = true;
               this.alertType = {
                 mensagem: "Lançamento incluido",
                 tipo: "success",
               };
               this.toggleUpdateLoading();
-              this.simularCalc(true, null, true);
 
               this.tableLoading = false;
-            }, 100);
+            }, 1000);
           }
         })
         .catch((erro) => {
           console.log(erro);
           this.falhaIndice();
         });
+
+      const interval = setInterval(() => {
+        if (this.isSimular) {
+          this.isSimular = false;
+          clearInterval(interval);
+          this.simularCalc(true, null, true);
+          this.simularCalc(true, null, true);
+        }
+      }, 1000);
     });
 
     setTimeout(() => {
