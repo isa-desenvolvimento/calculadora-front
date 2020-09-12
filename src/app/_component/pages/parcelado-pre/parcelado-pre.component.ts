@@ -692,6 +692,14 @@ export class ParceladoPreComponent implements OnInit {
 
       Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor])
         .then((resultado) => {
+          this.tableData.dataRows.sort((a, b) => {
+            return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
+              ? -1
+              : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
+              ? 1
+              : 0;
+          });
+
           temIndice[i] = true;
 
           const indiceValor =
@@ -748,27 +756,11 @@ export class ParceladoPreComponent implements OnInit {
                 tipo: "success",
               };
 
-              const interval = setInterval(() => {
-                if (this.isSimular) {
-                  clearInterval(interval);
-                  this.isSimular = false;
-                  this.simularCalc(true, null, true);
+              this.simularCalc(true, null, true);
+              this.simularCalc(true, null, true);
 
-                  this.tableData.dataRows.sort((a, b) => {
-                    return parseFloat(a["nparcelas"]) <
-                      parseFloat(b["nparcelas"])
-                      ? -1
-                      : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-                      ? 1
-                      : 0;
-                  });
-
-                  this.tableLoading = false;
-                  this.toggleUpdateLoading();
-                }
-              }, 1000);
-
-              //this.simularCalc(true, null, true);
+              this.tableLoading = false;
+              this.toggleUpdateLoading();
             }, 100);
           }
         })
@@ -1020,7 +1012,6 @@ export class ParceladoPreComponent implements OnInit {
                   -qtdDias / 30
                 )
               : 1;
-            debugger;
             const valorPMTVincenda = valorNoVencimento * desagio;
 
             // Table Valuesinclui
