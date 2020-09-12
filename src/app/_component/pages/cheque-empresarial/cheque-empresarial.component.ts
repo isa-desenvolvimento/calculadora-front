@@ -162,11 +162,18 @@ export class ChequeEmpresarialComponent implements OnInit {
             doc["content"].splice(3, 0, {
               style: { fontSize: 10 },
               alignment: "left",
-              margin: [0, 0, 10, 20],
-              text: `CNPJ/CPF : ${this.infoContrato["cnpj"]}`,
+              margin: [0, 0, 10, 0],
+              text: `CNPJ : ${this.infoContrato["cnpj"]}`,
             });
 
-            doc["content"][4]["table"]["widths"] = [
+            doc["content"].splice(4, 0, {
+              style: { fontSize: 10 },
+              alignment: "left",
+              margin: [0, 0, 10, 20],
+              text: `Contrato : ${this.infoContrato["contrato"]}`,
+            });
+
+            doc["content"][5]["table"]["widths"] = [
               80,
               100,
               40,
@@ -183,7 +190,7 @@ export class ChequeEmpresarialComponent implements OnInit {
               "auto",
             ];
 
-            const footer = doc["content"][4]["table"]["body"].pop();
+            const footer = doc["content"][5]["table"]["body"].pop();
             const valor = footer.pop();
             footer.map((value, index) => {
               if (index !== 0) {
@@ -191,9 +198,9 @@ export class ChequeEmpresarialComponent implements OnInit {
               }
             });
             footer.push(valor);
-            doc["content"][4]["table"]["body"].push(footer);
+            doc["content"][5]["table"]["body"].push(footer);
 
-            doc["content"][4]["table"]["body"].map((row, index) => {
+            doc["content"][5]["table"]["body"].map((row, index) => {
               if (
                 index !== 0 &&
                 this.tableData.dataRows.length - 1 >= index - 1
@@ -539,7 +546,8 @@ export class ChequeEmpresarialComponent implements OnInit {
             });
 
             setTimeout(() => {
-              (this.tableData.dataRows.length - 1) === index && this.simularCalc(true, null, true);
+              this.tableData.dataRows.length - 1 === index &&
+                this.simularCalc(true, null, true);
             }, 1000);
 
             return cheque;
