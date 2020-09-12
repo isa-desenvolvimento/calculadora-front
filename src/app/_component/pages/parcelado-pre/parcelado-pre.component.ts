@@ -202,8 +202,36 @@ export class ParceladoPreComponent implements OnInit {
               fillColor: "white",
             };
 
-            doc["content"][0].text = "DEMONSTRATIVO DE SALDO DEVEDOR";
-            doc["content"][1]["table"]["widths"] = [
+            doc["content"].splice(0, 0, {
+              margin: [0, 0, 0, 12],
+              alignment: "center",
+              image:
+                "data:image/png;base64,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",
+            });
+            doc["content"][1].text = "DEMONSTRATIVO DE SALDO DEVEDOR";
+
+            doc["content"].splice(2, 0, {
+              style: { fontSize: 10 },
+              alignment: "left",
+              margin: [0, 15, 10, 0],
+              text: `Cliente : ${this.infoContrato["cliente"]}`,
+            });
+
+            doc["content"].splice(3, 0, {
+              style: { fontSize: 10 },
+              alignment: "left",
+              margin: [0, 0, 10, 0],
+              text: `CNPJ : ${this.infoContrato["cnpj"]}`,
+            });
+
+            doc["content"].splice(4, 0, {
+              style: { fontSize: 10 },
+              alignment: "left",
+              margin: [0, 0, 10, 20],
+              text: `Contrato : ${this.infoContrato["contrato"]}`,
+            });
+
+            doc["content"][5]["table"]["widths"] = [
               80,
               50,
               100,
@@ -224,19 +252,20 @@ export class ParceladoPreComponent implements OnInit {
               "auto",
             ];
 
-            const footer = doc["content"][1]["table"]["body"].pop();
+            debugger;
+            const footer = doc["content"][5]["table"]["body"].pop();
 
             let valor = footer.pop();
             footer.map((value, index) => {
-              if (index !== 0) {
+              if (index !== 0 && value.text == "TOTAL DE PARCELAS VENCIDAS") {
                 value.text = "";
               }
             });
             footer.push(valor);
 
-            doc["content"][1]["table"]["body"].push(footer);
+            doc["content"][5]["table"]["body"].push(footer);
 
-            doc["content"][1]["table"]["body"].map((row, index) => {
+            doc["content"][5]["table"]["body"].map((row, index) => {
               if (
                 index !== 0 &&
                 this.tableData.dataRows.length - 1 >= index - 1
