@@ -128,7 +128,7 @@ export class ParceladoPreComponent implements OnInit {
     formMultaSobContrato: 0,
     formIndice: "---",
     formIndiceEncargos: 1,
-    formIndiceDesagio: 1,
+    formDesagio: 1,
   };
 
   constructor(
@@ -642,7 +642,12 @@ export class ParceladoPreComponent implements OnInit {
     this.tableLoading = true;
     let temIndice = [];
 
-    tableDataParcelas.map(async (parcela, key) => {
+    const size = tableDataParcelas.length;
+    let i = 0;
+
+    while (size > i) {
+      //tableDataParcelas.map(async (parcela, key) => {
+      const parcela = tableDataParcelas[i];
       const indice = this.form_riscos.formIndice;
       const dataVencimento = parcela["dataVencimento"];
       const inputExternoDataCalculo = this.form_riscos.formDataCalculo;
@@ -654,8 +659,8 @@ export class ParceladoPreComponent implements OnInit {
 
       const tableDataAmortizacao = this.tableDataAmortizacao.dataRows;
       const amortizacao =
-        tableDataAmortizacao.length && tableDataAmortizacao[key]
-          ? tableDataAmortizacao[key]
+        tableDataAmortizacao.length && tableDataAmortizacao[i]
+          ? tableDataAmortizacao[i]
           : {
               preFA_saldo_devedor: 0,
               preFA_data_vencimento: inputExternoDataCalculo,
@@ -683,11 +688,11 @@ export class ParceladoPreComponent implements OnInit {
           });
       });
 
-      temIndice[key] = false;
+      temIndice[i] = false;
 
       Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor])
         .then((resultado) => {
-          temIndice[key] = true;
+          temIndice[i] = true;
 
           const indiceValor =
             typeof resultado[0] === "number" ? resultado[0] : 1;
@@ -734,7 +739,7 @@ export class ParceladoPreComponent implements OnInit {
           });
 
           this.updateLoadingBtn = false;
-          if (tableDataParcelas.length - 1 === key) {
+          if (size === this.tableData.dataRows.length) {
             setTimeout(() => {
               this.parcelas.tableDataParcelas.dataRows = [];
               this.isSimular = true;
@@ -742,10 +747,29 @@ export class ParceladoPreComponent implements OnInit {
                 mensagem: "Lançamento incluido",
                 tipo: "success",
               };
-              this.toggleUpdateLoading();
 
-              this.tableLoading = false;
-            }, 1000);
+              const interval = setInterval(() => {
+                if (this.isSimular) {
+                  clearInterval(interval);
+                  this.isSimular = false;
+                  this.simularCalc(true, null, true);
+
+                  this.tableData.dataRows.sort((a, b) => {
+                    return parseFloat(a["nparcelas"]) <
+                      parseFloat(b["nparcelas"])
+                      ? -1
+                      : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
+                      ? 1
+                      : 0;
+                  });
+
+                  this.tableLoading = false;
+                  this.toggleUpdateLoading();
+                }
+              }, 1000);
+
+              //this.simularCalc(true, null, true);
+            }, 100);
           }
         })
         .catch((erro) => {
@@ -753,15 +777,8 @@ export class ParceladoPreComponent implements OnInit {
           this.falhaIndice();
         });
 
-      const interval = setInterval(() => {
-        if (this.isSimular) {
-          this.isSimular = false;
-          clearInterval(interval);
-          this.simularCalc(true, null, true);
-          this.simularCalc(true, null, true);
-        }
-      }, 1000);
-    });
+      i++;
+    } //);
 
     setTimeout(() => {
       if (!temIndice.every((tem) => !!tem)) {
@@ -889,16 +906,6 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   simularCalc(isInlineChange = false, origin = null, ordenar = false) {
-    if (ordenar) {
-      this.tableData.dataRows.sort((a, b) => {
-        return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
-          ? -1
-          : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-          ? 1
-          : 0;
-      });
-    }
-
     if (origin === "btn") {
       this.setFormDefault();
     }
@@ -987,9 +994,7 @@ export class ParceladoPreComponent implements OnInit {
             const correcaoPeloIndice =
               (valorNoVencimento / indiceDataVencimento) * indiceDataCalcAmor -
               valorNoVencimento;
-            const qtdDias = vincenda
-              ? -getQtdDias(dataVencimento, dataCalcAmor)
-              : getQtdDias(dataVencimento, dataCalcAmor);
+            const qtdDias = getQtdDias(dataVencimento, dataCalcAmor);
             porcentagem = (porcentagem / 30) * qtdDias;
             const valor =
               (valorNoVencimento + correcaoPeloIndice) * porcentagem;
@@ -1011,13 +1016,14 @@ export class ParceladoPreComponent implements OnInit {
             const totalDevedor = subtotal - amortizacao;
             const desagio = vincenda
               ? Math.pow(
-                  this.formDefaultValues.formIndiceDesagio / 100 + 1,
-                  qtdDias / 30
+                  this.formDefaultValues.formDesagio / 100 + 1,
+                  -qtdDias / 30
                 )
               : 1;
+            debugger;
             const valorPMTVincenda = valorNoVencimento * desagio;
 
-            // Table Values
+            // Table Valuesinclui
             if (vincenda) {
               row["totalBackup"] = valorPMTVincenda - amortizacao;
 
