@@ -129,6 +129,7 @@ export class ParceladoPreComponent implements OnInit {
     formIndice: "---",
     formIndiceEncargos: 1,
     formDesagio: 1,
+    isDate: false,
   };
 
   constructor(
@@ -541,11 +542,12 @@ export class ParceladoPreComponent implements OnInit {
         } else {
           //debugger
           const NPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[0];
-          const SUBNPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[1]
+          debugger;
+          let SUBNPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[1]
             ? parseInt(TABLE_AUX[i]["nparcelas"].split(".")[1]) + 1
             : 1;
           let nextRow = false;
-          DIFERENCIADA.map((amor) => {
+          DIFERENCIADA.map((amor, indice) => {
             //debugger
             // if (nextRow) return;
             if (
@@ -580,6 +582,10 @@ export class ParceladoPreComponent implements OnInit {
               case subtotal > saldoPgo:
                 TABLE_AUX[i]["amortizacao"] = saldoPgo;
                 TABLE_AUX[i]["subtotal"] = subtotal - saldoPgo;
+                TABLE_AUX[i]["dataCalcAmor"] = formatDate(
+                  amor["data_vencimento"],
+                  "YYYY-MM-DD"
+                );
 
                 TABLE_AUX[i]["status"] = PARCELA_AMORTIZADA;
                 TABLE_AUX[i]["totalDevedor"] = 0;
@@ -588,19 +594,29 @@ export class ParceladoPreComponent implements OnInit {
                 amor["wasUsed"] = true;
                 delete amor["residual"];
 
-                const qtdDias = getQtdDias(
-                  formatDate(TABLE_AUX[i]["dataCalcAmor"]),
-                  formatDate(amor["data_vencimento"])
-                );
+                const DATA_VENCIMENTO__ = amor.hasOwnProperty(
+                  "data_vencimento_alterada"
+                )
+                  ? formatDate(amor["data_vencimento_alterada"], "YYYY-MM-DD")
+                  : null;
+                const DATA_CALC__ = amor.hasOwnProperty("data_calc_alterada")
+                  ? formatDate(amor["data_calc_alterada"], "YYYY-MM-DD")
+                  : null;
+
+                let qtdDias = 0;
+                if (DATA_VENCIMENTO__ && DATA_CALC__) {
+                  qtdDias = getQtdDias(DATA_CALC__, DATA_VENCIMENTO__);
+                }
 
                 const NEWPARCELAS = {
                   ...TABLE_AUX[i],
                   nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
-                  dataVencimento: TABLE_AUX[i]["dataCalcAmor"],
-                  dataCalcAmor: amor["data_vencimento"],
+                  dataVencimento: DATA_VENCIMENTO__,
+                  dataCalcAmor: DATA_CALC__,
                   status: PARCELA_ABERTA,
                   amortizacao: 0,
                   isAmortizado: false,
+                  indiceAmor: indice,
                   encargosMonetarios: {
                     ...TABLE_AUX[i]["encargosMonetarios"],
                     jurosAm: {
@@ -617,6 +633,7 @@ export class ParceladoPreComponent implements OnInit {
                 this.simularCalc(true);
                 i++;
 
+                SUBNPARCELAS++;
                 nextRow = true;
 
                 break;
@@ -633,7 +650,8 @@ export class ParceladoPreComponent implements OnInit {
         }
       }
     }
-    this.auxtableData.dataRows = this.tableData.dataRows = TABLE_AUX;
+    this.tableData.dataRows = TABLE_AUX;
+    //debugger
   }
 
   setFormRiscos(form) {
@@ -691,8 +709,8 @@ export class ParceladoPreComponent implements OnInit {
         tableDataAmortizacao.length && tableDataAmortizacao[i]
           ? tableDataAmortizacao[i]
           : {
-              preFA_saldo_devedor: 0,
-              preFA_data_vencimento: inputExternoDataCalculo,
+              saldo_devedor: 0,
+              data_vencimento: inputExternoDataCalculo,
             };
 
       const getIndiceDataVencimento = new Promise((res, rej) => {
@@ -708,7 +726,7 @@ export class ParceladoPreComponent implements OnInit {
         this.indicesService
           .getIndiceDataBase(
             indice,
-            amortizacao["preFA_data_vencimento"],
+            amortizacao["data_vencimento"],
             this.formDefaultValues
           )
           .then((data) => {
@@ -737,7 +755,7 @@ export class ParceladoPreComponent implements OnInit {
             typeof resultado[1] === "number" ? resultado[1] : 1;
           const isVincenda_ = isVincenda(
             dataVencimento,
-            amortizacao["preFA_data_vencimento"]
+            amortizacao["data_vencimento"]
           );
 
           this.tableData.dataRows.push({
@@ -748,7 +766,7 @@ export class ParceladoPreComponent implements OnInit {
             indiceDataVencimento: indiceValor,
             indiceDCA: indice,
             indiceDataCalcAmor: indiceDataCalcAmor,
-            dataCalcAmor: amortizacao["preFA_data_vencimento"],
+            dataCalcAmor: amortizacao["data_vencimento"],
             valorNoVencimento: parcela["valorNoVencimento"],
             encargosMonetarios: {
               correcaoPeloIndice: null,
@@ -761,7 +779,7 @@ export class ParceladoPreComponent implements OnInit {
             },
             subtotal: 0,
             valorPMTVincenda: 0,
-            amortizacao: amortizacao["preFA_saldo_devedor"],
+            amortizacao: amortizacao["saldo_devedor"],
             totalDevedor: 0,
             status: parcela["status"],
             contractRef: this.contractRef,
@@ -907,6 +925,18 @@ export class ParceladoPreComponent implements OnInit {
       row[ColunaData] = dataValor;
       row[tipoIndiceValue] = resultado[0];
       setTimeout(() => {
+        if (row["amortizacaoDataDiferenciada"]) {
+          if (ColunaData === "dataVencimento") {
+            this.tableDataAmortizacao.dataRows[row["indiceAmor"]][
+              "data_vencimento_alterada"
+            ] = dataValor;
+          } else {
+            this.tableDataAmortizacao.dataRows[row["indiceAmor"]][
+              "data_calc_alterada"
+            ] = dataValor;
+          }
+        }
+
         this.updateInlineIndice(
           this.formDefaultValues.formIndice,
           row,
@@ -946,6 +976,13 @@ export class ParceladoPreComponent implements OnInit {
         const indice = this.formDefaultValues.formIndice;
         row["indiceDV"] = indice;
         row["indiceDCA"] = indice;
+      }
+
+      if (this.formDefaultValues.isDate) {
+        row["dataCalcAmor"] = this.formatDate(
+          this.formDefaultValues.formDataCalculo,
+          "YYYY-MM-DD"
+        );
       }
 
       const getIndiceDataVencimento = new Promise((res, rej) => {

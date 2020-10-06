@@ -43,4 +43,5 @@ export interface InfoParaCalculo {
   formIndice: string;
   formIndiceEncargos: number;
   formDesagio: number;
+  isDate: boolean;
 }
