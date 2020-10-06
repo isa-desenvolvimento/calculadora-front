@@ -605,7 +605,7 @@ export class ParceladoPreComponent implements OnInit {
 
                 let qtdDias = 0;
                 if (DATA_VENCIMENTO__ && DATA_CALC__) {
-                  qtdDias = getQtdDias(DATA_CALC__, DATA_VENCIMENTO__);
+                  qtdDias = getQtdDias(DATA_VENCIMENTO__, DATA_CALC__);
                 }
 
                 const NEWPARCELAS = {
