@@ -643,6 +643,8 @@ export class ParceladoPreComponent implements OnInit {
           });
 
           setTimeout(() => {
+            this.tableData.dataRows = TABLE_AUX;
+
             this.simularCalc(true);
           }, 0);
 
@@ -650,7 +652,6 @@ export class ParceladoPreComponent implements OnInit {
         }
       }
     }
-    this.tableData.dataRows = TABLE_AUX;
     //debugger
   }
 
@@ -1238,16 +1239,19 @@ export class ParceladoPreComponent implements OnInit {
     switch (rowAmortizacao.tipo) {
       case AMORTIZACAO_DATA_ATUAL:
         this.tableDataAmortizacao.dataRows = [];
-        this.tableData.dataRows.map((row) => {
-          row["amortizacao"] = 0;
-          row["totalDevedor"] = row["subtotal"];
-          row["status"] = PARCELA_ABERTA;
-          row["infoParaAmortizacao"]["dataRows"] = tableAmortizacao;
-        });
+        this.tableData.dataRows = this.tableData.dataRows
+          .filter((row) => !row["amortizacaoDataDiferenciada"])
+          .map((row) => {
+            row["amortizacao"] = 0;
+            row["totalDevedor"] = row["subtotal"];
+            row["isAmortizado"] = false;
+            row["status"] = PARCELA_ABERTA;
+            return row;
+          });
 
         setTimeout(() => {
           this.adicionarAmortizacao(tableAmortizacao);
-        }, 100);
+        }, 500);
 
         break;
       case AMORTIZACAO_DATA_DIFERENCIADA:
