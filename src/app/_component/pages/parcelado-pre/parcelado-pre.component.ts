@@ -189,9 +189,22 @@ export class ParceladoPreComponent implements OnInit {
             ],
           },
           customize: (doc) => {
+
             doc["defaultStyle"] = { ...doc["defaultStyle"], fontSize: 8 };
             doc["styles"]["tableHeader"] = {
               ...doc["styles"]["tableHeader"],
+              fontSize: 8,
+              color: "black",
+              fillColor: "white",
+            };
+            doc["styles"]["tableBodyEven"] = {
+              ...doc["styles"]["tableBodyEven"],
+              fontSize: 8,
+              color: "black",
+              fillColor: "white",
+            };
+            doc["styles"]["tableBodyOdd"] = {
+              ...doc["styles"]["tableBodyOdd"],
               fontSize: 8,
               color: "black",
               fillColor: "white",
@@ -202,7 +215,6 @@ export class ParceladoPreComponent implements OnInit {
               color: "black",
               fillColor: "white",
             };
-
             doc["content"].splice(0, 0, {
               margin: [0, 0, 0, 12],
               alignment: "center",
@@ -232,28 +244,28 @@ export class ParceladoPreComponent implements OnInit {
               text: `Contrato : ${this.infoContrato["contrato"]}`,
             });
 
+
             doc["content"][5]["table"]["widths"] = [
-              80,
               50,
-              100,
+              45,
               50,
+              45,
+              45,
               50,
-              100,
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
-              "auto",
+              40,
+              50,
+              45,
+              25,
+              25,
+              50,
+              45,
+              45,
+              45,
+              45,
+              45,
+              45,
             ];
 
-            debugger;
             const footer = doc["content"][5]["table"]["body"].pop();
 
             let valor = footer.pop();
@@ -373,9 +385,7 @@ export class ParceladoPreComponent implements OnInit {
     this.toggleUpdateLoading();
   }
 
-  atualizarRisco() {
-    this.controleLancamentos = 0;
-
+  ordenarParcelas() {
     this.tableData.dataRows.sort((a, b) => {
       return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
         ? -1
@@ -383,6 +393,12 @@ export class ParceladoPreComponent implements OnInit {
         ? 1
         : 0;
     });
+  }
+
+  atualizarRisco() {
+    this.controleLancamentos = 0;
+
+    this.ordenarParcelas()
 
     this.tableDataAmortizacao.dataRows.map((armotizacao) => {
       delete armotizacao["incluida"];
@@ -740,14 +756,6 @@ export class ParceladoPreComponent implements OnInit {
 
       Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor])
         .then((resultado) => {
-          this.tableData.dataRows.sort((a, b) => {
-            return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
-              ? -1
-              : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-              ? 1
-              : 0;
-          });
-
           temIndice[i] = true;
 
           const indiceValor =
@@ -793,6 +801,8 @@ export class ParceladoPreComponent implements OnInit {
             infoParaAmortizacao: this.tableDataAmortizacao,
             modulo: isVincenda_ ? PARCELADO_PRE : PARCELADO_POS,
           });
+
+          this.ordenarParcelas()
 
           this.updateLoadingBtn = false;
           if (size === this.tableData.dataRows.length) {
@@ -958,6 +968,8 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   simularCalc(isInlineChange = false, origin = null, ordenar = false) {
+    this.ordenarParcelas()
+
     if (origin === "btn") {
       this.setFormDefault();
     }
