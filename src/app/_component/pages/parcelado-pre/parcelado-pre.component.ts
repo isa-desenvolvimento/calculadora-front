@@ -550,7 +550,7 @@ export class ParceladoPreComponent implements OnInit {
       // TABLE_AUX = TABLE;
       // TABLE_AUX = TABLE.slice();
       //  TABLE_AUX = angular.copy(TABLE);
-      TABLE_AUX = JSON.parse(JSON.stringify(TABLE));
+      TABLE_AUX =[...TABLE];
       let i = 0;
       //debugger
       while (size > i) {
@@ -578,7 +578,15 @@ export class ParceladoPreComponent implements OnInit {
               ? amor["residual"]
               : parseFloat(amor["saldo_devedor"]);
             const amortizacao = parseFloat(TABLE_AUX[i]["amortizacao"]);
+            const dataTable = formatDate(
+              TABLE_AUX[i]["dataCalcAmor"],
+              "YYYY-MM-DD"
+            );
 
+            const  dataAmortizacao =  amor["data_vencimento"]
+            
+            TABLE_AUX[i]["dataCalcAmor"] = null
+            
             switch (true) {
               case subtotal === saldoPgo:
                 TABLE_AUX[i]["amortizacao"] = subtotal;
@@ -599,37 +607,20 @@ export class ParceladoPreComponent implements OnInit {
               case subtotal > saldoPgo:
                 TABLE_AUX[i]["amortizacao"] = saldoPgo;
                 TABLE_AUX[i]["subtotal"] = subtotal - saldoPgo;
-                TABLE_AUX[i]["dataCalcAmor"] = formatDate(
-                  amor["data_vencimento"],
-                  "YYYY-MM-DD"
-                );
-
                 TABLE_AUX[i]["status"] = PARCELA_AMORTIZADA;
                 TABLE_AUX[i]["totalDevedor"] = 0;
                 TABLE_AUX[i]["isAmortizado"] = true;
-
+                debugger
+                this.tableData.dataRows[i]["dataCalcAmor"] = dataAmortizacao
+              
                 amor["wasUsed"] = true;
                 delete amor["residual"];
-
-                const DATA_VENCIMENTO__ = amor.hasOwnProperty(
-                  "data_vencimento_alterada"
-                )
-                  ? formatDate(amor["data_vencimento_alterada"], "YYYY-MM-DD")
-                  : null;
-                const DATA_CALC__ = amor.hasOwnProperty("data_calc_alterada")
-                  ? formatDate(amor["data_calc_alterada"], "YYYY-MM-DD")
-                  : null;
-
-                let qtdDias = 0;
-                if (DATA_VENCIMENTO__ && DATA_CALC__) {
-                  qtdDias = getQtdDias(DATA_VENCIMENTO__, DATA_CALC__);
-                }
 
                 const NEWPARCELAS = {
                   ...TABLE_AUX[i],
                   nparcelas: `${NPARCELAS}.${SUBNPARCELAS}`,
-                  dataVencimento: DATA_VENCIMENTO__,
-                  dataCalcAmor: DATA_CALC__,
+                  dataVencimento: dataAmortizacao,
+                  dataCalcAmor: dataTable,
                   status: PARCELA_ABERTA,
                   amortizacao: 0,
                   isAmortizado: false,
@@ -638,7 +629,7 @@ export class ParceladoPreComponent implements OnInit {
                     ...TABLE_AUX[i]["encargosMonetarios"],
                     jurosAm: {
                       ...TABLE_AUX[i]["encargosMonetarios"]["jurosAm"],
-                      dias: qtdDias,
+                      dias: getQtdDias(dataAmortizacao, dataTable),
                     },
                   },
 
@@ -820,10 +811,9 @@ export class ParceladoPreComponent implements OnInit {
               };
 
               
-
              this.tableData.dataRows = this.tableData.dataRows.concat(TABLE)
              this.parcelas.tableDataParcelas.dataRows = [];
-             
+
               this.simularCalc(true, null, true);
               this.simularCalc(true, null, true);
 
