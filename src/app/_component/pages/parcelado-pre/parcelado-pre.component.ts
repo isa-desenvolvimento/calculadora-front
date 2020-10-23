@@ -157,7 +157,8 @@ export class ParceladoPreComponent implements OnInit {
     this.dtOptions = {
       paging: false,
       searching: false,
-      ordering: false,
+      ordering: true,
+      orderFixed: [0, 'asc' ],
       dom: "Bfrtip",
       buttons: [
         {
@@ -558,7 +559,7 @@ export class ParceladoPreComponent implements OnInit {
         } else {
           //debugger
           const NPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[0];
-          debugger;
+          //debugger;
           let SUBNPARCELAS = TABLE_AUX[i]["nparcelas"].split(".")[1]
             ? parseInt(TABLE_AUX[i]["nparcelas"].split(".")[1]) + 1
             : 1;
@@ -692,6 +693,8 @@ export class ParceladoPreComponent implements OnInit {
   }
 
   incluirParcelas(tableDataParcelas, isAmortizacao = false) {
+
+
     if (!this.form_riscos.formIndice && !isAmortizacao) {
       this.updateLoadingBtn = false;
       this.alertType = {
@@ -708,8 +711,12 @@ export class ParceladoPreComponent implements OnInit {
 
     const size = tableDataParcelas.length;
     let i = 0;
+    const TABLE = [];
+
 
     while (size > i) {
+ 
+
       //tableDataParcelas.map(async (parcela, key) => {
       const parcela = tableDataParcelas[i];
       const indice = this.form_riscos.formIndice;
@@ -754,7 +761,7 @@ export class ParceladoPreComponent implements OnInit {
 
       temIndice[i] = false;
 
-      Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor])
+     Promise.all([getIndiceDataVencimento, getIndiceDataCalcAmor])
         .then((resultado) => {
           temIndice[i] = true;
 
@@ -767,7 +774,7 @@ export class ParceladoPreComponent implements OnInit {
             amortizacao["data_vencimento"]
           );
 
-          this.tableData.dataRows.push({
+          TABLE.push({
             nparcelas: parcela["nparcelas"].toString(),
             parcelaInicial: parcela["parcelaInicial"],
             dataVencimento: dataVencimento,
@@ -802,24 +809,29 @@ export class ParceladoPreComponent implements OnInit {
             modulo: isVincenda_ ? PARCELADO_PRE : PARCELADO_POS,
           });
 
-          this.ordenarParcelas()
-
           this.updateLoadingBtn = false;
-          if (size === this.tableData.dataRows.length) {
+
+          if (size === TABLE.length) {
             setTimeout(() => {
-              this.parcelas.tableDataParcelas.dataRows = [];
               this.isSimular = true;
               this.alertType = {
                 mensagem: "Lançamento incluido",
                 tipo: "success",
               };
 
+              
+
+             this.tableData.dataRows = this.tableData.dataRows.concat(TABLE)
+             this.parcelas.tableDataParcelas.dataRows = [];
+             
               this.simularCalc(true, null, true);
               this.simularCalc(true, null, true);
 
               this.tableLoading = false;
               this.toggleUpdateLoading();
+
             }, 100);
+
           }
         })
         .catch((erro) => {
@@ -874,13 +886,7 @@ export class ParceladoPreComponent implements OnInit {
             return parcela;
           });
 
-        this.tableData.dataRows.sort((a, b) => {
-          return parseFloat(a["nparcelas"]) < parseFloat(b["nparcelas"])
-            ? -1
-            : parseFloat(a["nparcelas"]) > parseFloat(b["nparcelas"])
-            ? 1
-            : 0;
-        });
+        this.ordenarParcelas();
 
         if (this.tableData.dataRows.length) {
           this.tableLoading = false;
@@ -969,6 +975,7 @@ export class ParceladoPreComponent implements OnInit {
 
   simularCalc(isInlineChange = false, origin = null, ordenar = false) {
     this.ordenarParcelas()
+
 
     if (origin === "btn") {
       this.setFormDefault();
