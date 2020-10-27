@@ -584,8 +584,7 @@ export class ParceladoPreComponent implements OnInit {
             );
 
             const  dataAmortizacao =  amor["data_vencimento"]
-            
-            TABLE_AUX[i]["dataCalcAmor"] = null
+            TABLE_AUX[i]["dataCalcAmor"] = dataAmortizacao
             
             switch (true) {
               case subtotal === saldoPgo:
@@ -610,8 +609,6 @@ export class ParceladoPreComponent implements OnInit {
                 TABLE_AUX[i]["status"] = PARCELA_AMORTIZADA;
                 TABLE_AUX[i]["totalDevedor"] = 0;
                 TABLE_AUX[i]["isAmortizado"] = true;
-                debugger
-                this.tableData.dataRows[i]["dataCalcAmor"] = dataAmortizacao
               
                 amor["wasUsed"] = true;
                 delete amor["residual"];
@@ -988,7 +985,7 @@ export class ParceladoPreComponent implements OnInit {
         row["indiceDCA"] = indice;
       }
 
-      if (this.formDefaultValues.isDate) {
+      if (this.formDefaultValues.isDate && origin === "btn") {
         row["dataCalcAmor"] = this.formatDate(
           this.formDefaultValues.formDataCalculo,
           "YYYY-MM-DD"
