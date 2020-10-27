@@ -132,6 +132,27 @@ export class ParceladoPreComponent implements OnInit {
     isDate: false,
   };
 
+  headerTable = [
+    "N° Parcela",
+    "Data Vencimento",
+    "Índice",
+    "Índice Data Vencimento",
+    "Data Cálculo/Amort.",
+    "Índice",
+    "Índice Data Cálculo/Amort ",
+    "Valor no Vencimento R$",
+    "Correção pelo índice",
+    "Dias",
+    "%",
+    "R$",
+    "Multa",
+    "Subtotal",
+    "Valor da PMT Vincenda",
+    "Amortização",
+    "Total Devedor",
+    "Status"
+  ]
+
   constructor(
     private formBuilder: FormBuilder,
     private parceladoPreService: ParceladoPreService,
@@ -245,6 +266,33 @@ export class ParceladoPreComponent implements OnInit {
               text: `Contrato : ${this.infoContrato["contrato"]}`,
             });
 
+            const TABLE = [];
+            this.tableData.dataRows.map((row, key)=> {
+              TABLE.push([
+                {text:row["nparcelas"] , style: "tableBodyOdd"},
+                {text:formatDate(row["dataVencimento"]) , style: "tableBodyOdd"},
+                {text:row["indiceDV"] , style: "tableBodyOdd"},
+                {text:row["indiceDataVencimento"] , style: "tableBodyOdd"},
+                {text:formatDate(row["dataCalcAmor"]) , style: "tableBodyOdd"},
+                {text:row["indiceDCA"] , style: "tableBodyOdd"},
+                {text:row["indiceDataCalcAmor"] , style: "tableBodyOdd"},
+                {text:formatCurrency(row["valorNoVencimento"]) , style: "tableBodyOdd"},
+                {text:formatCurrency(row["encargosMonetarios"]["correcaoPeloIndice"]) , style: "tableBodyOdd"},
+                {text:row["encargosMonetarios"]["jurosAm"]["dias"] , style: "tableBodyOdd"},
+                {text:row["encargosMonetarios"]["jurosAm"]["percentsJuros"] , style: "tableBodyOdd"},
+                {text:formatCurrency(row["encargosMonetarios"]["jurosAm"]["moneyValue"]) , style: "tableBodyOdd"},
+                {text:row["encargosMonetarios"]["multa"] , style: "tableBodyOdd"},
+                {text:formatCurrency(row["subtotal"]) , style: "tableBodyOdd"},
+                {text:formatCurrency(row["valorPMTVincenda"]) , style: "tableBodyOdd"},
+                {text:formatCurrency(row["amortizacao"]) , style: "tableBodyOdd"},
+                {text:formatCurrency(row["totalDevedor"]) , style: "tableBodyOdd"},
+                {text:row["status"] , style: "tableBodyOdd"},
+              ])
+            })
+
+            TABLE.unshift(doc["content"][5]["table"]['body'][0])
+
+            doc["content"][5]["table"]['body'] = TABLE;
 
             doc["content"][5]["table"]["widths"] = [
               50,
