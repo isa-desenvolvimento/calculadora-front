@@ -34,6 +34,7 @@ import {
   PARCELADO_POS,
 } from "../../util/constants";
 import { LowerCasePipe } from "@angular/common";
+import { JurosAm } from '../../../_models/ChequeEmpresarial';
 
 declare interface TableData {
   dataRows: Array<Object>;
@@ -642,6 +643,7 @@ export class ParceladoPreComponent implements OnInit {
                 amor["wasUsed"] = true;
                 nextRow = true;
                 delete amor["residual"];
+                TABLE_AUX[i]["isAmortizado"] = true;
 
                 break;
               case subtotal < saldoPgo:
@@ -1161,7 +1163,7 @@ export class ParceladoPreComponent implements OnInit {
                 : valorPMTVincenda.toFixed(2);
               row["vincenda"] = true;
 
-              if (!setCampoSemAlteracao) {
+              if (!setCampoSemAlteracao && !row["isAmortizado"] ) {
                 valorPMTVincendaTotalVincendas += valorPMTVincenda;
                 totalDevedorTotalVincendas += valorPMTVincenda;
               }
@@ -1192,7 +1194,7 @@ export class ParceladoPreComponent implements OnInit {
               row["vincenda"] = false;
               row["desagio"] = desagio;
 
-              if (!setCampoSemAlteracao) {
+              if (!setCampoSemAlteracao && !row["isAmortizado"]) {
                 moneyValueTotal += valor;
                 multaTotal += multa;
                 subtotalTotal += subtotal;
@@ -1213,6 +1215,7 @@ export class ParceladoPreComponent implements OnInit {
                 correcaoPeloIndice: correcaoPeloIndiceTotal || 0,
                 valorNoVencimento: valorNoVencimentoTotal || 0,
               };
+
 
               this.totalParcelasVincendas = {
                 totalDevedor: totalDevedorTotalVincendas || 0,
@@ -1295,14 +1298,20 @@ export class ParceladoPreComponent implements OnInit {
       case AMORTIZACAO_DATA_ATUAL:
         this.tableDataAmortizacao.dataRows = [];
         this.tableData.dataRows = this.tableData.dataRows
-          .filter((row) => !row["amortizacaoDataDiferenciada"])
-          .map((row) => {
-            row["amortizacao"] = 0;
-            row["totalDevedor"] = row["subtotal"];
-            row["isAmortizado"] = false;
-            row["status"] = PARCELA_ABERTA;
-            return row;
-          });
+        .map((row, key) => {
+
+          if(row["isAmortizado"]) {
+            row["dataCalcAmor"] = this.tableData.dataRows[key + 1]["dataCalcAmor"] 
+          }
+
+          row["amortizacao"] = 0;
+          row["totalDevedor"] = row["subtotal"];
+          row["status"] = PARCELA_ABERTA;
+          row["isAmortizado"] = false;
+
+          return row;
+        })
+        .filter((row) => !row["amortizacaoDataDiferenciada"]);
 
         setTimeout(() => {
           this.adicionarAmortizacao(tableAmortizacao);
@@ -1312,14 +1321,21 @@ export class ParceladoPreComponent implements OnInit {
       case AMORTIZACAO_DATA_DIFERENCIADA:
         this.tableDataAmortizacao.dataRows = [];
         this.tableData.dataRows = this.tableData.dataRows
-          .filter((row) => !row["amortizacaoDataDiferenciada"])
-          .map((row) => {
+          .map((row, key) => {
+
+            if(row["isAmortizado"]) {
+              row["dataCalcAmor"] = this.tableData.dataRows[key + 1]["dataCalcAmor"] 
+            }
+
             row["amortizacao"] = 0;
             row["totalDevedor"] = row["subtotal"];
-            row["isAmortizado"] = false;
             row["status"] = PARCELA_ABERTA;
+            row["isAmortizado"] = false;
+
             return row;
-          });
+          })
+          .filter((row) => !row["amortizacaoDataDiferenciada"]);
+
 
         setTimeout(() => {
           this.adicionarAmortizacao(tableAmortizacao);
