@@ -268,6 +268,7 @@ export class ParceladoPreComponent implements OnInit {
 
             const TABLE = [];
             this.tableData.dataRows.map((row, key)=> {
+
               TABLE.push([
                 {text:row["nparcelas"] , style: "tableBodyOdd"},
                 {text:formatDate(row["dataVencimento"]) , style: "tableBodyOdd"},
@@ -279,9 +280,9 @@ export class ParceladoPreComponent implements OnInit {
                 {text:formatCurrency(row["valorNoVencimento"]) , style: "tableBodyOdd"},
                 {text:formatCurrency(row["encargosMonetarios"]["correcaoPeloIndice"]) , style: "tableBodyOdd"},
                 {text:row["encargosMonetarios"]["jurosAm"]["dias"] , style: "tableBodyOdd"},
-                {text:row["encargosMonetarios"]["jurosAm"]["percentsJuros"] , style: "tableBodyOdd"},
+                {text: row["encargosMonetarios"]["jurosAm"]["percentsJuros"] === "---" ? "---" :formatCurrency(row["encargosMonetarios"]["jurosAm"]["percentsJuros"]), style: "tableBodyOdd"},
                 {text:formatCurrency(row["encargosMonetarios"]["jurosAm"]["moneyValue"]) , style: "tableBodyOdd"},
-                {text:row["encargosMonetarios"]["multa"] , style: "tableBodyOdd"},
+                {text:formatCurrency(row["encargosMonetarios"]["multa"]) , style: "tableBodyOdd"},
                 {text:formatCurrency(row["subtotal"]) , style: "tableBodyOdd"},
                 {text:formatCurrency(row["valorPMTVincenda"]) , style: "tableBodyOdd"},
                 {text:formatCurrency(row["amortizacao"]) , style: "tableBodyOdd"},
@@ -305,7 +306,7 @@ export class ParceladoPreComponent implements OnInit {
               50,
               45,
               25,
-              25,
+              50,
               50,
               45,
               45,

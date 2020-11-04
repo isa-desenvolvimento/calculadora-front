@@ -527,6 +527,7 @@ export class ChequeEmpresarialComponent implements OnInit {
 
     this.chequeEmpresarialService.getAll().subscribe(
       (chequeEmpresarialList) => {
+        debugger
         this.tableData.dataRows = chequeEmpresarialList
           .filter((row) => row["contractRef"] === infoContrato.contractRef)
           .map((cheque, index) => {
@@ -706,6 +707,7 @@ export class ChequeEmpresarialComponent implements OnInit {
             const correcaoPeloIndice = (row["encargosMonetarios"][
               "correcaoPeloIndice"
             ] = parseFloat(correcao));
+            debugger
             const valorLancado = row["isTipoLancamento"]
               ? row["lancamentos"]
               : 0;
