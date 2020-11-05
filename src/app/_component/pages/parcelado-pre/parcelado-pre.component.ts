@@ -1194,7 +1194,7 @@ export class ParceladoPreComponent implements OnInit {
               row["vincenda"] = false;
               row["desagio"] = desagio;
 
-              if (!setCampoSemAlteracao && !row["isAmortizado"]) {
+              if (!setCampoSemAlteracao && !row["isAmortizado"] ) {
                 moneyValueTotal += valor;
                 multaTotal += multa;
                 subtotalTotal += subtotal;
