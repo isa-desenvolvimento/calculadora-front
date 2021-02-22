@@ -10,7 +10,7 @@
     "e2e": "ng e2e",
     "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
     "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
-    "commit": "cz"
+    "commit": "git_cz"
   },
   "private": true,
   "dependencies": {
@@ -67,7 +67,8 @@
     "protractor": "~5.4.2",
     "ts-node": "~8.3.0",
     "tslint": "~5.18.0",
-    "typescript": "^3.6.5"
+    "typescript": "^3.6.5",
+    "git-cz": "^4.7.6"
   },
   "husky": {
     "hooks": {
@@ -77,7 +78,7 @@
   },
   "config": {
     "commitizen": {
-      "path": "./node_modules/cz-conventional-changelog"
+      "path": "git-cz"
     }
   }
 }
