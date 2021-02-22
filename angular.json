@@ -1,6 +1,6 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
-  "version": 1, 
+  "version": 1,
   "newProjectRoot": "projects",
   "projects": {
     "calculadora-front": {
@@ -123,6 +123,10 @@
           }
         }
       }
-    }},
-  "defaultProject": "calculadora-front"
+    }
+  },
+  "defaultProject": "calculadora-front",
+  "cli": {
+    "analytics": "b6ad2c08-ae90-494d-8c19-e591ee5cd6e9"
+  }
 }
