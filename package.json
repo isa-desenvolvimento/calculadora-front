@@ -1,1 +1,85 @@
-""
+{
+  "name": "calculadora-front",
+  "version": "0.0.0",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "test": "ng test",
+    "lint": "tsc --noEmit && eslint . --ext js,ts,json --quiet --fix",
+    "e2e": "ng e2e",
+    "postinstall": "ngcc --properties es2015 browser module main --first-only --create-ivy-entry-points",
+    "prettier-watch": "onchange 'src/**/*.ts' -- prettier --write {{changed}}",
+    "commit": "git_cz",
+    "clean": "rm -rf node_modules && rm -rf yarn.lock && yarn install"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "~9.0.0-rc.0",
+    "@angular/common": "~9.0.0-rc.0",
+    "@angular/compiler": "~9.0.0-rc.0",
+    "@angular/core": "~9.0.0-rc.0",
+    "@angular/forms": "~9.0.0-rc.0",
+    "@angular/platform-browser": "~9.0.0-rc.0",
+    "@angular/platform-browser-dynamic": "~9.0.0-rc.0",
+    "@angular/router": "~9.0.0-rc.0",
+    "rxjs": "~6.5.3",
+    "tslib": "^1.10.0",
+    "zone.js": "~0.10.2"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "~0.900.0-rc.0",
+    "@angular-eslint/builder": "1.2.0",
+    "@angular-eslint/eslint-plugin": "1.2.0",
+    "@angular-eslint/eslint-plugin-template": "1.2.0",
+    "@angular-eslint/schematics": "1.2.0",
+    "@angular-eslint/template-parser": "1.2.0",
+    "@angular/cli": "~9.0.0-rc.0",
+    "@angular/compiler-cli": "~9.0.0-rc.0",
+    "@angular/language-service": "~9.0.0-rc.0",
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
+    "@types/jasmine": "~3.4.0",
+    "@types/jasminewd2": "~2.0.3",
+    "@types/node": "^12.11.1",
+    "@typescript-eslint/eslint-plugin": "4.3.0",
+    "@typescript-eslint/parser": "^4.3.0",
+    "codelyzer": "^5.1.2",
+    "commitizen": "^4.2.3",
+    "cz-conventional-changelog": "^3.3.0",
+    "eslint": "^7.6.0",
+    "eslint-config-prettier": "^8.0.0",
+    "eslint-plugin-angular": "^4.0.1",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jsdoc": "30.7.6",
+    "eslint-plugin-prefer-arrow": "1.2.2",
+    "eslint-plugin-prettier": "^3.3.1",
+    "git-cz": "^4.7.6",
+    "husky": "^5.1.1",
+    "jasmine-core": "~3.5.0",
+    "jasmine-spec-reporter": "~4.2.1",
+    "karma": "~4.3.0",
+    "karma-chrome-launcher": "~3.1.0",
+    "karma-coverage-istanbul-reporter": "~2.1.0",
+    "karma-jasmine": "~2.0.1",
+    "karma-jasmine-html-reporter": "^1.4.2",
+    "onchange": "^7.1.0",
+    "prettier": "2.2.1",
+    "prettier-eslint": "^12.0.0",
+    "protractor": "~5.4.2",
+    "ts-node": "~8.3.0",
+    "tslint": "~5.18.0",
+    "typescript": "^3.6.5"
+  },
+  "husky": {
+    "hooks": {
+      "commit-msg": "commitlint -E HUSKY_GIT_PARAMS",
+      "prepare-commit-msg": "exec < /dev/tty && git cz --hook || true"
+    }
+  },
+  "config": {
+    "commitizen": {
+      "path": "git-cz"
+    }
+  }
+}
