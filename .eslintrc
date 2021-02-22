@@ -1,0 +1,31 @@
+{
+  "parser": "@typescript-eslint/parser", // Specifies the ESLint parser
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/eslint-recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
+  ],
+  "parserOptions": {
+    "ecmaVersion": 2020, // Allows for the parsing of modern ECMAScript features
+    "sourceType": "module" // Allows for the use of imports
+  },
+  "settings": {
+    "angular": {
+      "version": "detect" // Tells eslint-plugin-react to automatically detect the version of React to use
+    }
+  },
+  "root": true,
+  "env": {
+    "node": true,
+    "jest": true
+  },
+  "rules": {
+    "@typescipt-eslint/interface-name-prefix": ["always"],
+    "no-underscore-dangle": "error",
+    "no-console": 1,       // Means warning
+    "prettier/prettier": 2 // Means error
+  },
+  "ignorePatterns": ["/*.*"],
+  "plugins": ["@typescript-eslint", "prettier" ]
+}
