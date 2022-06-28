@@ -12,19 +12,25 @@ Além disto é bom ter um editor para trabalhar com o código como [VSCode](http
 
 ### 🎲 Rodando o Front
 
-```
+
 # Clone este repositório
-$ git clone https://juliano_sts@bitbucket.org/juliano_sts/calculadora-front.git
+```
+git clone https://juliano_sts@bitbucket.org/juliano_sts/calculadora-front.git
+```
 
 # Acesse a pasta do projeto no terminal/cmd
-$ cd calculadora-front
-
+```
+cd calculadora-front
+```
 # Instale as dependências 
-$ npm install
-
-# Execute a aplicação em modo de desenvolvimento
-$ npm start
-
-# O servidor inciará na porta:4200 - acesse <http://localhost:4200>
 
 ```
+npm install
+```
+
+# Execute a aplicação em modo de desenvolvimento
+```
+npm start
+```
+
+# O servidor inciará na porta:4200 - acesse <http://localhost:4200>
