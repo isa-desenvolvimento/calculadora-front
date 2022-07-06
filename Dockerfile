@@ -15,7 +15,7 @@ COPY nginx/default.conf /etc/nginx/conf.d/default.conf
 
 WORKDIR /app
 
-COPY --from=build /app/dist/auth-dashboard /usr/share/nginx/html
+COPY --from=build /app/dist/calculadora-juridica /usr/share/nginx/html
 
 ## add permissions
 RUN chown -R nginx:nginx /app && chmod -R 755 /app && \
