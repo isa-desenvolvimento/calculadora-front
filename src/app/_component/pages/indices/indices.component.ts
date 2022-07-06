@@ -49,7 +49,7 @@ export class IndicesComponent implements OnInit {
     });
 
     this.tableData = {
-      dataRows: [],
+      dataRows: []
     };
 
     this.dtOptions = {
@@ -110,7 +110,7 @@ export class IndicesComponent implements OnInit {
     this.indicesService.addIndice(indiceList).subscribe(
       (resp) => {
         // this.tableData.dataRows.push(indice);
-        $("#tableIndice").DataTable().ajax.reload();
+        this.changeIndices(null, true)
         this.indicesForm.reset({ indice: this.indice_form.indice.value });
         this.alertType = {
           mensagem: "Índice incluido!",
@@ -181,7 +181,7 @@ export class IndicesComponent implements OnInit {
   deleteRow(row) {
     this.indicesService.removeIndice(row.id).subscribe(
       (resp) => {
-        $("#tableIndice").DataTable().ajax.reload();
+       this.changeIndices(null, true)
 
         this.alertType = {
           mensagem: "Índice excluido!",
