@@ -1,5 +1,6 @@
 import { Component, OnInit, Input, EventEmitter, Output } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
+import { Pastas } from "src/app/_models/pastas";
 import { PastasContratosService } from "../../../_services/pastas-contratos.service";
 
 @Component({
@@ -10,20 +11,30 @@ export class PesquisaComponent implements OnInit {
   peForm: FormGroup;
   txtContractRef = "";
 
+  pastas: Pastas[] = []
+
   @Input() tableLoading: boolean;
   @Output() contractRef = new EventEmitter();
   @Output() resetForm = new EventEmitter();
 
   contractList_field = [];
   typeContractList_field = [];
-  cnpjList_field = this.agruparPasta("CNPJ");
-  clienteList_field = this.agruparPasta("CLIENTE");
-  folderData_field = this.agruparPasta("PASTA");
+  cnpjList_field = [];
+  clienteList_field = [];
+  folderData_field = [];
 
   constructor(
     private formBuilder: FormBuilder,
     private pastasContratosService: PastasContratosService
-  ) {}
+  ) {
+    this.pastasContratosService.getPastas().subscribe(response => {
+      this.pastas = response
+
+      this.cnpjList_field = this.agruparPasta("cnpj");
+      this.clienteList_field = this.agruparPasta("cliente");
+      this.folderData_field = this.agruparPasta("pasta");
+    })
+  }
 
   ngOnInit(): void {
     this.peForm = this.formBuilder.group({
@@ -63,7 +74,7 @@ export class PesquisaComponent implements OnInit {
   agruparPasta(attr) {
     const pastasFiltros = [];
 
-    this.pastas.data.map((pasta) => pastasFiltros.push(pasta[attr]));
+    this.pastas.map((pasta) => pastasFiltros.push(pasta[attr]));
     const setUnico = new Set(pastasFiltros);
 
     return [...setUnico];
@@ -88,11 +99,11 @@ export class PesquisaComponent implements OnInit {
       });
     }
 
-    this.pastas.data.map((pasta) => {
-      if (pasta.PASTA === this.form.pasta.value) {
-        this.contractList_field.push(pasta.CONTRATO);
-        this.clienteList_field.push(pasta.CLIENTE);
-        this.cnpjList_field.push(pasta.CNPJ);
+    this.pastas.map((pasta) => {
+      if (pasta.pasta === this.form.pasta.value) {
+        this.contractList_field.push(pasta.contrato);
+        this.clienteList_field.push(pasta.cliente);
+        this.cnpjList_field.push(pasta.cnpj);
       }
     });
 
@@ -118,12 +129,12 @@ export class PesquisaComponent implements OnInit {
       });
     }
 
-    this.pastas.data.map((pasta) => {
+    this.pastas.map((pasta) => {
       if (
-        pasta.PASTA === this.form.pasta.value &&
-        pasta.CONTRATO === this.form.contrato.value
+        pasta.pasta === this.form.pasta.value &&
+        pasta.contrato === this.form.contrato.value
       ) {
-        this.typeContractList_field.push(pasta.DESCRICAO);
+        this.typeContractList_field.push(pasta.descricao);
       }
     });
 
@@ -149,11 +160,11 @@ export class PesquisaComponent implements OnInit {
       this.cnpjList_field = [];
     }
 
-    this.pastas.data.map((pasta) => {
-      if (pasta.CLIENTE === this.form.cliente.value) {
-        this.contractList_field.push(pasta.CONTRATO);
-        this.folderData_field.push(pasta.PASTA);
-        this.cnpjList_field.push(pasta.CNPJ);
+    this.pastas.map((pasta) => {
+      if (pasta.cliente === this.form.cliente.value) {
+        this.contractList_field.push(pasta.contrato);
+        this.folderData_field.push(pasta.pasta);
+        this.cnpjList_field.push(pasta.cnpj);
       }
     });
 
@@ -185,15 +196,15 @@ export class PesquisaComponent implements OnInit {
       this.clienteList_field = [];
     }
 
-    this.pastas.data.map((pasta) => {
-      if (pasta.CNPJ === this.form.cnpj.value) {
+    this.pastas.map((pasta) => {
+      if (pasta.cnpj === this.form.cnpj.value) {
         if (!this.form.cliente.value) {
-          this.clienteList_field.push(pasta.CLIENTE);
+          this.clienteList_field.push(pasta.cliente);
         }
 
         if (!this.form.pasta.value) {
-          this.contractList_field.push(pasta.CONTRATO);
-          this.folderData_field.push(pasta.PASTA);
+          this.contractList_field.push(pasta.contrato);
+          this.folderData_field.push(pasta.pasta);
         }
       }
     });
@@ -208,9 +219,6 @@ export class PesquisaComponent implements OnInit {
     this.folderData_field = [...setUnicoPasta];
   }
 
-  get pastas(): any {
-    return this.pastasContratosService.getPastas();
-  }
   get form() {
     return this.peForm.controls;
   }
