@@ -1,3 +1,9 @@
+<app-notificacao
+[mensagem]="alertType.mensagem"
+[tipo]="alertType.tipo"
+[show]="updateLoading"
+></app-notificacao>
+
 <div
   class="container"
   style="
@@ -13,9 +19,6 @@
     </div>
     <div class="card-body">
       <div class="card-text">
-        <div *ngIf="errorMessage" class="alert alert-danger" role="alert">
-          {{ errorMessage }}
-        </div>
         <form (ngSubmit)="login()" #form="ngForm">
           <div class="form-group">
             <label for="username" style="display: block">Username</label>

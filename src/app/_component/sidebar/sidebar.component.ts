@@ -1,10 +1,14 @@
 import { Component, OnInit } from "@angular/core";
+import {
+  getPermissao,
+} from "../util/util";
 
 export interface RouteInfo {
   path: string;
   title: string;
   icon: string;
   class: string;
+  roles?: any;
 }
 
 export const ROUTES: RouteInfo[] = [
@@ -27,7 +31,7 @@ export const ROUTES: RouteInfo[] = [
     class: "",
   },
   { path: "/indices", title: "Índices", icon: "nc-sound-wave", class: "" },
-  { path: "/user", title: "Usuário", icon: "nc-single-02", class: "" },
+  { path: "/user", title: "Usuário", icon: "nc-single-02", class: "", roles: ['admin'] },
   { path: "/log", title: "Auditoria", icon: "nc-paper", class: "" },
 ];
 
@@ -40,6 +44,14 @@ export class SidebarComponent implements OnInit {
   public username = "Calculadora"; // localStorage.getItem("username");
   public menuItems: any[];
   ngOnInit() {
-    this.menuItems = ROUTES.filter((menuItem) => menuItem);
+    this.menuItems = ROUTES.filter((menuItem) => {
+      if (menuItem?.roles) {
+        if (getPermissao(menuItem?.roles)) {
+          return menuItem
+        }
+      } else {
+        return menuItem
+      }
+    });
   }
 }

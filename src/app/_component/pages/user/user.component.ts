@@ -3,6 +3,11 @@ import { FormBuilder, FormGroup, Validators } from "@angular/forms";
 import { UserService } from "../../../_services/user.service";
 import { User } from "../../../_models/user";
 
+declare interface TableData {
+  headerRow: string[];
+  dataRows: Object[];
+}
+
 @Component({ templateUrl: "user.component.html" })
 export class UserComponent implements OnInit {
   userForm: FormGroup;
@@ -11,6 +16,14 @@ export class UserComponent implements OnInit {
   returnUrl: string;
   errorMessage = "";
   payload: User;
+  tableData: TableData;
+
+
+  updateLoading = false;
+  alertType = {
+    mensagem: "",
+    tipo: "",
+  };
 
   constructor(
     private userService: UserService,
@@ -24,6 +37,7 @@ export class UserComponent implements OnInit {
       status: ["", Validators.required],
       profile: ["", Validators.required],
     });
+
   }
 
   // convenience getter for easy access to form fields
@@ -35,11 +49,12 @@ export class UserComponent implements OnInit {
     this.userForm.reset();
   }
 
-  addUser() {
+  addUser(table) {
     // stop here if form is invalid
     if (this.userForm.invalid) {
       return;
     }
+
 
     this.loading = true;
 
@@ -53,14 +68,74 @@ export class UserComponent implements OnInit {
 
     this.userService.addUser(this.payload).subscribe(
       (data) => {
-        // TODO: Plmdds
-        location.reload();
+        this.alertType = {
+          mensagem: "Registro incluido!",
+          tipo: "success",
+        };
+
+       
         this.resetFields();
+    table.buildDataTable()
+
+        this.toggleUpdateLoading();
+
       },
       (err) => {
-        this.errorMessage = err.error.title;
-        this.loading = false;
+        this.alertType = {
+          mensagem: err.error.message,
+          tipo: "danger",
+        };
       }
     );
+  }
+
+  updateUser(payload) {
+    this.userService.updateUser(payload).subscribe(
+      () => {
+        this.alertType = {
+          mensagem: "Registro atualizado!",
+          tipo: "success",
+        };
+        this.toggleUpdateLoading();
+
+      },
+      (err) => {
+        this.alertType = {
+          mensagem: err.error.message,
+          tipo: "danger",
+        };
+        this.toggleUpdateLoading();
+
+      }
+    );
+  }
+
+  
+  deleteUser(payload) {
+    this.userService.removeUser(payload).subscribe(
+      () => {
+        this.alertType = {
+          mensagem: "Registro excluido!",
+          tipo: "danger",
+        };
+        this.toggleUpdateLoading();
+
+      },
+      (err) => {
+        this.alertType = {
+          mensagem: err.error.message,
+          tipo: "danger",
+        };
+        this.toggleUpdateLoading();
+
+      }
+    );
+  }
+
+  toggleUpdateLoading() {
+    this.updateLoading = true;
+    setTimeout(() => {
+      this.updateLoading = false;
+    }, 5000);
   }
 }

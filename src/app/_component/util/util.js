@@ -35,3 +35,9 @@ export const isVincenda = (vencimento, calcAmor) => {
 
 export const setCampoSemAlteracao = (semFormat = false) =>
   semFormat ? "---" : "NaN";
+
+export const getPermissao = (roles) => {
+  const profile = localStorage.getItem("profile").trim() || '';
+
+  return roles.includes(profile)
+}

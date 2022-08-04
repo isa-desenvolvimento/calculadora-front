@@ -18,6 +18,7 @@ import {
   isVincenda,
   verifyNumber,
   getQtdDias,
+  getPermissao
 } from "../../util/util";
 import {
   LISTA_INDICES,
@@ -241,6 +242,22 @@ export class ParceladoPreComponent implements OnInit {
       ],
       language: LANGUAGEM_TABLE,
     };
+  }
+
+  resetSimulacao(simulacao, event) {
+    if (simulacao) {
+      simulacao.resetForm(event)
+    }
+  }
+
+  permissao(roles) {
+    return getPermissao(roles)
+  }
+
+  getFormDataCalculo(simulacao) {
+    if (simulacao) {
+      simulacao.formRiscos['formDataCalculo']
+    }
   }
 
   filterPago(row) {

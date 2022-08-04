@@ -1,5 +1,5 @@
 export const environment = {
   production: true,
-  AUTH_PATH: "https://git.heroku.com/calculadora-juridica-back.git/api/auth",
-  API_PATH: "https://git.heroku.com/calculadora-juridica-back.git/api"
+  AUTH_PATH: "https://localhost:5001/api/auth",
+  API_PATH: "https://localhost:5001/api",
 };

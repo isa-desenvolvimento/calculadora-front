@@ -24,7 +24,7 @@ import {
   verifyNumber,
   getQtdDias,
   isVincenda,
-  setCampoSemAlteracao,
+  getPermissao,
 } from "../../util/util";
 import {
   LISTA_INDICES,
@@ -218,6 +218,16 @@ export class ChequeEmpresarialComponent implements OnInit {
       ],
       language: LANGUAGEM_TABLE,
     };
+  }
+
+  resetSimulacao(simulacao, event) {
+    if (simulacao) {
+      simulacao.resetForm(event)
+    }
+  }
+
+  permissao(roles) {
+    return getPermissao(roles)
   }
 
   formatCurrency(value) {

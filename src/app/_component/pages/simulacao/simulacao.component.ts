@@ -1,6 +1,6 @@
 import { Component, OnInit, Input, EventEmitter, Output } from "@angular/core";
 import { FormBuilder, FormGroup, Validators } from "@angular/forms";
-import { getCurrentDate, verifyNumber, formatDate } from "../../util/util";
+import { getCurrentDate, verifyNumber, formatDate, getPermissao } from "../../util/util";
 import {
   LISTA_INDICES,
   ENCARGOS,
@@ -74,6 +74,10 @@ export class SimulacaoComponent implements OnInit {
   changeInput(e = null) {
     this.isEncargo = this.form_riscos.formIndice.value === ENCARGOS;
     this.formValue.emit(this.formRiscos.value);
+  }
+
+  permissao(roles) {
+    return getPermissao(roles)
   }
 
   get form_riscos() {

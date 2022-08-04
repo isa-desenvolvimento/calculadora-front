@@ -18,26 +18,44 @@ const routes: Routes = [
       {
         path: "user",
         component: UserComponent,
+        data: {
+          roles: ['edit', 'admin']
+        }
       },
       {
         path: "cheque-empresarial",
-        component: ChequeEmpresarialComponent,
+        component: ChequeEmpresarialComponent,       
+        data: {
+          roles: ['edit', 'admin', 'consult']
+        }
       },
       {
         path: "parcelado-pos",
-        component: ParceladoPreComponent,
+        component: ParceladoPreComponent,       
+        data: {
+          roles: ['edit', 'admin', 'consult']
+        }
       },
       {
         path: "parcelado-pre",
-        component: ParceladoPreComponent,
+        component: ParceladoPreComponent,       
+        data: {
+          roles: ['edit', 'admin', 'consult']
+        }
       },
       {
         path: "indices",
-        component: IndicesComponent,
+        component: IndicesComponent,       
+        data: {
+          roles: ['edit', 'admin', 'consult']
+        }
       },
       {
         path: "log",
-        component: LogComponent,
+        component: LogComponent,       
+        data: {
+          roles: ['edit', 'admin', 'consult']
+        }
       },
       { path: "", redirectTo: "/", pathMatch: "full" },
     ],

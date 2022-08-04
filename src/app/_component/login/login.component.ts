@@ -9,7 +9,11 @@ import { Router } from "@angular/router";
 })
 export class LoginComponent implements OnInit {
   model: any = {};
-  errorMessage: String = "";
+  updateLoading = false;
+  alertType = {
+    mensagem: "",
+    tipo: "",
+  };
 
   constructor(private authService: AuthService, private router: Router) {}
 
@@ -26,8 +30,20 @@ export class LoginComponent implements OnInit {
         }
       },
       (error) => {
-        this.errorMessage = error;
+        this.alertType = {
+          mensagem: error,
+          tipo: "danger",
+        };
+
+        this.toggleUpdateLoading()
       }
     );
+  }
+
+  toggleUpdateLoading() {
+    this.updateLoading = true;
+    setTimeout(() => {
+      this.updateLoading = false;
+    }, 5000);
   }
 }

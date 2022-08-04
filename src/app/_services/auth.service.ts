@@ -28,6 +28,12 @@ export class AuthService {
   // Handle erros da api
   handleError(error: HttpErrorResponse) {
     console.log("error", error);
+
+    if (error?.error.message) {
+      return throwError(
+        error.error.message
+      );
+    }
     return throwError(
       "Ocorreu um erro ao realizar a requisição. Tente novamente mais tarde!"
     );
@@ -43,6 +49,8 @@ export class AuthService {
   // Salva usuário no localStorage
   setUser(response: LoginResponse) {
     localStorage.setItem("username", response.user.username);
+    localStorage.setItem("profile", response.user.profile);
+
     localStorage.setItem("token", response.token);
     this.router.navigate(["/"]);
   }

@@ -1,4 +1,10 @@
 <div class="row">
+  <app-notificacao
+  [mensagem]="alertType.mensagem"
+  [tipo]="alertType.tipo"
+  [show]="updateLoading"
+></app-notificacao>
+
   <div class="col-md-4">
     <div class="card card-user">
       <div class="card-header">
@@ -111,7 +117,7 @@
                             name="status"
                             formControlName="status"
                             id="status1"
-                            [value]="true"
+                            [value]="1"
                             checked
                           />
                           <label class="form-check-label" for="status1">
@@ -125,7 +131,7 @@
                             name="status"
                             formControlName="status"
                             id="status2"
-                            [value]="false"
+                            [value]="0"
                           />
                           <label class="form-check-label" for="status2">
                             Inativo
@@ -141,7 +147,7 @@
                   <button
                     type="button"
                     class="btn btn-info btn-round"
-                    (click)="addUser()"
+                    (click)="addUser(table)"
                     [disabled]="!userForm.valid"
                   >
                     Adicionar
@@ -164,6 +170,6 @@
     </div>
   </div>
   <div class="col-md-8 col-sm-12 pt-0">
-    <table-cmp></table-cmp>
+    <table-cmp #table (updateUser)="updateUser($event)" (deleteUser)="deleteUser($event)"></table-cmp>
   </div>
 </div>

@@ -145,3 +145,7 @@ div.dt-buttons {
  ::-webkit-scrollbar-thumb:hover {
     background: #9a9a9a;
 }
+
+.nav-item {
+    cursor: pointer;
+}

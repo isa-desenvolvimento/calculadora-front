@@ -1,4 +1,4 @@
-import { Component, OnInit } from "@angular/core";
+import { Component, OnInit, Output,EventEmitter, Input } from "@angular/core";
 import { UserService } from "../../../_services/user.service";
 import { User } from "../../../_models/user";
 
@@ -13,6 +13,9 @@ declare interface TableData {
   templateUrl: "table.component.html",
 })
 export class TableComponent implements OnInit {
+  @Output() updateUser: EventEmitter<any> = new EventEmitter();
+  @Output() deleteUser: EventEmitter<any> = new EventEmitter();
+
   constructor(private userService: UserService) {}
 
   public myModel: any;
@@ -26,18 +29,26 @@ export class TableComponent implements OnInit {
 
   buildDataTable() {
     this.tableLoading = true;
-    this.userService.getAll().subscribe(
-      (userList) => {
-        this.tableData = {
-          headerRow: ["Data de criação", "Nome", "Perfil", "Status", ""],
-          dataRows: userList.reverse(),
-        };
-        this.tableLoading = false;
-      },
-      (err) => {
-        this.errorMessage = err.error.message;
-      }
-    );
+    setTimeout(() => {
+      this.userService.getAll().subscribe(
+        (userList) => {
+          this.tableData = {
+            // headerRow: ["Data de criação", "Nome", "Perfil", "Status", ""],
+            headerRow: ["Data de criação", "Nome", "Perfil", "Status"],
+            dataRows: userList.reverse(),
+          };
+          setTimeout(() => {
+            this.tableLoading = false;
+          }, 1000);
+        },
+        (err) => {
+          this.errorMessage = err.error.message;
+          setTimeout(() => {
+            this.tableLoading = false;
+          }, 100);
+        }
+      );
+    }, 100);
   }
 
   formatDate(createdDate: Date) {
@@ -54,18 +65,6 @@ export class TableComponent implements OnInit {
     return formatedDate;
   }
 
-  updateUser(payload: User) {
-    this.userService.updateUser(payload).subscribe(
-      () => {
-        // TODO: Plmdds
-        location.reload();
-      },
-      (err) => {
-        this.errorMessage = err.error.title;
-        // this.loading = false;
-      }
-    );
-  }
 
   updateName(event: any, payload: User) {
     const localUsername = event.target.innerText;
@@ -78,7 +77,9 @@ export class TableComponent implements OnInit {
     const localPayload = { ...payload };
     localPayload.username = localUsername;
 
-    this.updateUser(localPayload);
+    this.updateUser.emit(localPayload);
+
+    this.buildDataTable();
   }
 
   updateSelect(event: any, payload: User, attr: string, ref: string) {
@@ -86,18 +87,13 @@ export class TableComponent implements OnInit {
     localPayload[attr] = event.target[ref];
     localPayload.status = localPayload.status === "true";
 
-    this.updateUser(localPayload);
+    this.updateUser.emit(localPayload);
+    this.buildDataTable();
   }
 
-  deleteUser(payload: User) {
-    this.userService.removeUser(payload.id).subscribe(
-      () => {
-        // TODO: Plmdds
-        location.reload();
-      },
-      (err) => {
-        this.errorMessage = err.error.message;
-      }
-    );
+  delete(payload: User) {
+    this.deleteUser.emit(payload.id)
+
+    this.buildDataTable();
   }
 }

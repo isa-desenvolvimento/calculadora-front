@@ -14,7 +14,7 @@
             <app-pesquisa
               (contractRef)="pesquisarContratos($event)"
               [tableLoading]="tableLoading"
-              (resetForm)="simulacao.resetForm($event)"
+              (resetForm)="resetSimulacao(simulacao, $event)"
               #pesquisa
             ></app-pesquisa>
           </div>
@@ -35,19 +35,19 @@
       </div>
     </div>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6" *ngIf="permissao(['admin', 'editor'])">
     <app-parcelas
-      [pesquisaFormValid]="pesquisa.peForm.valid"
+      [pesquisaFormValid]="pesquisa?.peForm.valid"
       (incluirParcelas)="incluirParcelas($event)"
       [minParcela]="minParcela"
     ></app-parcelas>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-6" *ngIf="permissao(['admin', 'editor'])">
     <app-amortizacao
       (deleteAmortizacao)="deleteRowAmortizacao($event)"
       [tableDataAmortizacao]="tableDataAmortizacao"
-      [dataCalculo]="simulacao.formRiscos['formDataCalculo']"
-      [pesquisaFormValid]="pesquisa.peForm.valid"
+      [dataCalculo]="getFormDataCalculo(simulacao)"
+      [pesquisaFormValid]="pesquisa?.peForm.valid"
       (incluirAmortizacao)="adicionarAmortizacao($event)"
     ></app-amortizacao>
   </div>
