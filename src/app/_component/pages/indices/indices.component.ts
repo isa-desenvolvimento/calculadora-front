@@ -54,25 +54,7 @@ export class IndicesComponent implements OnInit {
 
     this.dtOptions = {
       paging: true,
-      serverSide: false,
-      // ajax: (dataTablesParameters: any, callback) => {
-      //   const info = $('#tableIndice').DataTable().page.info();
-      //   const indiceType = this.indice_form.indice.value;
-      //   const length = dataTablesParameters.length || 10;
-      //   const page = info.page || 0;
-      //   const draw = dataTablesParameters.draw || 1;
-
-      //   this.indicesService.getIndicePage(indiceType, length, page, draw).subscribe(resp => {
-      //     this.tableData.dataRows = resp['data'];
-
-      //     callback({
-      //       recordsTotal: resp['recordsTotal'],
-      //       recordsFiltered: resp['recordsFiltered'],
-      //       pages: resp['recordsTotal'] / resp['length'],
-      //       data: []
-      //     });
-      //   });
-      // },
+      searching: true,
       language: LANGUAGEM_TABLE,
     };
   }
@@ -140,7 +122,7 @@ export class IndicesComponent implements OnInit {
       this.indicesService
         .getIndice(this.indice_form.indice.value)
         .subscribe((indices: any) => {
-          this.tableData.dataRows = indices.data;
+          this.tableData.dataRows = indices;
           this.infoTable = indices;
 
           setTimeout(() => {

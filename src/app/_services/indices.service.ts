@@ -9,7 +9,7 @@ export class IndicesService {
 
   getIndice(indice: string) {
     return this.http.get<Indices[]>(
-      `${environment.API_PATH}/indices?indice=${indice}`
+      `${environment.API_PATH}/indices?indice=${indice}&getAll=true`
     );
   }
 
